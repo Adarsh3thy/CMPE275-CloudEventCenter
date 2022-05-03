@@ -60,15 +60,13 @@ public class Event {
 	@Column(name = "EVENT_DESC")
 	private String description;
 	
-	 @Temporal(TemporalType.TIMESTAMP)
 	 @Column(name = "EVENT_START_TIME")
 	 private Timestamp startTime;
 	 
-	 @Temporal(TemporalType.TIMESTAMP)
+
 	 @Column(name="EVENT_END_TIME")
 	 private Timestamp  endTime;
 	 
-	 @Temporal(TemporalType.TIMESTAMP)
 	 @Column(name="EVENT_DEADLINE")
 	 private Timestamp  deadline;
 	 
