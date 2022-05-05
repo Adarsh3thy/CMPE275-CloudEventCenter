@@ -54,10 +54,13 @@ public class EventService {
 				Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(), 
 						eventData.getState(), eventData.getZip());
 				
+				
+				//Event Organizer field is failing, retest after UserController is completed
+				//Switch eventData.getOrganizer() to null for successfull testing
 				Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(), 
 						eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(), 
 						eventData.getMaxParticipants(), eventData.getFee(), false, 
-						null, address);
+						eventData.getOrganizer(), address);
 
 				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
 	                    .body(eventRepository.save(event));

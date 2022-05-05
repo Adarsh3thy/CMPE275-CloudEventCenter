@@ -2,6 +2,8 @@ package com.cmpe275.finalProject.cloudEventCenter.POJOs;
 
 import java.time.LocalDateTime;
 
+import com.cmpe275.finalProject.cloudEventCenter.model.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -25,4 +27,5 @@ public class EventData {
 	int maxParticipants; 
 	double fee;
 	boolean approvalReq;
+	User organizer;
 }
