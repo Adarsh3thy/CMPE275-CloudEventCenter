@@ -1,24 +1,24 @@
 package com.cmpe275.finalProject.cloudEventCenter.aspect;
 
-import java.util.List;
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.joda.time.LocalDateTime;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
-import com.cmpe275.finalProject.cloudEventCenter.model.Role;
-import com.cmpe275.finalProject.cloudEventCenter.model.User;
 
 @Aspect
+@Component
+@EnableAspectJAutoProxy
+@Order(0)
 public class ValidationAspect {
 	
-	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.addEvent(..)) "
-			+ "&& args(EventData eventData)")
+	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.addEvent(..)) && args(eventData)")
 	public void eventValidationAdvice(JoinPoint joinPoint, EventData eventData) {
 		
-		System.out.printf("Permission check before the executuion of the metohd %s\n", joinPoint.getSignature().getName());
+		System.out.printf("Permission check before the executuion of the method %s\n", joinPoint.getSignature().getName());
 		
 		//Validation should be updated
 		if(eventData.getTitle().isBlank() || eventData.getDescription().isBlank())
@@ -46,8 +46,6 @@ public class ValidationAspect {
 		if(eventData.getMaxParticipants() > Integer.MAX_VALUE) {
 			throw new IllegalArgumentException("Enter a valid number of max participants");
 		}
-		
-		
 		
 		//MUST BE RE-CHECKED - uncomment next few lines afte user controller
 //		User eventOrganizerUser = eventData.getOrganizer();

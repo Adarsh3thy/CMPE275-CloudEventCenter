@@ -6,11 +6,11 @@ package com.cmpe275.finalProject.cloudEventCenter.service;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
@@ -24,6 +24,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
  */
 
 @Service
+@Component
 public class EventService {
 	
 	@Autowired

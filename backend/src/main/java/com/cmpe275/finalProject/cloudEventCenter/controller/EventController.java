@@ -56,14 +56,10 @@ public class EventController {
 			@RequestParam(value="organizerID") String organizerID
 			) {
 		
-		System.out.println("reached");
-		
 		LocalDateTime converted_startTime = LocalDateTime.parse(startTime);
 		LocalDateTime converted_endTime = LocalDateTime.parse(endTime);
 		LocalDateTime converted_deadline = LocalDateTime.parse(deadline);
 		User eventOrganizer = userRepository.getById(organizerID);
-		
-//		EventData newEvent = new EventData();
 		
 		EventData newEvent = new EventData(title, description, converted_startTime, converted_endTime, converted_deadline, 
 				street, number, city, state, zip, minParticipants, maxParticipants, fee, approvalReq, eventOrganizer);
