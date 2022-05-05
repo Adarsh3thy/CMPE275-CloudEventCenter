@@ -56,8 +56,8 @@ public class User {
     private Address address;
 
     @ManyToMany(cascade = CascadeType.MERGE)
-	 @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	 private List<Role> roles;
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private List<Role> roles;
 
    
 }
