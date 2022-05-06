@@ -16,7 +16,7 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 public class ValidationAspect {
 	
 	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.addEvent(..)) && args(eventData)")
-	public void eventValidationAdvice(JoinPoint joinPoint, EventData eventData) {
+	public void CreateEventValidationAdvice(JoinPoint joinPoint, EventData eventData) {
 		
 		System.out.printf("Permission check before the executuion of the method %s\n", joinPoint.getSignature().getName());
 		
@@ -61,5 +61,11 @@ public class ValidationAspect {
 //			if(!is_organization)
 //				throw new IllegalArgumentException("Event organizer is not an ORGANIZATION, you cannot charge a fee");
 //		}
+	}
+	
+	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.getEventByID(..)) && args(id)")
+	public void getEventValidationAdvice(JoinPoint joinPoint, String id) {
+		if(id.isBlank())
+			throw new IllegalArgumentException("Enter an event ID"); 
 	}
 }

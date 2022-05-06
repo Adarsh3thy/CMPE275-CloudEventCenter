@@ -61,10 +61,27 @@ public class EventService {
 				Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(), 
 						eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(), 
 						eventData.getMaxParticipants(), eventData.getFee(), false, 
-						eventData.getOrganizer(), address);
+						null, address);
 
 				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
 	                    .body(eventRepository.save(event));
+				
+		}catch(Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN EXCEPTION BLOCK");
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body(e.toString());
+		}
+	}
+	
+	@Transactional
+	public ResponseEntity<?> getEventByID(String id) {
+		try {
+				Event event = eventRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Invalid event ID"));
+
+				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
+	                    .body(event);
 				
 		}catch(Exception e) {
 			e.printStackTrace(System.out);
