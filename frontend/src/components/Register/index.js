@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image52 from "../../assets/google-logo.png";
 import UndrawImage from "../../assets/isometric.png";
 import arrowUp from "../../assets/arrow-up.svg";
 import { logo } from "../../utils/constants";
 import { TextField, Typography, Button, Grid } from "@mui/material";
-import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { withRouter } from "react-router-dom";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -276,4 +274,4 @@ const Register = ({ ...props }) => {
   );
 };
 
-export default withRouter(Register);
+export default Register;
