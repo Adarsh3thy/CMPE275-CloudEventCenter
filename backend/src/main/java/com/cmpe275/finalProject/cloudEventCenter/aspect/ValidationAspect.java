@@ -68,4 +68,10 @@ public class ValidationAspect {
 		if(id.isBlank())
 			throw new IllegalArgumentException("Enter an event ID"); 
 	}
+	
+	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.cancelEvent(..)) && args(id)")
+	public void deleteEventValidationAdvice(JoinPoint joinPoint, String id) {
+		if(id.isBlank())
+			throw new IllegalArgumentException("Enter an event ID"); 
+	}
 }
