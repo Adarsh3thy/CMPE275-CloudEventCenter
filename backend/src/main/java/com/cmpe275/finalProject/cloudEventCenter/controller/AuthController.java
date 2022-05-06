@@ -15,9 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cmpe275.finalProject.cloudEventCenter.config.Config;
+import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
+import com.cmpe275.finalProject.cloudEventCenter.payload.request.LogOutRequest;
 import com.cmpe275.finalProject.cloudEventCenter.payload.request.LoginRequest;
 import com.cmpe275.finalProject.cloudEventCenter.payload.request.SignupRequest;
+import com.cmpe275.finalProject.cloudEventCenter.payload.request.TokenRefreshRequest;
+import com.cmpe275.finalProject.cloudEventCenter.payload.response.MessageResponse;
+import com.cmpe275.finalProject.cloudEventCenter.payload.response.TokenRefreshResponse;
+import com.cmpe275.finalProject.cloudEventCenter.service.RefreshTokenService;
 import com.cmpe275.finalProject.cloudEventCenter.service.UserService;
+import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;
+import com.cmpe275.finalProject.cloudEventCenter.exception.TokenRefreshException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,6 +36,12 @@ public class AuthController {
 
 	@Autowired
 	Config urlConfig;
+	
+	 @Autowired
+	 RefreshTokenService refreshTokenService;
+	 
+	 @Autowired
+	  JwtUtils jwtUtils;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -63,4 +77,26 @@ public class AuthController {
 			return "<html>\n" + "    <body>\n" + "        <p>Verification Failed</p>\n" + "    </body>\n" + "</html>\n";
 		}
 	}
+	
+	  @PostMapping("/logout")
+	  public ResponseEntity<?> logoutUser(@Valid @RequestBody LogOutRequest logOutRequest) {
+	    refreshTokenService.deleteByUserId(logOutRequest.getEmail());
+	    return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+	  }
+	
+	@PostMapping("/refreshtoken")
+	  public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+	    String requestRefreshToken = request.getRefreshToken();
+	    return refreshTokenService.findByToken(requestRefreshToken)
+	        .map(refreshTokenService::verifyExpiration)
+	        .map(RefreshToken::getUser)
+	        .map(user -> {
+	          String token = jwtUtils.generateTokenFromEmail(user.getEmail());
+	          return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+	        })
+	        .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+	                "Refresh token is not in database!"));
+	  }
+	
+
 }

@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
+import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.payload.response.JwtResponse;
@@ -64,7 +65,9 @@ public class UserService {
 
 	@Autowired
 	JwtUtils jwtUtils;
-	
+
+	@Autowired
+	RefreshTokenService refreshTokenService;
 
 	public ResponseEntity<?> createUser(String email, String password, String fullName, String screenName,
 			String gender, String description, Set<String> strRoles, String number, String street, String city,
@@ -78,7 +81,7 @@ public class UserService {
 		Address address = new Address(street, number, city, state, zip);
 
 		User user = new User(null, email, fullName, screenName, passwordEncoder.encode(password), gender, description,
-				null, true, null, address, null,null);
+				null, true, null, address, null, null);
 
 		Set<Role> roles = new HashSet<>();
 		if (strRoles != null) {
@@ -100,7 +103,7 @@ public class UserService {
 
 		String randomCode = RandomString.make(64);
 		user.setVerificationCode(randomCode);
-		//user.setEnabled(false);
+		// user.setEnabled(false);
 		user.setRoles(roles);
 		userRepository.save(user);
 		// sendVerificationEmail(user, siteURL);
@@ -122,8 +125,12 @@ public class UserService {
 
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());
+		
+		System.out.println("userDetails.getId(): "+userDetails.getId());
+		 RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
 		System.out.println(roles);
-		JwtResponse jwtResp = new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
+		JwtResponse jwtResp = new JwtResponse(jwt,refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(),
 				userDetails.getEmail(), roles);
 		return ResponseEntity.ok(jwtResp);
 
@@ -131,29 +138,26 @@ public class UserService {
 
 	private void sendVerificationEmail(User user, String siteURL)
 			throws MessagingException, UnsupportedEncodingException {
-		
+
 		Properties props = System.getProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.port", "587");
-        props.put("mail.smtp.starttls.enable", "true");
-      props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-     //   props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        props.put("mail.smtp.ssl.enable", "false");
-       // props.put("mail.smtp.socketFactory.port", "587");
-       // props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+		// props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		props.put("mail.smtp.ssl.enable", "false");
+		// props.put("mail.smtp.socketFactory.port", "587");
+		// props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 
-        Session session = Session.getDefaultInstance(props,
-        		new Authenticator() {
-        		@Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication("cmpe275Zhangproject@gmail.com", "Patr0nu$");
-                }
-        }
-        		);
-        session.setDebug(true);
+		Session session = Session.getDefaultInstance(props, new Authenticator() {
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("cmpe275Zhangproject@gmail.com", "Patr0nu$");
+			}
+		});
+		session.setDebug(true);
 
-        
 		String toAddress = user.getEmail();
 		String fromAddress = "cmpe275Zhangproject@gmail.com";
 		String senderName = "Cloud Event Center";
@@ -161,13 +165,11 @@ public class UserService {
 		String content = "Dear [[name]],<br>" + "Please click the link below to verify your registration:<br>"
 				+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "VMS";
 
-		MimeMessage message =new MimeMessage(session);
-		
+		MimeMessage message = new MimeMessage(session);
+
 		message.setFrom(new InternetAddress(fromAddress, senderName));
 		message.setRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
 		message.setSubject(subject);
-		
-		
 
 		String fName = user.getFullName() != null ? user.getFullName() : "";
 
@@ -178,24 +180,24 @@ public class UserService {
 
 		message.setContent("<h1>some content</h1>", "text/html");
 		Transport transport = session.getTransport();
-		 transport.connect("smtp.gmail.com", "cmpe275Zhangproject@gmail.com", "Patr0nu$");
-		 transport.sendMessage(message, message.getAllRecipients());
-		 mailSender.send(message);
+		transport.connect("smtp.gmail.com", "cmpe275Zhangproject@gmail.com", "Patr0nu$");
+		transport.sendMessage(message, message.getAllRecipients());
+		mailSender.send(message);
 
 	}
-	
-	 public boolean verify(String verificationCode) {
-	        User user = userRepository.findByVerificationCode(verificationCode);
 
-	        if (user == null || user.isEnabled()) {
-	            return false;
-	        } else {
-	            user.setVerificationCode(null);
-	            user.setEnabled(true);
-	            userRepository.save(user);
+	public boolean verify(String verificationCode) {
+		User user = userRepository.findByVerificationCode(verificationCode);
 
-	            return true;
-	        }
+		if (user == null || user.isEnabled()) {
+			return false;
+		} else {
+			user.setVerificationCode(null);
+			user.setEnabled(true);
+			userRepository.save(user);
 
-	    }
+			return true;
+		}
+
+	}
 }
