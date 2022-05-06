@@ -68,7 +68,7 @@ public class EventService {
 				
 		}catch(Exception e) {
 			e.printStackTrace(System.out);
-			System.out.println("IN EXCEPTION BLOCK");
+			System.out.println("IN addEvent EXCEPTION BLOCK");
 			return ResponseEntity
 		            .status(HttpStatus.BAD_REQUEST)
 		            .body(e.toString());
@@ -85,7 +85,25 @@ public class EventService {
 				
 		}catch(Exception e) {
 			e.printStackTrace(System.out);
-			System.out.println("IN EXCEPTION BLOCK");
+			System.out.println("IN getEventByID EXCEPTION BLOCK");
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body(e.toString());
+		}
+	}
+	
+	@Transactional
+	public ResponseEntity<?> cancelEvent(String id) {
+		try {
+				Event event = eventRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Invalid event ID"));
+				eventRepository.deleteById(id);
+				
+				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
+	                    .body(event);
+				
+		}catch(Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN cancelEvent EXCEPTION BLOCK");
 			return ResponseEntity
 		            .status(HttpStatus.BAD_REQUEST)
 		            .body(e.toString());
