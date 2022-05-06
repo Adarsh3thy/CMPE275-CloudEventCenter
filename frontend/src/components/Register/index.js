@@ -7,18 +7,17 @@ import { TextField, Typography, Button, Grid } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
-import { useLocation } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Register = () => {
+const Register = ({ ...props }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   // TODO: handlers
 
@@ -67,10 +66,18 @@ const Register = () => {
             Organizing events has never been that easy.
           </span>
         </Grid>
+        <Snackbar
+          // open={errorMessage}
+          autoHideDuration={6000}
+          // onClose={handleClose}
+        >
+          <Alert severity="error" sx={{ width: "100%" }}>
+            {/* {errorMessage} */}
+          </Alert>
+        </Snackbar>
         <Grid item>
           <Typography
             style={{
-              width: "116px",
               height: "45px",
               fontFamily: "Work Sans",
               fontStyle: "normal",
@@ -80,7 +87,7 @@ const Register = () => {
               marginTop: "25px",
             }}
           >
-            Sign Up
+            Get started with CEC!
           </Typography>
         </Grid>
         <form
@@ -90,6 +97,7 @@ const Register = () => {
             <TextField
               required
               type="email"
+              autoComplete="email"
               placeholder="Email Address"
               value={email}
               style={{
@@ -99,7 +107,7 @@ const Register = () => {
                 borderRadius: "5px",
                 marginTop: "30px",
               }}
-              error={error != "" ? true : false}
+              error={open ? true : false}
               onChange={(e) => setEmail(e.target.value)}
             />
           </Grid>
@@ -107,6 +115,7 @@ const Register = () => {
             <TextField
               required
               type="password"
+              autoComplete="current-password"
               placeholder="Password"
               style={{
                 width: "395px",
@@ -116,7 +125,7 @@ const Register = () => {
                 marginTop: "5px",
               }}
               onChange={(e) => setPassword(e.target.value)}
-              error={error != "" ? true : false}
+              error={open ? true : false}
             />
           </Grid>
           <Grid item>
@@ -149,7 +158,7 @@ const Register = () => {
                   margin: "0px 8px",
                 }}
               />
-              Register
+              Sign Up
             </Button>
           </Grid>
         </form>
@@ -236,25 +245,10 @@ const Register = () => {
                 window.location.href = "/login";
               }}
             >
-              Sign In Now
+              Sign in
             </a>
           </Grid>
         </Grid>
-        <Stack sx={{ width: "100%" }}>
-          <Snackbar
-            open={open}
-            autoHideDuration={6000}
-            // onClose={handleClose}
-          >
-            <Alert
-              // onClose={handleClose}
-              severity={success ? "success" : "error"}
-              sx={{ width: "100%" }}
-            >
-              {success ? success : error}
-            </Alert>
-          </Snackbar>
-        </Stack>
       </Grid>
       <Grid
         item
@@ -282,4 +276,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default withRouter(Register);
