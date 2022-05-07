@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+
 import java.util.List;
 import java.util.Set;
 
@@ -27,12 +29,15 @@ public class User {
     private String id;
 
     @Column(name = "EMAIL",unique = true)
+    @NotEmpty(message = "*Please provide an email")
     private String email;
     
     @Column(name = "FULL_NAME")
+    @NotEmpty(message = "*Please provide a full name")
     private String fullName;
     
-    @Column(name = "SCREEN_NAME")
+    @Column(name = "SCREEN_NAME",unique = true)
+    @NotEmpty(message = "*Please provide a screen name")
     private String screenName;
     
     @Column(name = "PASSWORD")
