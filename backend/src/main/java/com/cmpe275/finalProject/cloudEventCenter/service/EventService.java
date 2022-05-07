@@ -3,6 +3,8 @@
  */
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
@@ -86,6 +88,25 @@ public class EventService {
 		}catch(Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN getEventByID EXCEPTION BLOCK");
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body(e.toString());
+		}
+	}
+	
+	
+	@Transactional
+	public ResponseEntity<?> getEventsByOrganizerID(String organizerID) {
+		try {
+//				Event event = eventRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Invalid Organzier ID"));
+				
+				List<Event> allEvents = eventRepository.findByOrganizerID(organizerID);
+				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
+	                    .body(allEvents);
+				
+		}catch(Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
 			return ResponseEntity
 		            .status(HttpStatus.BAD_REQUEST)
 		            .body(e.toString());

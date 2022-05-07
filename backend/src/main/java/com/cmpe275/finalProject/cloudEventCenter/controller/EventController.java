@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 
 //import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
-import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
-import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 import com.cmpe275.finalProject.cloudEventCenter.service.EventService;
 
@@ -39,8 +36,6 @@ public class EventController {
 	@Autowired
 	private UserRepository userRepository;
 	
-	@Autowired
-	private EventRepository eventRepository;
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = "/event", method = RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
@@ -76,6 +71,12 @@ public class EventController {
 	@RequestMapping(value = "/event/{id}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<?> getEvent(@PathVariable("id") String id){
 		return eventService.getEventByID(id);
+	}
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/event/organizer/{organizerID}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<?> getAllEvents(@PathVariable("organizerID") String organizerID){
+		return eventService.getEventsByOrganizerID(organizerID);
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
