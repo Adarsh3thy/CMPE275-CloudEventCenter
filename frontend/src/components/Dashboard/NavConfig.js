@@ -14,7 +14,7 @@ const navConfig = [
     icon: getIcon("eva:shopping-bag-fill"),
   },
   {
-    title: "Event Registrations",
+    title: "Registrations",
     path: "/registrations",
     icon: getIcon("eva:file-text-fill"),
   },

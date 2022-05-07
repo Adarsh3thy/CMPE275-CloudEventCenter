@@ -1,14 +1,11 @@
 import { filter } from "lodash";
 import { sentenceCase } from "change-case";
 import { useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
 import {
   Card,
   Table,
   Stack,
-  Avatar,
   Button,
-  Checkbox,
   TableRow,
   TableBody,
   TableCell,
@@ -28,6 +25,7 @@ import {
   UserMoreMenu,
 } from "../../sections/@dashboard/events";
 import USERLIST from "../../_mock/events";
+import CreateEvent from "./CreateEvent";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -72,30 +70,15 @@ function applySortFilter(array, comparator, query) {
 
 export default function Events() {
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState("asc");
-
   const [selected, setSelected] = useState([]);
-
   const [orderBy, setOrderBy] = useState("name");
-
   const [filterName, setFilterName] = useState("");
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [open, setOpen] = useState(false);
 
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleClick = (event, name) => {
@@ -155,9 +138,8 @@ export default function Events() {
             </Typography>
             <Button
               variant="contained"
-              component={RouterLink}
-              to="#"
               startIcon={<Iconify icon="eva:plus-fill" />}
+              onClick={(e) => setOpen(true)}
             >
               New Event
             </Button>
@@ -173,15 +155,7 @@ export default function Events() {
             <Scrollbar>
               <TableContainer sx={{ minWidth: 800 }}>
                 <Table>
-                  <UserListHead
-                    order={order}
-                    orderBy={orderBy}
-                    headLabel={TABLE_HEAD}
-                    rowCount={USERLIST.length}
-                    numSelected={selected.length}
-                    onRequestSort={handleRequestSort}
-                    onSelectAllClick={handleSelectAllClick}
-                  />
+                  <UserListHead headLabel={TABLE_HEAD} />
                   <TableBody>
                     {filteredUsers
                       .slice(
@@ -189,15 +163,8 @@ export default function Events() {
                         page * rowsPerPage + rowsPerPage
                       )
                       .map((row) => {
-                        const {
-                          id,
-                          name,
-                          role,
-                          status,
-                          company,
-                          avatarUrl,
-                          isVerified,
-                        } = row;
+                        const { id, name, role, status, company, isVerified } =
+                          row;
                         const isItemSelected = selected.indexOf(name) !== -1;
 
                         return (
@@ -208,13 +175,9 @@ export default function Events() {
                             role="checkbox"
                             selected={isItemSelected}
                             aria-checked={isItemSelected}
+                            sx={{ cursor: "pointer" }}
                           >
-                            <TableCell padding="checkbox">
-                              <Checkbox
-                                checked={isItemSelected}
-                                onChange={(event) => handleClick(event, name)}
-                              />
-                            </TableCell>
+                            <TableCell padding="checkbox" />
                             <TableCell
                               component="th"
                               scope="row"
@@ -225,7 +188,6 @@ export default function Events() {
                                 alignItems="center"
                                 spacing={2}
                               >
-                                <Avatar alt={name} src={avatarUrl} />
                                 <Typography variant="subtitle2" noWrap>
                                   {name}
                                 </Typography>
@@ -284,6 +246,8 @@ export default function Events() {
             />
           </Card>
         </Container>
+
+        <CreateEvent open={open} handleClose={handleClose} />
       </Page>
     </>
   );
