@@ -49,7 +49,7 @@ public class RefreshTokenService {
     return token;
   }
   @Transactional
-  public int deleteByUserId(String email) {
-    return refreshTokenRepository.deleteByUser(userRepository.findByEmail(email).get());
+  public int deleteByUserId(String id) {
+    return refreshTokenRepository.deleteByUser(userRepository.findById(id).get());
   }
 }

@@ -77,7 +77,11 @@ public class UserService {
 		if (userRepository.existsByEmail(email)) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
 		}
-
+		
+		if(strRoles==null || strRoles.isEmpty()) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: No roles are specified for the user"));
+		}
+		
 		Address address = new Address(street, number, city, state, zip);
 
 		User user = new User(null, email, fullName, screenName, passwordEncoder.encode(password), gender, description,
@@ -93,8 +97,8 @@ public class UserService {
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(adminRole);
 					break;
-				case "participant":
-					Role userRole = roleRepository.findByName(ERole.ROLE_PARTICIPANT)
+				case "person":
+					Role userRole = roleRepository.findByName(ERole.ROLE_PERSON)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(userRole);
 				}
@@ -125,14 +129,47 @@ public class UserService {
 
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());
-		
-		System.out.println("userDetails.getId(): "+userDetails.getId());
-		 RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
+		System.out.println("userDetails.getId(): " + userDetails.getId());
+		RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
 		System.out.println(roles);
-		JwtResponse jwtResp = new JwtResponse(jwt,refreshToken.getToken(), userDetails.getId(), userDetails.getUsername(),
-				userDetails.getEmail(), roles);
+		JwtResponse jwtResp = new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
+				userDetails.getUsername(), userDetails.getEmail(), roles);
 		return ResponseEntity.ok(jwtResp);
+
+	}
+
+	public ResponseEntity<?> updateUser(String userId, String fullName, String screenName,
+			String gender, String description, String number, String street, String city, String state, String zip) {
+
+		if (!userRepository.existsById(userId)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error:user does not exist!"));
+		}
+
+		User user = userRepository.getById(userId);
+		Address address = new Address(street, number, city, state, zip);
+		user.setScreenName(screenName);
+		
+		user.setFullName(fullName);
+		user.setFullName(fullName);
+		user.setGender(gender);
+		user.setAddress(address);
+		user.setDescription(description);
+
+		userRepository.save(user);
+
+		return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
+
+	}
+
+	public ResponseEntity<?> getUser(String userId) {
+		
+		if (!userRepository.existsById(userId)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error:user does not exist!"));
+		}
+		
+		return ResponseEntity.ok( userRepository.getById(userId));
 
 	}
 

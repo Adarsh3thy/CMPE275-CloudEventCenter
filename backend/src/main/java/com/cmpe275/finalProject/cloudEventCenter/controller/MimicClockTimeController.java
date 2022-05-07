@@ -17,7 +17,7 @@ import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 
 @RestController
 @RequestMapping("/api/clock")
-public class MiminClockTimeController {
+public class MimicClockTimeController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(

@@ -8,7 +8,9 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +22,7 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.SignupRequest;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.TokenRefreshRequest;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.TokenRefreshResponse;
+import com.cmpe275.finalProject.cloudEventCenter.POJOs.UpdateUserRequest;
 import com.cmpe275.finalProject.cloudEventCenter.config.Config;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.service.RefreshTokenService;
@@ -61,11 +64,25 @@ public class AuthController {
 				signUpRequest.getStreet(), signUpRequest.getCity(), signUpRequest.getState(), signUpRequest.getZip(),
 				getSiteURL(request));
 	}
+	
+	@PutMapping("/user/{id}")
+	public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequest updateUserRequest
+			,@PathVariable String id) {
+		return userService.updateUser(id, 
+				updateUserRequest.getFullName(), updateUserRequest.getScreenName(), updateUserRequest.getGender(),
+				updateUserRequest.getDescription(), updateUserRequest.getNumber(),
+				updateUserRequest.getStreet(), updateUserRequest.getCity(), updateUserRequest.getState(), updateUserRequest.getZip());
+	}
 
 	private String getSiteURL(HttpServletRequest request) {
 		String siteURL = request.getRequestURL().toString();
 		System.out.println(siteURL.replace(request.getServletPath(), ""));
 		return siteURL.replace(request.getServletPath(), "");
+	}
+	
+	@GetMapping("/user/{id}")
+	public ResponseEntity<?> getUser(@PathVariable String id) {
+		return userService.getUser(id);
 	}
 
 	@GetMapping("/verify")
@@ -80,7 +97,7 @@ public class AuthController {
 	
 	  @PostMapping("/logout")
 	  public ResponseEntity<?> logoutUser(@Valid @RequestBody LogOutRequest logOutRequest) {
-	    refreshTokenService.deleteByUserId(logOutRequest.getEmail());
+	    refreshTokenService.deleteByUserId(logOutRequest.getId());
 	    return ResponseEntity.ok(new MessageResponse("Log out successful!"));
 	  }
 	
