@@ -2,10 +2,7 @@ import PropTypes from "prop-types";
 import { alpha, styled } from "@mui/material/styles";
 import { Box, Stack, AppBar, Toolbar, IconButton } from "@mui/material";
 import Iconify from "../../mui_components/Iconify";
-import Searchbar from "./Searchbar";
 import AccountPopover from "./AccountPopover";
-import LanguagePopover from "./LanguagePopover";
-import NotificationsPopover from "./NotificationsPopover";
 
 const DRAWER_WIDTH = 280;
 const APPBAR_MOBILE = 64;
@@ -44,7 +41,6 @@ export default function DashboardNavbar({ onOpenSidebar }) {
           <Iconify icon="eva:menu-2-fill" />
         </IconButton>
 
-        <Searchbar />
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack
