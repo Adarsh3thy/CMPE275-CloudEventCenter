@@ -8,7 +8,6 @@ const Page = forwardRef(({ children, title = "", meta, ...other }, ref) => (
       <title>{`${title} | Minimal-UI`}</title>
       {meta}
     </Typography>
-
     <Box ref={ref} {...other}>
       {children}
     </Box>

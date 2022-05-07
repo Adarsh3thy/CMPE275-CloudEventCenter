@@ -4,7 +4,6 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { Box, Link, Drawer, Typography, Avatar } from "@mui/material";
 import account from "../../_mock/account";
-// import useResponsive from "../../hooks/useResponsive";
 import Logo from "../../mui_components/Logo";
 import Scrollbar from "../../mui_components/Scrollbar";
 import NavSection from "../../mui_components/NavSection";
@@ -35,7 +34,6 @@ DashboardSidebar.propTypes = {
 export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
   const { pathname } = useLocation();
 
-  // const isDesktop = useResponsive("up", "lg");
   const isDesktop = true;
 
   useEffect(() => {
@@ -59,7 +57,6 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
       <Box sx={{ px: 2.5, py: 3, display: "inline-flex" }}>
         <Logo />
       </Box>
-
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none" component={RouterLink} to="#">
           <AccountStyle>
@@ -75,9 +72,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
           </AccountStyle>
         </Link>
       </Box>
-
       <NavSection navConfig={navConfig} />
-
       <Box sx={{ flexGrow: 1 }} />
     </Scrollbar>
   );
@@ -95,7 +90,6 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
           {renderContent}
         </Drawer>
       )}
-
       {isDesktop && (
         <Drawer
           open

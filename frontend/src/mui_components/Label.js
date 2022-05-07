@@ -102,9 +102,7 @@ export default function Label({
       }}
     >
       {startIcon && <Box sx={{ mr: 0.75, ...style }}>{startIcon}</Box>}
-
       {children}
-
       {endIcon && <Box sx={{ ml: 0.75, ...style }}>{endIcon}</Box>}
     </RootStyle>
   );
