@@ -32,13 +32,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.cmpe275.finalProject.cloudEventCenter.POJOs.JwtResponse;
+import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
-import com.cmpe275.finalProject.cloudEventCenter.payload.response.JwtResponse;
-import com.cmpe275.finalProject.cloudEventCenter.payload.response.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.repository.RoleRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;

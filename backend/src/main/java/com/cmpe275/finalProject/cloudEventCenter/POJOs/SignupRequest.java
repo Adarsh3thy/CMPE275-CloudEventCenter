@@ -1,4 +1,4 @@
-package com.cmpe275.finalProject.cloudEventCenter.payload.request;
+package com.cmpe275.finalProject.cloudEventCenter.POJOs;
 
 import java.util.Set;
 
