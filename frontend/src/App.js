@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+// Components (Layouts/Pages)
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UpdateUser from "./components/UpdateUser";
