@@ -2,6 +2,10 @@ package com.cmpe275.finalProject.cloudEventCenter.model;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,6 +45,7 @@ public class User {
     private String screenName;
     
     @Column(name = "PASSWORD")
+    @JsonIgnore
     private String password;
     
     @Column(name = "GENDER")
@@ -55,6 +60,7 @@ public class User {
     @Column(name = "ENABLED")
     private boolean enabled;
     
+    
     @Column(name = "PASSCODE")
     private String passcode;
     
@@ -67,6 +73,8 @@ public class User {
     
     @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(name = "user_events", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler","$$_hibernate_interceptor"
+    	,"Organizer","participants"})
     private Set<Event> events;
 
    
