@@ -9,6 +9,9 @@ import {
   DialogTitle,
   MenuItem,
 } from "@mui/material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 export default function CreateEvent({ open, handleClose }) {
   /*
@@ -30,7 +33,9 @@ export default function CreateEvent({ open, handleClose }) {
         organizer.  
   */
 
-  const [title, setTitle] = useState(null);
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+  const [deadline, setDeadline] = useState(new Date());
 
   return (
     <div>
@@ -62,15 +67,42 @@ export default function CreateEvent({ open, handleClose }) {
                 variant="outlined"
               />
             </Grid>
-            <Grid item container direction="row" md={12}>
+            <Grid item container direction="row" md={12} spacing={2}>
               <Grid item md={4}>
-                1
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} />}
+                    label="Start time"
+                    value={startTime}
+                    onChange={(newValue) => {
+                      setStartTime(newValue);
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
               <Grid item md={4}>
-                2
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} />}
+                    label="End time"
+                    value={endTime}
+                    onChange={(newValue) => {
+                      setEndTime(newValue);
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
               <Grid item md={4}>
-                3
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    renderInput={(props) => <TextField {...props} />}
+                    label="Deadline"
+                    value={deadline}
+                    onChange={(newValue) => {
+                      setDeadline(newValue);
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
             </Grid>
             <Grid item container direction="row" spacing={2}>
