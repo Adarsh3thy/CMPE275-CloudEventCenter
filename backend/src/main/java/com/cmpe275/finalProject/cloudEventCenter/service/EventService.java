@@ -3,7 +3,10 @@
  */
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -18,7 +21,9 @@ import org.springframework.stereotype.Service;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
+import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
+import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 
 /**
  * @author shrey
@@ -32,6 +37,9 @@ public class EventService {
 	@Autowired
 	private EventRepository eventRepository;
 	
+	@Autowired
+	private UserRepository userRepository;
+	 
 	/**
 	   * This method is used to add an Event
 	   * @param title title of the event
@@ -57,13 +65,13 @@ public class EventService {
 				Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(), 
 						eventData.getState(), eventData.getZip());
 				
-				
+				User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
 				//Event Organizer field is failing, retest after UserController is completed
 				//Switch eventData.getOrganizer() to null for successfull testing
 				Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(), 
 						eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(), 
 						eventData.getMaxParticipants(), eventData.getFee(), false, 
-						null, address);
+						user, address, new HashSet<User>());
 
 				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
 	                    .body(eventRepository.save(event));
@@ -96,13 +104,46 @@ public class EventService {
 	
 	
 	@Transactional
-	public ResponseEntity<?> getEventsByOrganizerID(String organizerID) {
+	public ResponseEntity<?> getAllEventsByOrganizerID(String organizerID) {
 		try {
 //				Event event = eventRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Invalid Organzier ID"));
-				
-				List<Event> allEvents = eventRepository.findByOrganizerID(organizerID);
+//			List<Event> allEvents = eventRepository.
+	//			List<Event> allEvents = eventRepository.findByOrganizerID(organizerID);
+//				System.out.println(eventRepository.existsByOrganizer(userRepository.getById(organizerID)));
+			List<Event> allEvents=eventRepository.findAll();
+//			List<Event> userEvents=new ArrayList<>();
+			System.out.println("aaa" + allEvents.toString());
+//			for(Event event:allEvents) {
+////				if(event.getOrganizer().getId().equals(organizerID))
+////					userEvents.add(event);
+////				else
+////					System.out.print("aaaaa");
+//				System.out.println("aaa" + event.toString());
+//				
+//			}
+//		System.out.println("userEvents :"+userEvents.toString());
+			
+				//List<Event> allEvents = eventRepository.findByOrganizer(userRepository.getById(organizerID));
+//				System.out.println("aaaaaaaaaaa" + allEvents.toString());
 				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
-	                    .body(allEvents);
+	                    .body("");
+				
+		}catch(Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body(e.toString());
+		}
+	}
+	
+	@Transactional
+	public ResponseEntity<?> getAllEventsByUserID(String userID) {
+		try {
+				
+				
+				return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
+	                    .body("");
 				
 		}catch(Exception e) {
 			e.printStackTrace(System.out);
