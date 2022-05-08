@@ -26,6 +26,7 @@ import {
 } from "../../sections/@dashboard/events";
 import USERLIST from "../../_mock/events";
 import CreateEvent from "./CreateEvent";
+import EventDetails from "./EventDetails";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -76,9 +77,14 @@ export default function Events() {
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState(false);
+  const [openEventDetails, setOpenEventDetails] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleEventDetailsClose = () => {
+    setOpenEventDetails(false);
   };
 
   const handleClick = (event, name) => {
@@ -175,6 +181,7 @@ export default function Events() {
                             role="checkbox"
                             selected={isItemSelected}
                             aria-checked={isItemSelected}
+                            onClick={(e) => setOpenEventDetails(true)}
                             sx={{ cursor: "pointer" }}
                           >
                             <TableCell padding="checkbox" />
@@ -248,6 +255,11 @@ export default function Events() {
         </Container>
 
         <CreateEvent open={open} handleClose={handleClose} />
+
+        <EventDetails
+          open={openEventDetails}
+          handleClose={handleEventDetailsClose}
+        />
       </Page>
     </>
   );
