@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.JwtResponse;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
+import com.cmpe275.finalProject.cloudEventCenter.mail.bean.Mail;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
@@ -42,7 +43,7 @@ import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.RoleRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;
-
+import com.cmpe275.finalProject.cloudEventCenter.mail.service.MailService;
 import net.bytebuddy.utility.RandomString;
 
 @Service
@@ -68,6 +69,9 @@ public class UserService {
 
 	@Autowired
 	RefreshTokenService refreshTokenService;
+	
+	@Autowired
+	MailService mailService;
 
 	public ResponseEntity<?> createUser(String email, String password, String fullName, String screenName,
 			String gender, String description, Set<String> strRoles, String number, String street, String city,
@@ -107,10 +111,10 @@ public class UserService {
 
 		String randomCode = RandomString.make(64);
 		user.setVerificationCode(randomCode);
-		// user.setEnabled(false);
+		 user.setEnabled(false);
 		user.setRoles(roles);
 		userRepository.save(user);
-		// sendVerificationEmail(user, siteURL);
+		 sendVerificationEmail(user, siteURL);
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 
 	}
@@ -175,57 +179,30 @@ public class UserService {
 
 	private void sendVerificationEmail(User user, String siteURL)
 			throws MessagingException, UnsupportedEncodingException {
+		
+		Mail mail = new Mail();
+		mail.setMailFrom("cmpe275Zhangproject@gmail.com");
+		 mail.setMailTo(user.getEmail());
+		 mail.setMailSubject("Confirm Registration");
 
-		Properties props = System.getProperties();
-		props.put("mail.transport.protocol", "smtp");
-		props.put("mail.smtp.port", "587");
-		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-		// props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-		props.put("mail.smtp.ssl.enable", "false");
-		// props.put("mail.smtp.socketFactory.port", "587");
-		// props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-
-		Session session = Session.getDefaultInstance(props, new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication("cmpe275Zhangproject@gmail.com", "Patr0nu$");
-			}
-		});
-		session.setDebug(true);
-
-		String toAddress = user.getEmail();
-		String fromAddress = "cmpe275Zhangproject@gmail.com";
-		String senderName = "Cloud Event Center";
-		String subject = "Confirm Registration";
-		String content = "Dear [[name]],<br>" + "Please click the link below to verify your registration:<br>"
-				+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "VMS";
-
-		MimeMessage message = new MimeMessage(session);
-
-		message.setFrom(new InternetAddress(fromAddress, senderName));
-		message.setRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
-		message.setSubject(subject);
-
+		 
 		String fName = user.getFullName() != null ? user.getFullName() : "";
+		 String content = "Dear [[name]],<br>" + "Please click the link below to verify your registration:<br>"
+					+ "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>" + "Thank you,<br>" + "CEC";
+		 content = content.replace("[[name]]", fName + " ");
+			String verifyURL = siteURL + "/api/auth/verify?code=" + user.getVerificationCode();
 
-		content = content.replace("[[name]]", fName + " ");
-		String verifyURL = siteURL + "/api/auth/verify?code=" + user.getVerificationCode();
-
-		content = content.replace("[[URL]]", verifyURL);
-
-		message.setContent("<h1>some content</h1>", "text/html");
-		Transport transport = session.getTransport();
-		transport.connect("smtp.gmail.com", "cmpe275Zhangproject@gmail.com", "Patr0nu$");
-		transport.sendMessage(message, message.getAllRecipients());
-		mailSender.send(message);
+			content = content.replace("[[URL]]", verifyURL);
+			 mail.setMailContent(content);
+			mailService.sendEmail(mail);
 
 	}
 
 	public boolean verify(String verificationCode) {
+		System.out.println("verificationCode: "+verificationCode);
 		User user = userRepository.findByVerificationCode(verificationCode);
-
+		
+		System.out.println("user : "+user.getEmail());
 		if (user == null || user.isEnabled()) {
 			return false;
 		} else {
