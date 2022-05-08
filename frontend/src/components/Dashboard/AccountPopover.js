@@ -97,7 +97,12 @@ export default function AccountPopover() {
           ))}
         </Stack>
         <Divider sx={{ borderStyle: "dashed" }} />
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem
+          sx={{ m: 1 }}
+          onClick={() => {
+            window.location.href = "/login";
+          }}
+        >
           Logout
         </MenuItem>
       </MenuPopover>
