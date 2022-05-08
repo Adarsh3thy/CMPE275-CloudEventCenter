@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Typography,
-  Button,
-  Grid,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormLabel,
-} from "@mui/material";
+import { TextField, Typography, Button, Grid, MenuItem } from "@mui/material";
 
 /*
 1) Email: a valid email address. Must be unique and cannot be changed. 
@@ -133,34 +124,16 @@ const UpdateUser = ({ ...props }) => {
                   onChange={(e) => setLastName(e.target.value)}
                 />
               </Grid>
-              <Grid item md={6} container direction="row">
-                <Grid item md={3} sx={{ marginTop: "15px" }}>
-                  <FormLabel
-                    id="demo-row-radio-buttons-group-label"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    Account Type:
-                  </FormLabel>
-                </Grid>
-                <Grid item md={9} sx={{ marginTop: "5px" }}>
-                  <RadioGroup
-                    row
-                    aria-labelledby="demo-row-radio-buttons-group-label"
-                    name="row-radio-buttons-group"
-                    onChange={(e) => setAccountType(e.target.value)}
-                  >
-                    <FormControlLabel
-                      value="participant"
-                      control={<Radio />}
-                      label="Participant"
-                    />
-                    <FormControlLabel
-                      value="organizer"
-                      control={<Radio />}
-                      label="Organizer"
-                    />
-                  </RadioGroup>
-                </Grid>
+              <Grid item md={6}>
+                <TextField
+                  fullWidth
+                  select
+                  label="Account type"
+                  onChange={(e) => setAccountType(e.target.value)}
+                >
+                  <MenuItem value={"p"}>Participant</MenuItem>
+                  <MenuItem value={"o"}>Organizer</MenuItem>
+                </TextField>
               </Grid>
             </Grid>
             <Grid item container direction="row" spacing={2}>
@@ -174,34 +147,16 @@ const UpdateUser = ({ ...props }) => {
                   onChange={(e) => setScreenName(e.target.value)}
                 />
               </Grid>
-              <Grid item md={6} container direction="row">
-                <Grid item md={2} sx={{ marginTop: "15px" }}>
-                  <FormLabel
-                    id="demo-row-radio-buttons-group-label"
-                    sx={{ fontWeight: "bold" }}
-                  >
-                    Gender:
-                  </FormLabel>
-                </Grid>
-                <Grid item md={10} sx={{ marginTop: "5px" }}>
-                  <RadioGroup
-                    row
-                    aria-labelledby="demo-row-radio-buttons-group-label"
-                    name="row-radio-buttons-group"
-                    onChange={(e) => setGender(e.target.value)}
-                  >
-                    <FormControlLabel
-                      value="male"
-                      control={<Radio />}
-                      label="Male"
-                    />
-                    <FormControlLabel
-                      value="female"
-                      control={<Radio />}
-                      label="Female"
-                    />
-                  </RadioGroup>
-                </Grid>
+              <Grid item md={6}>
+                <TextField
+                  fullWidth
+                  select
+                  label="Gender"
+                  onChange={(e) => setGender(e.target.value)}
+                >
+                  <MenuItem value={"m"}>Male</MenuItem>
+                  <MenuItem value={"f"}>Female</MenuItem>
+                </TextField>
               </Grid>
             </Grid>
             <Grid item>
