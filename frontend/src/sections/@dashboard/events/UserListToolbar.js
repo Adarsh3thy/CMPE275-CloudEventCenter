@@ -1,10 +1,7 @@
 import PropTypes from "prop-types";
-// material
 import { styled } from "@mui/material/styles";
 import {
   Toolbar,
-  Tooltip,
-  IconButton,
   Typography,
   OutlinedInput,
   InputAdornment,
@@ -40,8 +37,9 @@ export default function UserListToolbar({
   numSelected,
   filterName,
   onFilterName,
+  isRegistration = false,
 }) {
-  return (
+  return !isRegistration ? (
     <RootStyle
       sx={{
         ...(numSelected > 0 && {
@@ -69,20 +67,6 @@ export default function UserListToolbar({
           }
         />
       )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <Iconify icon="eva:trash-2-fill" />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <Iconify icon="ic:round-filter-list" />
-          </IconButton>
-        </Tooltip>
-      )}
     </RootStyle>
-  );
+  ) : null;
 }

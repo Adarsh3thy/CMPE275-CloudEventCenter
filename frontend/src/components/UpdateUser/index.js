@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { TextField, Typography, Button, Grid } from "@mui/material";
+import {
+  TextField,
+  Typography,
+  Button,
+  Grid,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+} from "@mui/material";
 
 /*
 1) Email: a valid email address. Must be unique and cannot be changed. 
@@ -89,6 +98,7 @@ const UpdateUser = ({ ...props }) => {
                   autoComplete="given-name"
                   variant="outlined"
                   autoFocus
+                  onChange={(e) => setFirstName(e.target.value)}
                 />
               </Grid>
               <Grid item md={4}>
@@ -98,6 +108,7 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="family-name"
                   variant="outlined"
+                  onChange={(e) => setMiddleName(e.target.value)}
                 />
               </Grid>
               <Grid item md={4}>
@@ -107,6 +118,7 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="family-name"
                   variant="outlined"
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </Grid>
             </Grid>
@@ -118,15 +130,37 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="given-name"
                   variant="outlined"
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </Grid>
-              <Grid item md={6}>
-                <TextField
-                  label="Account Type"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                />
+              <Grid item md={6} container direction="row">
+                <Grid item md={3} sx={{ marginTop: "15px" }}>
+                  <FormLabel
+                    id="demo-row-radio-buttons-group-label"
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    Account Type:
+                  </FormLabel>
+                </Grid>
+                <Grid item md={9} sx={{ marginTop: "5px" }}>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                    onChange={(e) => setAccountType(e.target.value)}
+                  >
+                    <FormControlLabel
+                      value="participant"
+                      control={<Radio />}
+                      label="Participant"
+                    />
+                    <FormControlLabel
+                      value="organizer"
+                      control={<Radio />}
+                      label="Organizer"
+                    />
+                  </RadioGroup>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item container direction="row" spacing={2}>
@@ -137,15 +171,37 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="given-name"
                   variant="outlined"
+                  onChange={(e) => setScreenName(e.target.value)}
                 />
               </Grid>
-              <Grid item md={6}>
-                <TextField
-                  label="Gender"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                />
+              <Grid item md={6} container direction="row">
+                <Grid item md={2} sx={{ marginTop: "15px" }}>
+                  <FormLabel
+                    id="demo-row-radio-buttons-group-label"
+                    sx={{ fontWeight: "bold" }}
+                  >
+                    Gender:
+                  </FormLabel>
+                </Grid>
+                <Grid item md={10} sx={{ marginTop: "5px" }}>
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    <FormControlLabel
+                      value="male"
+                      control={<Radio />}
+                      label="Male"
+                    />
+                    <FormControlLabel
+                      value="female"
+                      control={<Radio />}
+                      label="Female"
+                    />
+                  </RadioGroup>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item>
@@ -157,6 +213,7 @@ const UpdateUser = ({ ...props }) => {
                 rows="3"
                 autoComplete="family-name"
                 variant="outlined"
+                onChange={(e) => setDescription(e.target.value)}
               />
             </Grid>
             <Grid item container direction="row" spacing={2}>
@@ -167,6 +224,7 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="given-name"
                   variant="outlined"
+                  onChange={(e) => setAddress1(e.target.value)}
                 />
               </Grid>
               <Grid item md={6}>
@@ -175,6 +233,7 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="family-name"
                   variant="outlined"
+                  onChange={(e) => setAddress2(e.target.value)}
                 />
               </Grid>
             </Grid>
@@ -186,6 +245,8 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="given-name"
                   variant="outlined"
+                  defaultValue={"San Jose"}
+                  onChange={(e) => setCity(e.target.value)}
                 />
               </Grid>
               <Grid item md={4}>
@@ -195,6 +256,8 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="family-name"
                   variant="outlined"
+                  defaultValue={"California"}
+                  onChange={(e) => setState(e.target.value)}
                 />
               </Grid>
               <Grid item md={4}>
@@ -204,6 +267,8 @@ const UpdateUser = ({ ...props }) => {
                   fullWidth
                   autoComplete="family-name"
                   variant="outlined"
+                  defaultValue={"95126"}
+                  onChange={(e) => setZipcode(e.target.value)}
                 />
               </Grid>
             </Grid>

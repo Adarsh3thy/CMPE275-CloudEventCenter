@@ -22,7 +22,6 @@ import SearchNotFound from "../../mui_components/SearchNotFound";
 import {
   UserListHead,
   UserListToolbar,
-  UserMoreMenu,
 } from "../../sections/@dashboard/events";
 import USERLIST from "../../_mock/events";
 import CreateEvent from "./CreateEvent";
@@ -214,10 +213,6 @@ export default function Events() {
                               >
                                 {sentenceCase(status)}
                               </Label>
-                            </TableCell>
-
-                            <TableCell align="right">
-                              <UserMoreMenu />
                             </TableCell>
                           </TableRow>
                         );
