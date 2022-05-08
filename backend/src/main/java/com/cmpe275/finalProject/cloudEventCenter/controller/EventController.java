@@ -59,7 +59,7 @@ public class EventController {
 			@RequestParam(value="approvalReq") boolean approvalReq,
 			@RequestParam(value="organizerID") String organizerID
 			) {
-		
+
 		LocalDateTime converted_startTime = LocalDateTime.parse(startTime);
 		LocalDateTime converted_endTime = LocalDateTime.parse(endTime);
 		LocalDateTime converted_deadline = LocalDateTime.parse(deadline);

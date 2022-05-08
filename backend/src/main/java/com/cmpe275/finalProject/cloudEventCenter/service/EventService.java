@@ -104,7 +104,6 @@ public class EventService {
 	public ResponseEntity<?> getAllEventsByOrganizerID(String organizerID) {
 		try {
 			User organizer = userRepository.getById(organizerID);
-			System.out.println(organizer.getEmail());
 
 			List<Event> events = eventRepository.findByOrganizer(organizer);
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(events);
@@ -116,18 +115,18 @@ public class EventService {
 		}
 	}
 
-	@Transactional
-	public ResponseEntity<?> getAllEventsByUserID(String userID) {
-		try {
-
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("");
-
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
-		}
-	}
+//	@Transactional
+//	public ResponseEntity<?> getAllEventsByUserID(String userID) {
+//		try {
+//
+//			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("");
+//
+//		} catch (Exception e) {
+//			e.printStackTrace(System.out);
+//			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
+//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+//		}
+//	}
 
 	@Transactional
 	public ResponseEntity<?> cancelEvent(String id) {
