@@ -27,22 +27,27 @@ import lombok.NoArgsConstructor;
 public class Address implements Serializable{
 	
 	/**
-	 * The street name of the player/team address
+	 * The street name of the Event address
 	 */
 	private String street;
 	
 	/**
-	 * The city name of the player/team address
+	 * The apt number of the Event address
+	 */
+	private String number;
+	
+	/**
+	 * The city name of the Event address
 	 */
 	private String city;
 	
 	/**
-	 * The state name of the player/team address
+	 * The state name of the Event address
 	 */
 	private String state;
 	
 	/**
-	 * The zip of the player/team address
+	 * The zip of the Event address
 	 */
 	private String zip;
 	
