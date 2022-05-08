@@ -14,6 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
+import com.cmpe275.finalProject.cloudEventCenter.model.SignUpForumQuestions;
 
 @Data
 @Builder
@@ -21,21 +22,28 @@ import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 @NoArgsConstructor
 @Entity
 @Component
-@Table(name = "SignUpForum", catalog = "EVENT_CENTER")
-public class SignUpForum {
+@Table(name = "SignUpForumQuestionAnswers", catalog = "EVENT_CENTER")
+public class SignUpForumQuestionsAnswers {
 	
 	@Id
 	@GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid")
 	@Column(name = "FORUM_ID")
 	private String id;
-		
-	// TBD: Foreign Key
+
+	// TODO: Foreign Key
 	@Column(name = "EVENT_ID")
 	private String event_id;
+		
+	@ManyToOne(cascade=CascadeType.ALL)
+	@JoinColumn(name = "QUESTION_ID", referencedColumnName = "QUESTION_ID")
+	private SignUpForumQuestions question_id;
 	
 	@Column(name = "label")
 	private String text;
+	
+	// Assets
+	// private List<MediaAsset<String>> assets
 	
 	@CreationTimestamp
 	@Column(name = "CREATED_AT")

@@ -67,8 +67,11 @@ public class EventService {
 	                    .body(eventRepository.save(event));
 				
 		}catch(Exception e) {
-			e.printStackTrace(System.out);
+//			e.printStackTrace(System.out);
+			
 			System.out.println("IN EXCEPTION BLOCK");
+			System.out.println(e.getLocalizedMessage());
+//			System.out.println(e.getLocalizedMessage());
 			return ResponseEntity
 		            .status(HttpStatus.BAD_REQUEST)
 		            .body(e.toString());
