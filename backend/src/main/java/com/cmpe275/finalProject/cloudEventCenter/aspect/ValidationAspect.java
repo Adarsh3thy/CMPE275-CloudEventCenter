@@ -3,17 +3,25 @@ package com.cmpe275.finalProject.cloudEventCenter.aspect;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
+import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
+import com.cmpe275.finalProject.cloudEventCenter.model.Role;
+import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
+
 
 @Aspect
 @Component
 @EnableAspectJAutoProxy
 @Order(0)
 public class ValidationAspect {
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.addEvent(..)) && args(eventData)")
 	public void CreateEventValidationAdvice(JoinPoint joinPoint, EventData eventData) {
@@ -47,20 +55,13 @@ public class ValidationAspect {
 			throw new IllegalArgumentException("Enter a valid number of max participants");
 		}
 		
-		//MUST BE RE-CHECKED - uncomment next few lines afte user controller
-//		User eventOrganizerUser = eventData.getOrganizer();
-//		List<Role> roles = eventOrganizerUser.getRoles();
-//		if(eventData.getFee() > 0) {
-//			boolean is_organization = false;
-//			
-//			for(Role r : roles) {
-//				if(r.getRoleName() == "ORGANIZATION")
-//					is_organization = true;
-//			}
-//			
-//			if(!is_organization)
-//				throw new IllegalArgumentException("Event organizer is not an ORGANIZATION, you cannot charge a fee");
-//		}
+		User organizer  = userRepository.findById(eventData.getOrganizerID()).orElse(null);
+		Role organizerRole = organizer.getRoles().iterator().next();
+		
+		if(eventData.getFee() > 0 && organizerRole.getName().equals(ERole.ROLE_PERSON)) {
+			throw new IllegalArgumentException("Participant cant charge a fee");
+		}
+		
 	}
 	
 	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.getEventByID(..)) && args(id)")
@@ -75,7 +76,7 @@ public class ValidationAspect {
 			throw new IllegalArgumentException("Enter an event ID"); 
 	}
 	
-	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.getEventsByOrganizerID(..)) && args(organizerID)")
+	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.EventService.getAllEventsByOrganizerID(..)) && args(organizerID)")
 	public void getAllEventsValidationAdvice(JoinPoint joinPoint, String organizerID) {
 		if(organizerID.isBlank())
 			throw new IllegalArgumentException("Enter an organizerID"); 

@@ -85,7 +85,7 @@ public class UserService {
 		Address address = new Address(street, number, city, state, zip);
 
 		User user = new User(null, email, fullName, screenName, passwordEncoder.encode(password), gender, description,
-				null, true, null, address, null, null);
+				null, true, null, address, null, null, null);
 
 		Set<Role> roles = new HashSet<>();
 		if (strRoles != null) {
@@ -101,6 +101,7 @@ public class UserService {
 					Role userRole = roleRepository.findByName(ERole.ROLE_PERSON)
 							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 					roles.add(userRole);
+					break;
 				}
 			});
 		}
