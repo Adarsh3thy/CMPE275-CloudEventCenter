@@ -2,6 +2,8 @@ package com.cmpe275.finalProject.cloudEventCenter.model;
 
 
 import java.time.LocalDateTime;
+import java.util.Set;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
@@ -12,6 +14,9 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
@@ -21,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
@@ -78,11 +84,16 @@ public class Event {
 	 
 	@Column(name="APPROVAL_REQ")
 	private boolean approvalRequired;
-	 
-	@OneToOne(fetch=FetchType.LAZY,cascade = CascadeType.ALL)
+	
+//	@OneToOne(fetch=FetchType.LAZY,cascade = CascadeType.ALL)
+//	@JoinColumn(name="ORGANIZER_ID",referencedColumnName = "USER_ID")
+//	private User Organizer;
+	
+	@ManyToOne(fetch=FetchType.LAZY,cascade = CascadeType.ALL)
 	@JoinColumn(name="ORGANIZER_ID",referencedColumnName = "USER_ID")
-	private User Organizer;
-	 
+	@JsonIgnoreProperties({"events", "eventToOrganize"})
+	private User organizer;
+	
     @Embedded
     @AttributeOverrides(value = {
     		 @AttributeOverride(name = "street", column = @Column(name = "STREET")),
@@ -92,5 +103,7 @@ public class Event {
     		 @AttributeOverride(name = "zip", column = @Column(name = "ZIP"))
     })
 	private Address address;
-
+    
+    @ManyToMany(mappedBy = "events")
+    private Set<User> participants;
 }

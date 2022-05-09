@@ -27,5 +27,5 @@ public class EventData {
 	int maxParticipants; 
 	double fee;
 	boolean approvalReq;
-	User organizer;
+	String organizerID;
 }
