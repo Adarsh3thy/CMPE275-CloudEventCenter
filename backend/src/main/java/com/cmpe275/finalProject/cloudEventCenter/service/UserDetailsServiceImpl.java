@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import com.cmpe275.finalProject.cloudEventCenter.exception.ResourceNotFoundException;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
+import com.cmpe275.finalProject.cloudEventCenter.security.UserPrincipal;
 
 
 @Component
@@ -28,6 +30,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 		return UserDetailsImpl.build(user);
 	}
+	
+	@Transactional
+    public UserDetails loadUserById(String id) {
+        User user = userRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("User", "id", id)
+        );
+
+        return UserPrincipal.create(user);
+    }
 
 
 	

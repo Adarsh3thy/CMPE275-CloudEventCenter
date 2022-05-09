@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.Set;
@@ -60,6 +61,12 @@ public class User {
     
     @Embedded
     private Address address;
+    
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider;
+    
+    private String providerId;
 
     @ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

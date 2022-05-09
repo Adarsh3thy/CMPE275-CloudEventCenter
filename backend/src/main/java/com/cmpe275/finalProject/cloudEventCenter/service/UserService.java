@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.JwtResponse;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
+import com.cmpe275.finalProject.cloudEventCenter.model.AuthProvider;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
@@ -83,9 +84,17 @@ public class UserService {
 		}
 		
 		Address address = new Address(street, number, city, state, zip);
-
-		User user = new User(null, email, fullName, screenName, passwordEncoder.encode(password), gender, description,
-				null, true, null, address, null, null);
+		
+		 User user = new User();
+		 user.setAddress(address);
+		 user.setEmail(email);
+		 user.setFullName(fullName);
+		 user.setPassword(passwordEncoder.encode(password));
+		 user.setScreenName(screenName);
+		 user.setGender(gender);
+		 user.setDescription(description);
+		 user.setProvider(AuthProvider.local);
+		 user.setEnabled(true);
 
 		Set<Role> roles = new HashSet<>();
 		if (strRoles != null) {
