@@ -75,7 +75,8 @@ public class EventService {
 			// Switch eventData.getOrganizer() to null for successfull testing
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>(),EEventStatus.REG_OPEN);
+					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>(),
+					EEventStatus.REG_OPEN, true);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 

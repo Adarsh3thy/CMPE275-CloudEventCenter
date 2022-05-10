@@ -112,4 +112,7 @@ public class Event {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "STATUS")
 	private EEventStatus  status;
+	
+	@Column(name = "IS_ACTIVE")
+	private boolean isActive;
 }
