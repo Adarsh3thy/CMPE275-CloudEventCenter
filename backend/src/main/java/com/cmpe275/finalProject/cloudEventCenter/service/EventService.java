@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
+import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
@@ -74,7 +75,7 @@ public class EventService {
 			// Switch eventData.getOrganizer() to null for successfull testing
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>());
+					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>(),EEventStatus.REG_OPEN);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
