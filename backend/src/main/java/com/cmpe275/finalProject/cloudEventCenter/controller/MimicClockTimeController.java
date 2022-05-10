@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 
 @RestController
-public class MiminClockTimeController {
+@RequestMapping("/api/clock")
+public class MimicClockTimeController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/clocktime", 
+			value = "/gettime", 
 			method = RequestMethod.GET
 	)
 	String getTime(){
@@ -30,7 +31,7 @@ public class MiminClockTimeController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/clocktime/{date}", 
+			value = "/settime/{date}", 
 			method = RequestMethod.POST
 	)
 	ResponseEntity<?> setTime(@PathVariable("date") String date) throws ParseException{

@@ -4,13 +4,15 @@
 package com.cmpe275.finalProject.cloudEventCenter.controller;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 //import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
-import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 import com.cmpe275.finalProject.cloudEventCenter.service.EventService;
@@ -29,6 +30,7 @@ import com.cmpe275.finalProject.cloudEventCenter.service.EventService;
  */
 
 @RestController
+@RequestMapping("/api")
 public class EventController {
 	
 	@Autowired
@@ -37,6 +39,8 @@ public class EventController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	
+//	@PreAuthorize("hasRole('ORGANIZER') or hasRole('PERSON')")
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = "/event", method = RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<?> createEvent(@RequestParam("title") String title,
@@ -55,15 +59,39 @@ public class EventController {
 			@RequestParam(value="approvalReq") boolean approvalReq,
 			@RequestParam(value="organizerID") String organizerID
 			) {
-		
+
 		LocalDateTime converted_startTime = LocalDateTime.parse(startTime);
 		LocalDateTime converted_endTime = LocalDateTime.parse(endTime);
 		LocalDateTime converted_deadline = LocalDateTime.parse(deadline);
-		User eventOrganizer = userRepository.getById(organizerID);
+//		User eventOrganizer = userRepository.findById(organizerID).orElseGet(null);
 		
 		EventData newEvent = new EventData(title, description, converted_startTime, converted_endTime, converted_deadline, 
-				street, number, city, state, zip, minParticipants, maxParticipants, fee, approvalReq, eventOrganizer);
+				street, number, city, state, zip, minParticipants, maxParticipants, fee, approvalReq, organizerID);
 		
 	    return eventService.addEvent(newEvent);
 	  }
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/event/{id}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<?> getEvent(@PathVariable("eventID") String id){
+		return eventService.getEventByID(id);
+	}
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/event/organizer/{organizerID}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<?> getAllEventsByOrganizerID(@PathVariable("organizerID") String organizerID){
+		return eventService.getAllEventsByOrganizerID(organizerID);
+	}
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/event/{id}", method = RequestMethod.PUT, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<?> DeleteEvent(@PathVariable("eventID") String id){
+		return eventService.cancelEvent(id);
+	}
+	
+//	@ResponseStatus(HttpStatus.OK)
+//	@RequestMapping(value = "/event/{id}", method = RequestMethod.PUT, produces=MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<?> getAllEventsByUserID(@PathVariable("userID") String id){
+//		return eventService.getAllEventsByUserID(id);
+//	}
 }

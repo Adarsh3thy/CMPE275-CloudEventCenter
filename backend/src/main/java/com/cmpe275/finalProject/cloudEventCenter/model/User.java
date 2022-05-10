@@ -8,7 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -26,12 +29,15 @@ public class User {
     private String id;
 
     @Column(name = "EMAIL",unique = true)
+    @NotEmpty(message = "*Please provide an email")
     private String email;
     
     @Column(name = "FULL_NAME")
+    @NotEmpty(message = "*Please provide a full name")
     private String fullName;
     
-    @Column(name = "SCREEN_NAME")
+    @Column(name = "SCREEN_NAME",unique = true)
+    @NotEmpty(message = "*Please provide a screen name")
     private String screenName;
     
     @Column(name = "PASSWORD")
@@ -57,7 +63,12 @@ public class User {
 
     @ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private List<Role> roles;
-
-   
+    private Set<Role> roles;
+    
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private Set<Event> events;
+    
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "organizer")
+    private Set<Event> eventToOrganize;
 }
