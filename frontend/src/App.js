@@ -7,6 +7,8 @@ import Register from "./components/Register";
 import UpdateUser from "./components/UpdateUser";
 import EventRegistrations from "./components/EventRegistrations";
 import Events from "./components/Events";
+import SignupForum from "./components/Forums/Signup";
+import ParticipationForum from "./components/Forums/Participation";
 import DashboardLayout from "./components/Dashboard";
 
 function App() {
@@ -35,6 +37,16 @@ function App() {
               exact
               path="/registrations"
               component={EventRegistrations}
+            />
+            <DashboardRoute
+              exact
+              path="/signup-forum"
+              component={SignupForum}
+            />
+            <DashboardRoute
+              exact
+              path="/participation-forum"
+              component={ParticipationForum}
             />
           </Switch>
         </BrowserRouter>
