@@ -7,13 +7,14 @@ import { TextField, Typography, Button, Grid } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { AuthConsumer } from "../contexts/Auth/AuthContext";
 import { loginUser } from "../../controllers/login";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Login = ({ ...props }) => {
+const Login = ({ processLogin }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   // Hook for the MUI snackbar alert
@@ -24,9 +25,16 @@ const Login = ({ ...props }) => {
     let data = {};
     data.email = email;
     data.password = password;
-    loginUser(data).then((res) => {
-      console.log(res);
-    });
+    loginUser(data)
+      .then((result) => {
+        processLogin(result).then((res) => {
+          window.location.href = res;
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        alert.error("Username or password is incorrect.");
+      });
   };
 
   return (
@@ -298,4 +306,8 @@ const Login = ({ ...props }) => {
   );
 };
 
-export default Login;
+export default (props) => (
+  <AuthConsumer>
+    {({ processLogin }) => <Login processLogin={processLogin} {...props} />}
+  </AuthConsumer>
+);

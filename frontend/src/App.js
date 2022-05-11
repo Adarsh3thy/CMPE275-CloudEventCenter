@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { AuthProvider } from "./components/contexts/Auth/AuthContext";
 // Components (Layouts/Pages)
 import Login from "./components/Login";
 import Register from "./components/Register";
@@ -23,19 +24,21 @@ function App() {
 
   return (
     <div className="App">
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Register} />
-          <DashboardRoute exact path="/events" component={Events} />
-          <DashboardRoute exact path="/update-user" component={UpdateUser} />
-          <DashboardRoute
-            exact
-            path="/registrations"
-            component={EventRegistrations}
-          />
-        </Switch>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/register" component={Register} />
+            <DashboardRoute exact path="/events" component={Events} />
+            <DashboardRoute exact path="/update-user" component={UpdateUser} />
+            <DashboardRoute
+              exact
+              path="/registrations"
+              component={EventRegistrations}
+            />
+          </Switch>
+        </BrowserRouter>
+      </AuthProvider>
     </div>
   );
 }
