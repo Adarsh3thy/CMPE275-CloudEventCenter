@@ -1,8 +1,7 @@
 import { Redirect, Route } from "react-router-dom";
-import { AuthConsumer } from "../components/contexts/Auth/AuthContext";
 
-const PrivateRoute = ({ redirectPath = "/login", children, user }) => {
-  const isLoggedIn = user != null;
+const PrivateRoute = ({ redirectPath = "/login", children }) => {
+  const isLoggedIn = localStorage.getItem("user") != null;
 
   const errorMessage = !isLoggedIn ? "You need to be logged in" : null;
 
@@ -26,8 +25,4 @@ const PrivateRoute = ({ redirectPath = "/login", children, user }) => {
   );
 };
 
-export default (props) => (
-  <AuthConsumer>
-    {({ user }) => <PrivateRoute user={user} {...props} />}
-  </AuthConsumer>
-);
+export default PrivateRoute;
