@@ -22,6 +22,9 @@ const ParticipationForum = () => {
             cursor: "pointer",
             background: index === 0 ? "#E5E4E2" : null,
           }}
+          onClick={() => {
+            window.location.href = "/participation-forum-comments";
+          }}
         >
           <Grid container wrap="nowrap" spacing={2}>
             <Grid item>

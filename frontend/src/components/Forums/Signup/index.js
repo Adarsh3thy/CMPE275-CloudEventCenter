@@ -22,6 +22,9 @@ const SignupForum = () => {
             cursor: "pointer",
             background: index === 0 ? "#E5E4E2" : null,
           }}
+          onClick={() => {
+            window.location.href = "/signup-forum-comments";
+          }}
         >
           <Grid container wrap="nowrap" spacing={2}>
             <Grid item>
