@@ -187,8 +187,8 @@ const Register = ({ ...props }) => {
               error={open ? true : false}
               onChange={(e) => setRole(e.target.value)}
             >
-              <MenuItem value={"participant"}>Participant</MenuItem>
-              <MenuItem value={"organizer"}>Organizer</MenuItem>
+              <MenuItem value={"person"}>Person</MenuItem>
+              <MenuItem value={"organization"}>Organization</MenuItem>
             </TextField>
           </Grid>
           <Grid item>
