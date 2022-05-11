@@ -12,6 +12,8 @@ import {
 } from "@mui/material";
 import MenuPopover from "../../mui_components/MenuPopover";
 import account from "../../_mock/account";
+import { AuthConsumer } from "../contexts/Auth/AuthContext";
+import { logoutUser } from "../../controllers/authentication";
 
 const MENU_OPTIONS = [
   {
@@ -26,7 +28,7 @@ const MENU_OPTIONS = [
   },
 ];
 
-export default function AccountPopover() {
+const AccountPopover = ({ user, processLogout }) => {
   const anchorRef = useRef(null);
 
   const [open, setOpen] = useState(null);
@@ -37,6 +39,15 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    let data = {};
+    data.id = user.id;
+    logoutUser(data).then(() => {
+      processLogout();
+    });
   };
 
   return (
@@ -97,15 +108,18 @@ export default function AccountPopover() {
           ))}
         </Stack>
         <Divider sx={{ borderStyle: "dashed" }} />
-        <MenuItem
-          sx={{ m: 1 }}
-          onClick={() => {
-            window.location.href = "/login";
-          }}
-        >
+        <MenuItem sx={{ m: 1 }} onClick={handleLogout}>
           Logout
         </MenuItem>
       </MenuPopover>
     </>
   );
-}
+};
+
+export default (props) => (
+  <AuthConsumer>
+    {({ user, processLogout }) => (
+      <AccountPopover user={user} processLogout={processLogout} {...props} />
+    )}
+  </AuthConsumer>
+);

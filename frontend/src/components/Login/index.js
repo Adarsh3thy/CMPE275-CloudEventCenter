@@ -8,13 +8,13 @@ import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
-import { loginUser } from "../../controllers/login";
+import { loginUser } from "../../controllers/authentication";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Login = ({ processLogin, history }) => {
+const Login = ({ processLogin, history, user }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   // Hook for the MUI snackbar alert
@@ -308,8 +308,13 @@ const Login = ({ processLogin, history }) => {
 
 export default (props) => (
   <AuthConsumer>
-    {({ processLogin, history }) => (
-      <Login processLogin={processLogin} history={history} {...props} />
+    {({ processLogin, history, user }) => (
+      <Login
+        processLogin={processLogin}
+        history={history}
+        user={user}
+        {...props}
+      />
     )}
   </AuthConsumer>
 );

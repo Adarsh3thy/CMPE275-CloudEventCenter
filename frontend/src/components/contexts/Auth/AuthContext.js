@@ -18,6 +18,7 @@ const AuthProvider = (props) => {
   const processLogout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    window.location.href = "/login";
   };
 
   useEffect(() => {
