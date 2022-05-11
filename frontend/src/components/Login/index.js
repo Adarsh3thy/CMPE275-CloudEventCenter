@@ -14,7 +14,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Login = ({ processLogin }) => {
+const Login = ({ processLogin, history }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   // Hook for the MUI snackbar alert
@@ -27,8 +27,8 @@ const Login = ({ processLogin }) => {
     data.password = password;
     loginUser(data)
       .then((result) => {
-        processLogin(result).then((res) => {
-          window.location.href = res;
+        processLogin(result.data).then((res) => {
+          history.push(res);
         });
       })
       .catch((error) => {
@@ -308,6 +308,8 @@ const Login = ({ processLogin }) => {
 
 export default (props) => (
   <AuthConsumer>
-    {({ processLogin }) => <Login processLogin={processLogin} {...props} />}
+    {({ processLogin, history }) => (
+      <Login processLogin={processLogin} history={history} {...props} />
+    )}
   </AuthConsumer>
 );

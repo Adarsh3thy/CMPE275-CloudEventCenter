@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Typography, Button, Grid, MenuItem } from "@mui/material";
+import { AuthConsumer } from "../contexts/Auth/AuthContext";
 
 /*
 1) Email: a valid email address. Must be unique and cannot be changed. 
@@ -20,7 +21,7 @@ its full name, or start with the full name with an optional suffix to achieve un
 You can provide default values for the latter three to simplify the registration process.
 */
 
-const UpdateUser = ({ ...props }) => {
+const UpdateUser = ({ user }) => {
   const [firstName, setFirstName] = useState(null);
   const [middleName, setMiddleName] = useState(null);
   const [lastName, setLastName] = useState(null);
@@ -37,6 +38,7 @@ const UpdateUser = ({ ...props }) => {
 
   // TODO: handlers
 
+  console.log("user: ", user);
   return (
     <Grid
       container
@@ -255,4 +257,8 @@ const UpdateUser = ({ ...props }) => {
   );
 };
 
-export default UpdateUser;
+export default (props) => (
+  <AuthConsumer>
+    {({ user }) => <UpdateUser user={user} {...props} />}
+  </AuthConsumer>
+);

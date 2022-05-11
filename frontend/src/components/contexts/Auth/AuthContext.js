@@ -3,15 +3,13 @@ import React, { useState } from "react";
 const AuthContext = React.createContext();
 
 const AuthProvider = (props) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [isAuth, setIsAuth] = useState(false);
+  const [user, setUser] = useState("user", null);
+  const [isAuth, setIsAuth] = useState("isAuth", false);
 
   const processLogin = (loginResponse) => {
     return new Promise((resolve, reject) => {
       if (loginResponse) {
         setIsAuth(true);
-        setToken(loginResponse.token);
         setUser(loginResponse);
         resolve("update-user");
       }
@@ -20,7 +18,6 @@ const AuthProvider = (props) => {
 
   const processLogout = () => {
     setIsAuth(false);
-    setToken(null);
     setUser(null);
   };
 
@@ -28,9 +25,9 @@ const AuthProvider = (props) => {
     <AuthContext.Provider
       value={{
         user: user,
-        token: token,
         processLogin: processLogin,
         processLogout: processLogout,
+        history: window.history,
         isAuth: isAuth,
       }}
     >
