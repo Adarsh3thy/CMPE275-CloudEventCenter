@@ -63,8 +63,11 @@ const UpdateUser = ({ user }) => {
     if (address1) data.street = address1;
     if (address2) data.number = address2;
     if (city) data.city = city;
+    else data.city = "San Jose";
     if (state) data.state = state;
+    else data.state = "California";
     if (zipcode) data.zip = zipcode;
+    else data.zip = "95126";
     updateUserDetails(user.id, data)
       .then((res) => {
         console.log(res);
