@@ -3,6 +3,8 @@
  */
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,14 +19,20 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
+import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 /**
  * @author shrey
@@ -63,6 +71,8 @@ public class EventService {
 	 * String state, String zip, int minParticipants, int maxParticipants, double
 	 * fee, String admissionPolicy
 	 */
+	
+	public static final int SEARCH_RESULT_PER_PAGE = 5;
 
 	@Transactional
 	public ResponseEntity<?> addEvent(EventData eventData) {
@@ -144,5 +154,55 @@ public class EventService {
 			System.out.println("IN cancelEvent EXCEPTION BLOCK");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
 		}
+	}
+
+	public ResponseEntity<?> searchEvent(String city, String status, String startTime, String endTime, String keyword,
+			String organizer,int page) {
+
+		int isActive = 0;
+		String reqStatus = status;
+
+		if (status == null) {
+			isActive = 1;
+			reqStatus = null;
+		} else {
+
+			if (status == "ACTIVE") {
+				isActive = 1;
+				reqStatus = null;
+			} else if (status.equals("OPENFORREGISTRATION")) {
+				isActive = 1;
+				reqStatus = "REG_OPEN";
+			} else if (status.equals("ALL")) {
+				isActive = 0;
+				reqStatus = null;
+			}
+		}
+		
+		ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
+		String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+		String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+		String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1,
+				mimicDateTime.lastIndexOf('-')-4);
+		String ConvertedDateTime=mimicDate+" "+mimicTime;
+		System.out.println("ConvertedDateTime: "+ConvertedDateTime);
+		
+		  System.out.println("keyword: "+keyword);
+		  System.out.println("isActive: "+isActive);
+		  System.out.println("startTime: "+startTime);
+		  System.out.println("status: "+reqStatus);
+		 
+
+		
+		
+		//List<Event> searchedEvents=eventRepository.searchForEvents(keyword, city, status, ConvertedDateTime, startTime, endTime, isActive);
+		
+		Pageable pageable = PageRequest.of(page - 1, SEARCH_RESULT_PER_PAGE); 
+		Page<Event> searchedEvents=eventRepository.searchForEvents( keyword,city,reqStatus,ConvertedDateTime,startTime,endTime,isActive,organizer,pageable);
+
+		
+		System.out.println(searchedEvents);
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(searchedEvents);
+
 	}
 }
