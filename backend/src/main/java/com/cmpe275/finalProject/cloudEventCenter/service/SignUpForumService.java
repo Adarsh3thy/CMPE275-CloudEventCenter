@@ -10,6 +10,9 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +25,12 @@ import com.cmpe275.finalProject.cloudEventCenter.model.SignUpForumQuestions;
 import com.cmpe275.finalProject.cloudEventCenter.repository.SignUpForumQuestionsRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.SignUpForumQuestionsAnswersRepository;
 import com.cmpe275.finalProject.cloudEventCenter.model.SignUpForumQuestionsAnswers;
-
+import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.HTTP_RESP;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
+import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
+
 
 
 /**
@@ -46,6 +51,9 @@ public class SignUpForumService {
 	@Autowired
 	private EventRepository events_repository;
 	
+	@Autowired
+	private UserRepository users_repository;
+	
 	@Transactional
 	public ResponseEntity<?> createQuestion(
 			String userId, 
@@ -55,12 +63,19 @@ public class SignUpForumService {
 		
 		try {
 			
-//			Event event = events_repository.findById(eventId).orElse(null);
-//			if (event == null) {
-//				return ResponseEntity
-//			            .status(HttpStatus.NOT_FOUND)
-//			            .body("Event not found");
-//			};
+			Event event = events_repository.findById(eventId).orElse(null);
+			if (event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			};
+			
+			User user = users_repository.findById(userId).orElse(null);
+			if (user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.UNAUTHORIZED)
+			            .body("Unauthorized User");
+			};
 			
 			// TODO: Validate event
 			// TODO: Has the event deadline passed?
@@ -68,8 +83,8 @@ public class SignUpForumService {
 			
 			SignUpForumQuestions question = new SignUpForumQuestions(
 					null,
-					userId,
-					eventId,
+					user,
+					event,
 					text,
 					null,
 					null
@@ -77,7 +92,7 @@ public class SignUpForumService {
 			
 			// TODO: What is the data type of the question
 			SignUpForumQuestions savedQuestion = questions_repository.save(question);
-			
+						
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
 					.contentType(MediaType.APPLICATION_JSON)
@@ -94,8 +109,16 @@ public class SignUpForumService {
 	@Transactional
 	public ResponseEntity<?> getQuestions(String eventId) {
 		try {
-			//TODO: Sort the data
-			List<SignUpForumQuestions> questions = questions_repository.findAll(); 
+			
+			Event event = events_repository.findById(eventId).orElse(null);
+			if (event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			};
+			
+			List<SignUpForumQuestions> questions = 
+					questions_repository.findByEvent(event, Sort.by(Sort.Direction.DESC, "createdAt")); 
 			return ResponseEntity
 					.status(HttpStatus.OK)
 					.contentType(MediaType.APPLICATION_JSON)
@@ -110,7 +133,7 @@ public class SignUpForumService {
 	}
 	
 	@Transactional
-	public ResponseEntity<?> getQuestionAnswers(String eventId, String questionId) {
+	public ResponseEntity<?> getQuestionAnswers(String questionId) {
 		try {
 			//TODO: Sort the data
 			
@@ -121,7 +144,8 @@ public class SignUpForumService {
 			            .body("Sign Up Forum Question not found");
 			}
 			
-			List<SignUpForumQuestionsAnswers> answers = answers_repository.findAll(); 
+			List<SignUpForumQuestionsAnswers> answers = answers_repository
+					.findByQuestion(question, Sort.by(Sort.Direction.DESC, "createdAt")); 
 			return ResponseEntity
 					.status(HttpStatus.OK)
 					.contentType(MediaType.APPLICATION_JSON)
@@ -136,20 +160,14 @@ public class SignUpForumService {
 	}
 	
 	@Transactional
-	public ResponseEntity<?> createAnswer(String userId, String eventId, String questionId, String text) {
-		try {
-			// TODO: Validate event (
-			// TODO: Has the event deadline passed?
-			// TODO: Is the event closed?
-			// TODO: Validate questionId
-			// TODO: Foreign Key Relations
-			
-//			Event event = events_repository.findById(eventId).orElse(null);
-//			if (event == null) {
-//				return ResponseEntity
-//			            .status(HttpStatus.NOT_FOUND)
-//			            .body("Event not found");
-//			};
+	public ResponseEntity<?> createAnswer(String userId, String questionId, String text) {
+		try {			
+			User user = users_repository.findById(userId).orElse(null);
+			if (user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.UNAUTHORIZED)
+			            .body("Unauthorized User");
+			};
 			
 			SignUpForumQuestions question = questions_repository.findById(questionId).orElse(null);
 			if (question == null) {
@@ -158,14 +176,27 @@ public class SignUpForumService {
 			            .body("Sign Up Forum Question not found");
 			}
 			
+			String eventId = question.getEvent().getId();
+			Event event = events_repository.findById(eventId).orElse(null);
+			if (event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			};
+			
 			SignUpForumQuestionsAnswers answer = new SignUpForumQuestionsAnswers(
 					null,
+					user,
 					eventId,
 					question,
 					text,
 					null,
 					null
 			);
+			
+			// TODO: Validate event (
+			// TODO: Has the event deadline passed?
+			// TODO: Is the event closed?
 			
 			SignUpForumQuestionsAnswers savedAnswer = answers_repository.save(answer); 
 			

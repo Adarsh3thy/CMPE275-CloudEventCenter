@@ -32,9 +32,6 @@ import com.cmpe275.finalProject.cloudEventCenter.service.SignUpForumService;
 @RestController
 public class SignUpForumController {
 	
-	String USER_ID_WHICH_SHOULD_NOT_BE_INJECTED = "1";
-	String EVENT_ID_WHICH_SHOULD_NOT_BE_INJECTED = "420";
-	
 	@Autowired
 	private SignUpForumService signUpForumService;
 	
@@ -46,23 +43,24 @@ public class SignUpForumController {
 	)
 	ResponseEntity<?> createSignUpForumQuestion(
 			@PathVariable(value =  "eventId") String eventId,
+			@RequestParam("userId") String userId,
 			@RequestParam("text") String text
 	) {	
-			return signUpForumService.createQuestion(this.USER_ID_WHICH_SHOULD_NOT_BE_INJECTED, this.EVENT_ID_WHICH_SHOULD_NOT_BE_INJECTED, text);
+			return signUpForumService.createQuestion(userId, eventId, text);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/sign_up_forum/{eventId}/questions/{questionId}/answers", 
+			value = "/sign_up_forum/questions/{questionId}/answers", 
 			method = RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<?> createAnswer(
-			@PathVariable(value =  "eventId") String eventId,
 			@PathVariable(value =  "questionId") String questionId,
+			@RequestParam("userId") String userId,
 			@RequestParam("text") String text
 	) {
-			return signUpForumService.createAnswer(this.USER_ID_WHICH_SHOULD_NOT_BE_INJECTED, this.EVENT_ID_WHICH_SHOULD_NOT_BE_INJECTED, questionId, text);
+			return signUpForumService.createAnswer(userId, questionId, text);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
@@ -74,19 +72,18 @@ public class SignUpForumController {
 	ResponseEntity<?> getSignUpForumQuestions(
 			@PathVariable(value =  "eventId") String eventId
 	) {
-			return signUpForumService.getQuestions(this.EVENT_ID_WHICH_SHOULD_NOT_BE_INJECTED);
+			return signUpForumService.getQuestions(eventId);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/sign_up_forum/{eventId}/questions/{questionId}/answers", 
+			value = "/sign_up_forum/questions/{questionId}/answers", 
 			method = RequestMethod.GET, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<?> getSignUpForumQuestionsAnswers(
-			@PathVariable(value =  "eventId") String eventId,
 			@PathVariable(value =  "questionId") String questionId
 	) {
-			return signUpForumService.getQuestionAnswers(this.EVENT_ID_WHICH_SHOULD_NOT_BE_INJECTED, questionId);
+			return signUpForumService.getQuestionAnswers(questionId);
     }
 }

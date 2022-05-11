@@ -73,7 +73,7 @@ public class EventController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = "/event/{id}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<?> getEvent(@PathVariable("eventID") String id){
+	ResponseEntity<?> getEvent(@PathVariable("id") String id){
 		return eventService.getEventByID(id);
 	}
 	
