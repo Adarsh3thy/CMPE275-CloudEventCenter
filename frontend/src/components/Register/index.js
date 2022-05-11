@@ -3,21 +3,39 @@ import Image52 from "../../assets/google-logo.png";
 import UndrawImage from "../../assets/isometric.png";
 import arrowUp from "../../assets/arrow-up.svg";
 import { logo } from "../../utils/constants";
-import { TextField, Typography, Button, Grid } from "@mui/material";
+import { TextField, Typography, Button, Grid, MenuItem } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { registerUser } from "../../controllers/authentication";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const Register = ({ ...props }) => {
+  const [fullName, setFullName] = useState(null);
+  const [role, setRole] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
 
   // TODO: handlers
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let data = {};
+    data.fullName = fullName;
+    data.email = email;
+    data.password = password;
+    data.screenName = fullName;
+    data.role = new Array(role);
+    registerUser(data)
+      .then((res) => {
+        window.location.href = "/login";
+      })
+      .catch((err) => console.log(err));
+  };
 
   return (
     <Grid
@@ -88,22 +106,35 @@ const Register = ({ ...props }) => {
             Get started with CEC!
           </Typography>
         </Grid>
-        <form
-        // onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit}>
           <Grid item>
             <TextField
               required
-              type="email"
-              autoComplete="email"
-              placeholder="Email Address"
-              value={email}
+              type="text"
+              autoComplete="fullName"
+              placeholder="Full Name"
               style={{
                 width: "395px",
                 height: "67px",
                 boxSizing: "border-box",
                 borderRadius: "5px",
                 marginTop: "30px",
+              }}
+              error={open ? true : false}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              required
+              type="email"
+              autoComplete="email"
+              placeholder="Email Address"
+              style={{
+                width: "395px",
+                height: "67px",
+                boxSizing: "border-box",
+                borderRadius: "5px",
               }}
               error={open ? true : false}
               onChange={(e) => setEmail(e.target.value)}
@@ -125,6 +156,23 @@ const Register = ({ ...props }) => {
               onChange={(e) => setPassword(e.target.value)}
               error={open ? true : false}
             />
+          </Grid>
+          <Grid item>
+            <TextField
+              required
+              select
+              label="Account type"
+              style={{
+                width: "395px",
+                height: "67px",
+                boxSizing: "border-box",
+                borderRadius: "5px",
+              }}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value={"participant"}>Participant</MenuItem>
+              <MenuItem value={"organizer"}>Organizer</MenuItem>
+            </TextField>
           </Grid>
           <Grid item>
             <Button
