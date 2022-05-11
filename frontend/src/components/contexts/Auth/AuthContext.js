@@ -1,25 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const AuthContext = React.createContext();
 
 const AuthProvider = (props) => {
-  const [user, setUser] = useState("user", null);
-  const [isAuth, setIsAuth] = useState("isAuth", false);
+  const [user, setUser] = useState(null);
 
   const processLogin = (loginResponse) => {
     return new Promise((resolve, reject) => {
       if (loginResponse) {
-        setIsAuth(true);
         setUser(loginResponse);
+        localStorage.setItem("user", JSON.stringify(loginResponse));
         resolve("update-user");
       }
     });
   };
 
   const processLogout = () => {
-    setIsAuth(false);
     setUser(null);
+    localStorage.removeItem("user");
   };
+
+  useEffect(() => {
+    setUser(
+      localStorage.getItem("user")
+        ? JSON.parse(localStorage.getItem("user"))
+        : null
+    );
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -28,7 +35,6 @@ const AuthProvider = (props) => {
         processLogin: processLogin,
         processLogout: processLogout,
         history: window.history,
-        isAuth: isAuth,
       }}
     >
       {props.children}
