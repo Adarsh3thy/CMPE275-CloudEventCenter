@@ -17,13 +17,20 @@ const Register = ({ ...props }) => {
   const [role, setRole] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
 
-  // TODO: handlers
+  const handleClose = (e) => {
+    e.preventDefault();
+    setOpen(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsSubmitted(true);
     let data = {};
     data.fullName = fullName;
     data.email = email;
@@ -32,9 +39,18 @@ const Register = ({ ...props }) => {
     data.role = new Array(role);
     registerUser(data)
       .then((res) => {
-        window.location.href = "/login";
+        setIsSubmitted(false);
+        setSuccessMessage(res.message + " Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setIsSubmitted(false);
+        setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
   };
 
   return (
@@ -83,12 +99,12 @@ const Register = ({ ...props }) => {
           </span>
         </Grid>
         <Snackbar
-          // open={errorMessage}
+          open={errorMessage}
           autoHideDuration={6000}
-          // onClose={handleClose}
+          onClose={handleClose}
         >
           <Alert severity="error" sx={{ width: "100%" }}>
-            {/* {errorMessage} */}
+            {errorMessage}
           </Alert>
         </Snackbar>
         <Grid item>
@@ -153,8 +169,8 @@ const Register = ({ ...props }) => {
                 borderRadius: "5px",
                 marginTop: "5px",
               }}
-              onChange={(e) => setPassword(e.target.value)}
               error={open ? true : false}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </Grid>
           <Grid item>
@@ -168,6 +184,7 @@ const Register = ({ ...props }) => {
                 boxSizing: "border-box",
                 borderRadius: "5px",
               }}
+              error={open ? true : false}
               onChange={(e) => setRole(e.target.value)}
             >
               <MenuItem value={"participant"}>Participant</MenuItem>
@@ -191,6 +208,7 @@ const Register = ({ ...props }) => {
                 fontSize: "18px",
                 marginTop: "12px",
               }}
+              disabled={isSubmitted ? true : false}
             >
               <img
                 src={arrowUp}
@@ -204,7 +222,7 @@ const Register = ({ ...props }) => {
                   margin: "0px 8px",
                 }}
               />
-              Sign Up
+              {isSubmitted ? "Please wait.." : "Sign Up"}
             </Button>
           </Grid>
         </form>
@@ -244,7 +262,7 @@ const Register = ({ ...props }) => {
                 borderRadius: "5px",
                 textAlign: "center",
               }}
-              // onClick={handleSjsuLogin}
+              // onClick={handleGoogleRegister}
             >
               <img
                 src={Image52}
@@ -318,6 +336,15 @@ const Register = ({ ...props }) => {
           }}
         />
       </Grid>
+      <Snackbar
+        open={successMessage}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 };
