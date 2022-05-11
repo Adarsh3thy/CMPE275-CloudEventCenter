@@ -4,7 +4,6 @@ import UndrawImage from "../../assets/isometric.png";
 import arrowUp from "../../assets/arrow-up.svg";
 import { logo } from "../../utils/constants";
 import { TextField, Typography, Button, Grid } from "@mui/material";
-import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
@@ -14,26 +13,38 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Login = ({ processLogin, history, user }) => {
+const Login = ({ processLogin, history }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
 
+  const handleClose = (e) => {
+    e.preventDefault();
+    setOpen(false);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsSubmitted(true);
     let data = {};
     data.email = email;
     data.password = password;
     loginUser(data)
       .then((result) => {
         processLogin(result.data).then((res) => {
+          setIsSubmitted(false);
           history.push(res);
         });
       })
       .catch((error) => {
         console.log(error);
-        alert.error("Username or password is incorrect.");
+        setIsSubmitted(false);
+        if ((error.status = 401)) setErrorMessage("Invalid Username/Password.");
+        else setErrorMessage("Something went wrong");
+        setOpen(true);
       });
   };
 
@@ -83,12 +94,12 @@ const Login = ({ processLogin, history, user }) => {
           </span>
         </Grid>
         <Snackbar
-          // open={errorMessage}
+          open={errorMessage}
           autoHideDuration={6000}
-          // onClose={handleClose}
+          onClose={handleClose}
         >
           <Alert severity="error" sx={{ width: "100%" }}>
-            {/* {errorMessage} */}
+            {errorMessage}
           </Alert>
         </Snackbar>
         <Grid item>
@@ -160,6 +171,7 @@ const Login = ({ processLogin, history, user }) => {
                 fontSize: "18px",
                 marginTop: "12px",
               }}
+              disabled={isSubmitted ? true : false}
             >
               <img
                 src={arrowUp}
@@ -173,7 +185,7 @@ const Login = ({ processLogin, history, user }) => {
                   margin: "0px 8px",
                 }}
               />
-              Sign In
+              {isSubmitted ? "Please wait.." : "Sign in"}
             </Button>
           </Grid>
         </form>
@@ -213,7 +225,7 @@ const Login = ({ processLogin, history, user }) => {
                 borderRadius: "5px",
                 textAlign: "center",
               }}
-              // onClick={handleSjsuLogin}
+              // onClick={handleGoogleLogin}
             >
               <img
                 src={Image52}
@@ -264,21 +276,6 @@ const Login = ({ processLogin, history, user }) => {
             </a>
           </Grid>
         </Grid>
-        <Stack sx={{ width: "100%" }}>
-          <Snackbar
-            open={open}
-            autoHideDuration={6000}
-            // onClose={handleClose}
-          >
-            <Alert
-              // onClose={handleClose}
-              severity="error"
-              sx={{ width: "100%" }}
-            >
-              Invalid Username/Password
-            </Alert>
-          </Snackbar>
-        </Stack>
       </Grid>
       <Grid
         item
@@ -308,13 +305,8 @@ const Login = ({ processLogin, history, user }) => {
 
 export default (props) => (
   <AuthConsumer>
-    {({ processLogin, history, user }) => (
-      <Login
-        processLogin={processLogin}
-        history={history}
-        user={user}
-        {...props}
-      />
+    {({ processLogin, history }) => (
+      <Login processLogin={processLogin} history={history} {...props} />
     )}
   </AuthConsumer>
 );
