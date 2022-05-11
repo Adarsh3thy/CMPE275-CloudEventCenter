@@ -117,6 +117,11 @@ export default function Events() {
     setFilterName(event.target.value);
   };
 
+  const handleEventRegistration = (e) => {
+    e.preventDefault();
+    setOpenEventDetails(false);
+  };
+
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
 
@@ -254,6 +259,7 @@ export default function Events() {
         <EventDetails
           open={openEventDetails}
           handleClose={handleEventDetailsClose}
+          handleEventRegistration={handleEventRegistration}
         />
       </Page>
     </>

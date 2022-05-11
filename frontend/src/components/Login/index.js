@@ -7,6 +7,7 @@ import { TextField, Typography, Button, Grid } from "@mui/material";
 import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { loginUser } from "../../controllers/login";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -18,7 +19,15 @@ const Login = ({ ...props }) => {
   // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
 
-  // TODO: handlers
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let data = {};
+    data.email = email;
+    data.password = password;
+    loginUser(data).then((res) => {
+      console.log(res);
+    });
+  };
 
   return (
     <Grid
@@ -90,9 +99,7 @@ const Login = ({ ...props }) => {
             Sign In
           </Typography>
         </Grid>
-        <form
-        // onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit}>
           <Grid item>
             <TextField
               required
