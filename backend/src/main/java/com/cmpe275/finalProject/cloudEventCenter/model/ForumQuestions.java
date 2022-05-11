@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.stereotype.Component;
 
+import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
@@ -22,8 +23,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Component
-@Table(name = "SignUpForumQuestions", catalog = "EVENT_CENTER")
-public class SignUpForumQuestions {
+@Table(name = "ForumQuestions", catalog = "EVENT_CENTER")
+public class ForumQuestions {
 	
 	/**
 	 * question_id
@@ -62,6 +63,9 @@ public class SignUpForumQuestions {
 //	private List<String> assets;
 	@Column(name = "TEXT")
 	private String text;
+	
+	@Column(name = "FORUM_TYPE")
+	private ForumTypes forumType; 
 	
 	@CreationTimestamp
 	@Column(name = "CREATED_AT")

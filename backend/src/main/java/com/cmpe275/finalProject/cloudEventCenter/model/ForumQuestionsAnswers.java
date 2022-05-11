@@ -13,8 +13,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
-import com.cmpe275.finalProject.cloudEventCenter.model.SignUpForumQuestions;
+import com.cmpe275.finalProject.cloudEventCenter.model.ForumQuestions;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
@@ -23,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @Entity
 @Component
-@Table(name = "SignUpForumQuestionAnswers", catalog = "EVENT_CENTER")
-public class SignUpForumQuestionsAnswers {
+@Table(name = "ForumQuestionAnswers", catalog = "EVENT_CENTER")
+public class ForumQuestionsAnswers {
 	
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -48,7 +47,7 @@ public class SignUpForumQuestionsAnswers {
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler","$$_hibernate_interceptor",
 		 "user", "event", 
 	})
-	private SignUpForumQuestions question;
+	private ForumQuestions question;
 	
 	@Column(name = "label")
 	private String text;
