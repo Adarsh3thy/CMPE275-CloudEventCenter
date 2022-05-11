@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { TextField, Typography, Button, Grid, MenuItem } from "@mui/material";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
 import { getUserDetails, updateUserDetails } from "../../controllers/user";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 /*
 1) Email: a valid email address. Must be unique and cannot be changed. 
@@ -22,6 +24,10 @@ its full name, or start with the full name with an optional suffix to achieve un
 You can provide default values for the latter three to simplify the registration process.
 */
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const UpdateUser = ({ user }) => {
   const [fullName, setFullName] = useState(null);
   const [screenName, setScreenName] = useState(null);
@@ -33,9 +39,20 @@ const UpdateUser = ({ user }) => {
   const [state, setState] = useState(null);
   const [zipcode, setZipcode] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  // Hook for the MUI snackbar alert
+  const [open, setOpen] = useState(false);
+
+  const handleClose = (e) => {
+    e.preventDefault();
+    setOpen(false);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsSubmitted(true);
     let data = {};
     if (fullName) data.fullName = fullName;
     else data.fullName = userDetails.fullName;
@@ -51,9 +68,15 @@ const UpdateUser = ({ user }) => {
     updateUserDetails(user.id, data)
       .then((res) => {
         console.log(res);
+        setIsSubmitted(false);
+        if ((res.status = 200))
+          setSuccessMessage("Successfully updated user details.");
       })
       .catch((err) => {
         console.log(err);
+        setIsSubmitted(false);
+        setErrorMessage("Something went wrong");
+        setOpen(true);
       });
   };
 
@@ -65,7 +88,6 @@ const UpdateUser = ({ user }) => {
     }
   }, [user]);
 
-  console.log(userDetails);
   return (
     <Grid
       container
@@ -100,6 +122,15 @@ const UpdateUser = ({ user }) => {
             Update your user information.
           </Typography>
         </Grid>
+        <Snackbar
+          open={errorMessage}
+          autoHideDuration={6000}
+          onClose={handleClose}
+        >
+          <Alert severity="error" sx={{ width: "100%" }}>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
         {userDetails ? (
           <form onSubmit={handleSubmit}>
             <Grid
@@ -276,11 +307,21 @@ const UpdateUser = ({ user }) => {
                     fontWeight: "bold",
                     fontSize: "18px",
                   }}
+                  disabled={isSubmitted ? true : false}
                 >
-                  Save
+                  {isSubmitted ? "Please wait.." : "Save"}
                 </Button>
               </Grid>
             </Grid>
+            <Snackbar
+              open={successMessage}
+              autoHideDuration={6000}
+              onClose={handleClose}
+            >
+              <Alert severity="success" sx={{ width: "100%" }}>
+                {successMessage}
+              </Alert>
+            </Snackbar>
           </form>
         ) : null}
       </Grid>
