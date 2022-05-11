@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.cmpe275.finalProject.cloudEventCenter.model.SignUpForumQuestions;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @Builder
@@ -31,13 +32,23 @@ public class SignUpForumQuestionsAnswers {
 	@Column(name = "FORUM_ID")
 	private String id;
 
-	// TODO: Foreign Key
+	@ManyToOne(cascade=CascadeType.ALL)
+	@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler","$$_hibernate_interceptor"
+		 ,"eventToOrganize","participant_events","roles","address", "email", "password", "gender", "verificationCode", "enabled", 
+		 "passcode", "events"
+	})
+	private User user;
+	
 	@Column(name = "EVENT_ID")
 	private String event_id;
 		
 	@ManyToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "QUESTION_ID", referencedColumnName = "QUESTION_ID")
-	private SignUpForumQuestions question_id;
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler","$$_hibernate_interceptor",
+		 "user", "event", 
+	})
+	private SignUpForumQuestions question;
 	
 	@Column(name = "label")
 	private String text;
@@ -47,11 +58,11 @@ public class SignUpForumQuestionsAnswers {
 	
 	@CreationTimestamp
 	@Column(name = "CREATED_AT")
-	private LocalDateTime created_at;
+	private LocalDateTime createdAt;
 	
     @UpdateTimestamp
 	@Column(name = "MODIFIED_AT")
-	private LocalDateTime modified_at;
+	private LocalDateTime modifiedAt;
 	
 	
 }
