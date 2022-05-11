@@ -18,6 +18,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,9 +38,11 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.mail.bean.Mail;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
+import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.RoleRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;
@@ -51,7 +54,7 @@ public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;
-
+	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -63,6 +66,10 @@ public class UserService {
 
 	@Autowired
 	RoleRepository roleRepository;
+	
+	@Autowired
+	EventRepository eventRepository;
+
 
 	@Autowired
 	JwtUtils jwtUtils;
@@ -214,5 +221,25 @@ public class UserService {
 			return true;
 		}
 
+	}
+	
+	
+	//TEST this after event registration
+	public ResponseEntity<?> getAllEventsByUserID(String userID) {
+		try {
+			System.out.println("Reached");
+			//User user = userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID"));
+			//System.out.println(user.getEmail());
+//			Set<Event> attending_events = user.getEvents();
+			//System.out.println(user.getEvents().size());
+			Set<Event> events=eventRepository.findEventsByUserId(userID);
+			System.out.println("events: "+events.size());
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("");
+
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN getAllEventsByUserID EXCEPTION BLOCK");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+		}
 	}
 }

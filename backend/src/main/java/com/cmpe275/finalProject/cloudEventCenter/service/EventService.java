@@ -70,9 +70,8 @@ public class EventService {
 			Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(),
 					eventData.getState(), eventData.getZip());
 
-			User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
-			// Event Organizer field is failing, retest after UserController is completed
-			// Switch eventData.getOrganizer() to null for successfull testing
+			User user = userRepository.findById(eventData.getOrganizerID()).orElseThrow(() -> new EntityNotFoundException("Invalid Organizer ID"));
+			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
 					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>(),

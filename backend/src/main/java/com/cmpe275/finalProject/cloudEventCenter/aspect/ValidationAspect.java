@@ -81,4 +81,10 @@ public class ValidationAspect {
 		if(organizerID.isBlank())
 			throw new IllegalArgumentException("Enter an organizerID"); 
 	}
+	
+	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.UserService.getAllEventsByUserID(..)) && args(userID)")
+	public void getAllEventsByUserIDValidationAdvice(JoinPoint joinPoint, String userID) {
+		if(userID.isBlank())
+			throw new IllegalArgumentException("Enter an userID"); 
+	}
 }

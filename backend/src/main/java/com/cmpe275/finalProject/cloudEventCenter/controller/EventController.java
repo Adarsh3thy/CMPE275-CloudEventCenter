@@ -89,9 +89,4 @@ public class EventController {
 		return eventService.cancelEvent(id);
 	}
 	
-//	@ResponseStatus(HttpStatus.OK)
-//	@RequestMapping(value = "/event/{id}", method = RequestMethod.PUT, produces=MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<?> getAllEventsByUserID(@PathVariable("userID") String id){
-//		return eventService.getAllEventsByUserID(id);
-//	}
 }
