@@ -93,7 +93,8 @@ public class Event {
 	
 	@ManyToOne(fetch=FetchType.LAZY,cascade = CascadeType.ALL)
 	@JoinColumn(name="ORGANIZER_ID",referencedColumnName = "USER_ID")
-	@JsonIgnoreProperties({"events", "eventToOrganize"})
+	@JsonIgnoreProperties({"events", "eventToOrganize","address","roles",
+		"hibernateLazyInitializer"})
 	private User organizer;
 	
     @Embedded
