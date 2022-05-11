@@ -10,6 +10,7 @@ import Events from "./components/Events";
 import SignupForum from "./components/Forums/Signup";
 import ParticipationForum from "./components/Forums/Participation";
 import DashboardLayout from "./components/Dashboard";
+import PrivateRoute from "./utils/PrivateRoute";
 
 function App() {
   const DashboardRoute = ({ exact, path, component: Component }) => (
@@ -18,7 +19,9 @@ function App() {
       path={path}
       render={(props) => (
         <div>
-          <DashboardLayout children={<Component {...props} />} />
+          <PrivateRoute>
+            <DashboardLayout children={<Component {...props} />} />
+          </PrivateRoute>
         </div>
       )}
     />
