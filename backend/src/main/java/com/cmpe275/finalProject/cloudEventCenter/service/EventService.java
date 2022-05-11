@@ -205,4 +205,19 @@ public class EventService {
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(searchedEvents);
 
 	}
+
+	public ResponseEntity<?> addParticipant(String eventID, String userID) {
+		try {
+			Event event = eventRepository.getById(eventID);
+			Set<User> participants = event.getParticipants();
+			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
+			event.setParticipants(participants);
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
+
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN addParticipant EXCEPTION BLOCK");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+		}
+	}
 }
