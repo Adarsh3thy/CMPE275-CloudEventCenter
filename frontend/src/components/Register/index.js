@@ -40,7 +40,7 @@ const Register = ({ ...props }) => {
     registerUser(data)
       .then((res) => {
         setIsSubmitted(false);
-        setSuccessMessage(res.message + " Redirecting...");
+        setSuccessMessage("Success! Redirecting...");
         setTimeout(() => {
           window.location.href = "/login";
         }, 3000);
