@@ -19,10 +19,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
+import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
+import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
+import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipentId;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.repository.EventParticipantRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 
@@ -40,6 +44,9 @@ public class EventService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private EventParticipantRepository eventParticipantRepository;
 
 	/**
 	 * This method is used to add an Event
@@ -70,11 +77,14 @@ public class EventService {
 			Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(),
 					eventData.getState(), eventData.getZip());
 
-			User user = userRepository.findById(eventData.getOrganizerID()).orElseThrow(() -> new EntityNotFoundException("Invalid Organizer ID"));
+			User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
+			// Event Organizer field is failing, retest after UserController is completed
+			// Switch eventData.getOrganizer() to null for successfull testing
+		
 			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new ArrayList<User>(),
+					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, null,
 					EEventStatus.REG_OPEN, true);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
@@ -147,7 +157,38 @@ public class EventService {
 	
 	public ResponseEntity<?> addParticipant(String eventID, String userID) {
 		try {
+			
 			Event event = eventRepository.getById(eventID);
+			if(event==null) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid event ID!"));
+
+			}
+			
+			User user=userRepository.getById(userID);
+			if(user==null) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid user ID!"));
+
+			}
+			if(event.getOrganizer().getId().equals(userID)) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: event organizer cant be participant too!"));
+
+			}
+			
+			if(event.getMaxParticipants()==event.getParticipants().size()) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: max limit for the event reached!"));
+
+			}
+			
+			EventParticipant eventParticipant=new EventParticipant();
+			EventParticipentId eventParticipantId=new EventParticipentId(event.getId(),user.getId());
+			eventParticipant.setId(eventParticipantId);
+			eventParticipant.setEvent(event);
+			eventParticipant.setParticipant(user);
+			eventParticipant.setStatus("REGISTERED");
+			
+			EventParticipant reteventParticipant=eventParticipantRepository.save(eventParticipant);
+			
+		/*	Event event = eventRepository.getById(eventID);
 			List<User> participants = event.getParticipants();
 //			System.out.println("aaa" + participants.size());
 			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
@@ -155,7 +196,9 @@ public class EventService {
 			eventRepository.save(event);
 //			System.out.println("aaa" + event.getParticipants().size());
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
-
+		*/
+			
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reteventParticipant);	
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN addParticipant EXCEPTION BLOCK");
