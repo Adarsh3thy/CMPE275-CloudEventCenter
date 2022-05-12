@@ -227,6 +227,8 @@ public class UserService {
 	
 	//TEST this after event registration
 	public ResponseEntity<?> getAllEventsByUserID(String userID) {
+		
+		try {
 		User user = userRepository.findById(userID).get();
 		if(user==null) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error:user not found!"));
@@ -234,7 +236,10 @@ public class UserService {
 		}
 		List<EventParticipant> attending_events = user.getEvents();
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(attending_events);
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body(new MessageResponse(e.toString()));
 
+		}
 		
 		/*try {
 			System.out.println("Reached");

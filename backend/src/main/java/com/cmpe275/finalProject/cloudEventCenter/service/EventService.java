@@ -74,8 +74,7 @@ public class EventService {
 	@Transactional
 	public ResponseEntity<?> addEvent(EventData eventData) {
 		try {
-			Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(),
-					eventData.getState(), eventData.getZip());
+			Address address = eventData.getAddress();
 
 			User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
 			// Event Organizer field is failing, retest after UserController is completed
