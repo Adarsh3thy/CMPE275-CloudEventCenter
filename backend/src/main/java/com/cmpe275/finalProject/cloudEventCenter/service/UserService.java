@@ -39,6 +39,7 @@ import com.cmpe275.finalProject.cloudEventCenter.mail.bean.Mail;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
+import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
@@ -226,7 +227,16 @@ public class UserService {
 	
 	//TEST this after event registration
 	public ResponseEntity<?> getAllEventsByUserID(String userID) {
-		try {
+		User user = userRepository.findById(userID).get();
+		if(user==null) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error:user not found!"));
+
+		}
+		List<EventParticipant> attending_events = user.getEvents();
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(attending_events);
+
+		
+		/*try {
 			System.out.println("Reached");
 			User user = userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID"));
 			System.out.println(user.getEmail());
@@ -238,6 +248,6 @@ public class UserService {
 			System.out.println(e.toString());
 			System.out.println("IN getAllEventsByUserID EXCEPTION BLOCK");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
-		}
+		}*/
 	}
 }
