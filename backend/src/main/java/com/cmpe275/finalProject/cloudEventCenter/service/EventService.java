@@ -67,14 +67,12 @@ public class EventService {
 	@Transactional
 	public ResponseEntity<?> addEvent(EventData eventData) {
 		try {
-			Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(),
-					eventData.getState(), eventData.getZip());
 
 			User user = userRepository.findById(eventData.getOrganizerID()).orElseThrow(() -> new EntityNotFoundException("Invalid Organizer ID"));
-			
+
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new ArrayList<User>(),
+					eventData.getMaxParticipants(), eventData.getFee(), false, user, eventData.getAddress(), new ArrayList<User>(),
 					EEventStatus.REG_OPEN, true);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
@@ -115,19 +113,6 @@ public class EventService {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
 		}
 	}
-
-//	@Transactional
-//	public ResponseEntity<?> getAllEventsByUserID(String userID) {
-//		try {
-//
-//			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace(System.out);
-//			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
-//		}
-//	}
 
 	@Transactional
 	public ResponseEntity<?> cancelEvent(String id) {
