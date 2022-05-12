@@ -2,6 +2,9 @@ package com.cmpe275.finalProject.cloudEventCenter.model;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -65,9 +68,14 @@ public class User {
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
     
-    @ManyToMany(cascade = CascadeType.MERGE)
-    @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private Set<Event> events;
+    @ManyToMany(mappedBy = "participants")
+    @JsonIgnoreProperties({"participants", "organizer"})
+    private List<Event> events;
+    
+//    @ManyToMany(cascade = CascadeType.MERGE)
+//    @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
+//    @JsonIgnoreProperties({"participants", "organizer"})
+//    private List<Event> events;
     
     @OneToMany(cascade = CascadeType.MERGE, mappedBy = "organizer")
     private Set<Event> eventToOrganize;

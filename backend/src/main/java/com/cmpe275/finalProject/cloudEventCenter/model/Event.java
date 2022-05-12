@@ -2,6 +2,7 @@ package com.cmpe275.finalProject.cloudEventCenter.model;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.AttributeOverride;
@@ -106,8 +107,12 @@ public class Event {
     })
 	private Address address;
     
-    @ManyToMany(mappedBy = "events")
-    private Set<User> participants;
+//    @ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
+//    private Set<User> participants;
+    
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> participants;
     
 	@Enumerated(EnumType.STRING)
 	@Column(name = "STATUS")

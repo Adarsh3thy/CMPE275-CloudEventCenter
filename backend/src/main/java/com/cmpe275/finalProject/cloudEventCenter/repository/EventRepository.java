@@ -15,10 +15,8 @@ public interface EventRepository extends JpaRepository<Event, String>{
 	
 	public List<Event> findByOrganizer(User organizer);
 	
-
-	
 	public boolean existsByOrganizer(User organizer);
 	
-	   @Query(value="select e.* from event e, participant_events p where e.event_id=p.event_id and p.user_id=?1",nativeQuery = true)
-	    public Set<Event> findEventsByUserId(String userId);
+	@Query(value="select e.* from event e, participant_events p where e.event_id=p.event_id and p.user_id=?1", nativeQuery = true)
+	public Set<Event> findEventsByUserId(String userId);
 }

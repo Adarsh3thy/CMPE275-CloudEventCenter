@@ -74,7 +74,7 @@ public class EventService {
 			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>(),
+					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new ArrayList<User>(),
 					EEventStatus.REG_OPEN, true);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
@@ -141,6 +141,24 @@ public class EventService {
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN cancelEvent EXCEPTION BLOCK");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+		}
+	}
+	
+	public ResponseEntity<?> addParticipant(String eventID, String userID) {
+		try {
+			Event event = eventRepository.getById(eventID);
+			List<User> participants = event.getParticipants();
+//			System.out.println("aaa" + participants.size());
+			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
+			event.setParticipants(participants);
+			eventRepository.save(event);
+//			System.out.println("aaa" + event.getParticipants().size());
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
+
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN addParticipant EXCEPTION BLOCK");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
 		}
 	}

@@ -228,16 +228,14 @@ public class UserService {
 	public ResponseEntity<?> getAllEventsByUserID(String userID) {
 		try {
 			System.out.println("Reached");
-			//User user = userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID"));
-			//System.out.println(user.getEmail());
-//			Set<Event> attending_events = user.getEvents();
-			//System.out.println(user.getEvents().size());
-			Set<Event> events=eventRepository.findEventsByUserId(userID);
-			System.out.println("events: "+events.size());
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("");
+			User user = userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID"));
+			System.out.println(user.getEmail());
+			List<Event> attending_events = user.getEvents();
+
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(attending_events);
 
 		} catch (Exception e) {
-			e.printStackTrace(System.out);
+			System.out.println(e.toString());
 			System.out.println("IN getAllEventsByUserID EXCEPTION BLOCK");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
 		}
