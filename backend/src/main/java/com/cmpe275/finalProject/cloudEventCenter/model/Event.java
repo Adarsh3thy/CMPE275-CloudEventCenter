@@ -107,7 +107,9 @@ public class Event {
     })
 	private Address address;
     
-    @ManyToMany(mappedBy = "events")
+//    @ManyToMany(mappedBy = "events")
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name = "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants;
     
 	@Enumerated(EnumType.STRING)

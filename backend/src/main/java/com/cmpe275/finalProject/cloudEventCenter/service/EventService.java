@@ -210,8 +210,11 @@ public class EventService {
 		try {
 			Event event = eventRepository.getById(eventID);
 			Set<User> participants = event.getParticipants();
+			System.out.println("aaa" + participants.size());
 			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
 			event.setParticipants(participants);
+			eventRepository.save(event);
+			System.out.println("aaa" + event.getParticipants().size());
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
 
 		} catch (Exception e) {
