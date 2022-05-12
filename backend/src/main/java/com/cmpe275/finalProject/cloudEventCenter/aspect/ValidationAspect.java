@@ -43,7 +43,7 @@ public class ValidationAspect {
 			throw new IllegalArgumentException("Enter a startTime after deadline");
 		}
 		
-		if(eventData.getCity().isBlank() || eventData.getState().isBlank() || eventData.getZip().isBlank()) {
+		if(eventData.getAddress().getCity().isBlank() || eventData.getAddress().getState().isBlank() || eventData.getAddress().getZip().isBlank()) {
 			throw new IllegalArgumentException("Enter a city, state and zipcode for the event");
 		}
 		

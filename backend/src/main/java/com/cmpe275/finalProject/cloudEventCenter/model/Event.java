@@ -75,7 +75,7 @@ public class Event {
 	private int minParticipants;
 	 
 	@Column(name="MAX_PARTICIPANTS")
-	private int MaxParticipants;
+	private int maxParticipants;
 	 
 	@Column(name="EVENT_FEE")
 	private double fee;
