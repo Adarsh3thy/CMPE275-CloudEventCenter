@@ -43,7 +43,7 @@ public class ValidationAspect {
 			throw new IllegalArgumentException("Enter a startTime after deadline");
 		}
 		
-		if(eventData.getCity().isBlank() || eventData.getState().isBlank() || eventData.getZip().isBlank()) {
+		if(eventData.getAddress().getCity().isBlank() || eventData.getAddress().getState().isBlank() || eventData.getAddress().getZip().isBlank()) {
 			throw new IllegalArgumentException("Enter a city, state and zipcode for the event");
 		}
 		
@@ -80,5 +80,11 @@ public class ValidationAspect {
 	public void getAllEventsValidationAdvice(JoinPoint joinPoint, String organizerID) {
 		if(organizerID.isBlank())
 			throw new IllegalArgumentException("Enter an organizerID"); 
+	}
+	
+	@Before("execution(public * com.cmpe275.finalProject.cloudEventCenter.service.UserService.getAllEventsByUserID(..)) && args(userID)")
+	public void getAllEventsByUserIDValidationAdvice(JoinPoint joinPoint, String userID) {
+		if(userID.isBlank())
+			throw new IllegalArgumentException("Enter an userID"); 
 	}
 }
