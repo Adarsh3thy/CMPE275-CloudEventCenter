@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -91,6 +92,23 @@ public class EventController {
 	@RequestMapping(value = "/event/{id}", method = RequestMethod.PUT, produces=MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<?> DeleteEvent(@PathVariable("eventID") String id){
 		return eventService.cancelEvent(id);
+	}
+	
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = "/event/{page}/search")
+	ResponseEntity<?> searchEvent(
+			@PathVariable("page") int page,
+			@RequestParam(required = false) String city,
+			@RequestParam(required = false) String status,
+			@RequestParam(required = false) String startTime,
+			@RequestParam(required = false) String endTime,
+			@RequestParam(required = false) String keyword,
+			@RequestParam(required = false) String organizer
+			
+			){
+		
+		return eventService.searchEvent(city, status, startTime, endTime, keyword, organizer,page);
+		
 	}
 	
 }

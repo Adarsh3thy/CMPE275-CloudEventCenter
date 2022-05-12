@@ -1,6 +1,9 @@
 package com.cmpe275.finalProject.cloudEventCenter.repository;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +22,33 @@ public interface EventRepository extends JpaRepository<Event, String>{
 	
 	@Query(value="select e.* from event e, participant_events p where e.event_id=p.event_id and p.user_id=?1", nativeQuery = true)
 	public Set<Event> findEventsByUserId(String userId);
+	
+
+	@Query(value="select e.* from event e, user u where e.organizer_id=u.user_id and "
+			+ "(?1 is null or (MATCH (e.event_title,e.event_desc) AGAINST (?1))"
+			+ "or lower(e.event_title) like %?1% or lower(e.event_desc) like %?1%) "
+			+ "and (?2 is null or lower(e.city) =?2) and "
+			+ "(?3 is null or e.status=?3) "
+			+ "and ((?5 is null and event_start_time>=DATE_FORMAT(?4,'%Y-%m-%d %H:%i:%s')) "
+			+ "or (?5 is not null and event_start_time>=DATE_FORMAT(?5,'%Y-%m-%d %H:%i:%s'))) "
+			+ "and (?6 is null or event_end_time<=DATE_FORMAT(?6,'%Y-%m-%d %H:%i:%s')) "
+			+ "and is_active=?7"
+			+" and (?8 is null or lower(u.screen_name) like %?8%)",
+			countQuery="select count(*) from event e, user u where e.organizer_id=u.user_id and "
+					+ "(?1 is null or (MATCH (e.event_title,e.event_desc) AGAINST (?1))"
+					+ "or lower(e.event_title) like %?1% or lower(e.event_desc) like %?1%) "
+					+ "and (?2 is null or lower(e.city) =?2) and "
+					+ "(?3 is null or e.status=?3) "
+					+ "and ((?5 is null and event_start_time>=DATE_FORMAT(?4,'%Y-%m-%d %H:%i:%s')) "
+					+ "or (?5 is not null and event_start_time>=DATE_FORMAT(?5,'%Y-%m-%d %H:%i:%s'))) "
+					+ "and (?6 is null or event_end_time<=DATE_FORMAT(?6,'%Y-%m-%d %H:%i:%s')) "
+					+ "and is_active=?7"
+					+" and (?8 is null or lower(u.screen_name) like %?8%)",
+			
+			
+			nativeQuery = true)
+	public Page<Event> searchForEvents(
+			 String keyword,String city,String status,String mimicTime,
+			 String startTime,String endTime,int active,String organizer,Pageable pageable
+			);
 }
