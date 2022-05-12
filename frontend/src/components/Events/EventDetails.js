@@ -9,6 +9,7 @@ import EventRegistration from "./EventRegistration";
 
 export default function EventDetails({
   open,
+  eventDetails,
   handleClose,
   handleEventRegistration,
 }) {
@@ -22,116 +23,112 @@ export default function EventDetails({
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>
-          {isSignUpModal ? "Event Sign up" : "Event Details"}
-        </DialogTitle>
-        <DialogContent>
-          {isSignUpModal ? (
-            <EventRegistration />
-          ) : (
-            <Grid container direction="column">
-              <Grid item>
-                <Typography
-                  sx={{
-                    textDecoration: "underline",
-                    fontWeight: "bold",
-                  }}
-                >
-                  Description:
-                </Typography>
-                <p>
-                  This is a sample description of an event created on the Cloud
-                  Event Center. This event is a great way to connect with
-                  industry professionals and brainstorm/have ideation sessions
-                  to solve some of the critical problems in the software
-                  industry right now.
-                </p>
-              </Grid>
-              <Grid item container direction="row" md={12}>
-                <Grid item md={6}>
+      {eventDetails ? (
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>
+            {isSignUpModal ? "Event Sign up" : "Event Details"}
+          </DialogTitle>
+          <DialogContent>
+            {isSignUpModal ? (
+              <EventRegistration />
+            ) : (
+              <Grid container direction="column">
+                <Grid item>
                   <Typography
                     sx={{
                       textDecoration: "underline",
                       fontWeight: "bold",
                     }}
                   >
-                    Min participants:
+                    Description:
                   </Typography>
-                  <p>25</p>
+                  <p>{eventDetails.description}</p>
                 </Grid>
-                <Grid item md={6}>
-                  <Typography
-                    sx={{
-                      textDecoration: "underline",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Max participants:
+                <Grid item container direction="row" md={12}>
+                  <Grid item md={6}>
+                    <Typography
+                      sx={{
+                        textDecoration: "underline",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Min participants:
+                    </Typography>
+                    <p>{eventDetails.minParticipants}</p>
+                  </Grid>
+                  <Grid item md={6}>
+                    <Typography
+                      sx={{
+                        textDecoration: "underline",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Max participants:
+                    </Typography>
+                    <p>{eventDetails.maxParticipants}</p>
+                  </Grid>
+                </Grid>
+                <Grid item container direction="row" md={12}>
+                  <Grid item md={6}>
+                    <Typography
+                      sx={{
+                        textDecoration: "underline",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Fee:
+                    </Typography>
+                    <p>${eventDetails.fee}</p>
+                  </Grid>
+                  <Grid item md={6}>
+                    <Typography
+                      sx={{
+                        textDecoration: "underline",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Current no. of sign-ups:
+                    </Typography>
+                    <p>{eventDetails.participants.length}</p>
+                  </Grid>
+                </Grid>
+                <Grid item>
+                  <Typography>
+                    <p>
+                      Have any questions?{" "}
+                      <Link sx={{ cursor: "pointer" }} href="/signup-forum">
+                        Check out our sign up forum here
+                      </Link>
+                    </p>
                   </Typography>
-                  <p>100</p>
                 </Grid>
               </Grid>
-              <Grid item container direction="row" md={12}>
-                <Grid item md={6}>
-                  <Typography
-                    sx={{
-                      textDecoration: "underline",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Fee:
-                  </Typography>
-                  <p>$200.00</p>
-                </Grid>
-                <Grid item md={6}>
-                  <Typography
-                    sx={{
-                      textDecoration: "underline",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Current no. of sign-ups:
-                  </Typography>
-                  <p>37</p>
-                </Grid>
-              </Grid>
-              <Grid item>
-                <Typography>
-                  <p>
-                    Have any questions?{" "}
-                    <Link sx={{ cursor: "pointer" }} href="/signup-forum">
-                      Check out our sign up forum here
-                    </Link>
-                  </p>
-                </Typography>
-              </Grid>
-            </Grid>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            sx={{ textTransform: "none" }}
-            onClick={
-              isSignUpModal ? () => setIsSignUpModal(false) : handleClose
-            }
-          >
-            {isSignUpModal ? "Back" : "Close"}
-          </Button>
-          <Button
-            variant="contained"
-            sx={{ textTransform: "none" }}
-            onClick={
-              isSignUpModal
-                ? (e) => handleEventRegistration(e)
-                : () => setIsSignUpModal(true)
-            }
-          >
-            {isSignUpModal ? "Confirm" : "Sign up for the event"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              sx={{ textTransform: "none" }}
+              onClick={
+                isSignUpModal ? () => setIsSignUpModal(false) : handleClose
+              }
+            >
+              {isSignUpModal ? "Back" : "Close"}
+            </Button>
+            <Button
+              variant="contained"
+              sx={{ textTransform: "none" }}
+              onClick={
+                isSignUpModal
+                  ? (e) => handleEventRegistration(e)
+                  : () => setIsSignUpModal(true)
+              }
+            >
+              {isSignUpModal ? "Confirm" : "Sign up for the event"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { filter } from "lodash";
 import { sentenceCase } from "change-case";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Table,
@@ -23,9 +23,10 @@ import {
   UserListHead,
   UserListToolbar,
 } from "../../sections/@dashboard/events";
-import USERLIST from "../../_mock/events";
 import CreateEvent from "./CreateEvent";
 import EventDetails from "./EventDetails";
+import { AuthConsumer } from "../contexts/Auth/AuthContext";
+import { getEvents, getEventDetails } from "../../controllers/events";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -46,37 +47,15 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(
-      array,
-      (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
-    );
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
-
-export default function Events() {
+const Events = ({ user }) => {
   const [page, setPage] = useState(0);
-  const [order, setOrder] = useState("asc");
   const [selected, setSelected] = useState([]);
-  const [orderBy, setOrderBy] = useState("name");
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState(false);
   const [openEventDetails, setOpenEventDetails] = useState(false);
+  const [allEvents, setAllEvents] = useState(null);
+  const [eventDetails, setEventDetails] = useState(null);
 
   const handleClose = () => {
     setOpen(false);
@@ -84,24 +63,6 @@ export default function Events() {
 
   const handleEventDetailsClose = () => {
     setOpenEventDetails(false);
-  };
-
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -113,25 +74,28 @@ export default function Events() {
     setPage(0);
   };
 
-  const handleFilterByName = (event) => {
-    setFilterName(event.target.value);
-  };
-
   const handleEventRegistration = (e) => {
     e.preventDefault();
     setOpenEventDetails(false);
   };
 
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const eventDetailsHandler = (e, eventId) => {
+    e.preventDefault();
+    getEventDetails(eventId)
+      .then((res) => {
+        setEventDetails(res.data);
+        setOpenEventDetails(true);
+      })
+      .catch((err) => console.log(err));
+  };
 
-  const filteredUsers = applySortFilter(
-    USERLIST,
-    getComparator(order, orderBy),
-    filterName
-  );
-
-  const isUserNotFound = filteredUsers.length === 0;
+  useEffect(() => {
+    getEvents(1)
+      .then((res) => {
+        setAllEvents(res.data.content);
+      })
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
     <>
@@ -155,37 +119,26 @@ export default function Events() {
             </Button>
           </Stack>
 
-          <Card>
-            <UserListToolbar
-              numSelected={selected.length}
-              filterName={filterName}
-              onFilterName={handleFilterByName}
-            />
+          {allEvents && allEvents.length > 0 ? (
+            <Card>
+              <UserListToolbar
+                numSelected={selected.length}
+                filterName={filterName}
+              />
 
-            <Scrollbar>
-              <TableContainer sx={{ minWidth: 800 }}>
-                <Table>
-                  <UserListHead headLabel={TABLE_HEAD} />
-                  <TableBody>
-                    {filteredUsers
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((row) => {
-                        const { id, name, role, status, company, isVerified } =
-                          row;
-                        const isItemSelected = selected.indexOf(name) !== -1;
-
-                        return (
+              <Scrollbar>
+                <TableContainer sx={{ minWidth: 800 }}>
+                  <Table>
+                    <UserListHead headLabel={TABLE_HEAD} />
+                    <TableBody>
+                      {allEvents.map((item) => (
+                        <>
                           <TableRow
                             hover
-                            key={id}
+                            key={item.id}
                             tabIndex={-1}
                             role="checkbox"
-                            selected={isItemSelected}
-                            aria-checked={isItemSelected}
-                            onClick={(e) => setOpenEventDetails(true)}
+                            onClick={(e) => eventDetailsHandler(e, item.id)}
                             sx={{ cursor: "pointer" }}
                           >
                             <TableCell padding="checkbox" />
@@ -200,68 +153,76 @@ export default function Events() {
                                 spacing={2}
                               >
                                 <Typography variant="subtitle2" noWrap>
-                                  {name}
+                                  {item.title}
                                 </Typography>
                               </Stack>
                             </TableCell>
-                            <TableCell align="left">{company}</TableCell>
-                            <TableCell align="left">{role}</TableCell>
                             <TableCell align="left">
-                              {isVerified ? "Yes" : "No"}
+                              {item.startTime} - {item.endTime}
+                            </TableCell>
+                            <TableCell align="left">
+                              {item.address.street}, {item.address.number},{" "}
+                              {item.address.city}, {item.address.state},{" "}
+                              {item.address.zip}
+                            </TableCell>
+                            <TableCell align="left">
+                              {item.organizer.screenName}
                             </TableCell>
                             <TableCell align="left">
                               <Label
                                 variant="ghost"
                                 color={
-                                  (status === "banned" && "error") || "success"
+                                  (item.status === "banned" && "error") ||
+                                  "success"
                                 }
                               >
-                                {sentenceCase(status)}
+                                {sentenceCase(item.status)}
                               </Label>
                             </TableCell>
                           </TableRow>
-                        );
-                      })}
-                    {emptyRows > 0 && (
-                      <TableRow style={{ height: 53 * emptyRows }}>
-                        <TableCell colSpan={6} />
-                      </TableRow>
-                    )}
-                  </TableBody>
-
-                  {isUserNotFound && (
-                    <TableBody>
-                      <TableRow>
-                        <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                          <SearchNotFound searchQuery={filterName} />
-                        </TableCell>
-                      </TableRow>
+                        </>
+                      ))}
                     </TableBody>
-                  )}
-                </Table>
-              </TableContainer>
-            </Scrollbar>
 
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={USERLIST.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Card>
+                    {allEvents && allEvents.length === 0 && (
+                      <TableBody>
+                        <TableRow>
+                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                            <SearchNotFound searchQuery={filterName} />
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    )}
+                  </Table>
+                </TableContainer>
+              </Scrollbar>
+
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={allEvents.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Card>
+          ) : null}
         </Container>
 
         <CreateEvent open={open} handleClose={handleClose} />
 
         <EventDetails
           open={openEventDetails}
+          eventDetails={eventDetails}
           handleClose={handleEventDetailsClose}
           handleEventRegistration={handleEventRegistration}
         />
       </Page>
     </>
   );
-}
+};
+
+export default (props) => (
+  <AuthConsumer>{({ user }) => <Events user={user} {...props} />}</AuthConsumer>
+);
