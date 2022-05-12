@@ -27,10 +27,10 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.SignupRequest;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.TokenRefreshRequest;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.TokenRefreshResponse;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.UpdateUserRequest;
-import com.cmpe275.finalProject.cloudEventCenter.config.Config;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.service.RefreshTokenService;
 import com.cmpe275.finalProject.cloudEventCenter.service.UserService;
+import com.cmpe275.finalProject.cloudEventCenter.security.Config;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;
 import com.cmpe275.finalProject.cloudEventCenter.exception.TokenRefreshException;
 
