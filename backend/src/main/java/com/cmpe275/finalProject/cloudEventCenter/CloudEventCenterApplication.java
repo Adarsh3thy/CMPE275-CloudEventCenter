@@ -6,10 +6,13 @@ import java.util.Date;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+import com.cmpe275.finalProject.cloudEventCenter.config.AppProperties;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 
 @SpringBootApplication
+@EnableConfigurationProperties(AppProperties.class)
 public class CloudEventCenterApplication {
 
 	public static void main(String[] args) {

@@ -16,6 +16,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.AuthEntryPointJwt;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.AuthTokenFilter;
+import com.cmpe275.finalProject.cloudEventCenter.security.oauth2.CustomOAuth2UserService;
+import com.cmpe275.finalProject.cloudEventCenter.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.cmpe275.finalProject.cloudEventCenter.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.cmpe275.finalProject.cloudEventCenter.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.cmpe275.finalProject.cloudEventCenter.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -26,12 +30,29 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	UserDetailsServiceImpl userDetailsService;
 	@Autowired
 	private AuthEntryPointJwt unauthorizedHandler;
-
+	
+	 @Autowired
+	 private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+	 
+	 @Autowired
+	 private CustomOAuth2UserService customOAuth2UserService;
+	 
+	 @Autowired
+	 private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+	 
+	 @Autowired
+	 private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+	 
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
 	}
-
+	
+	@Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
+	
 	@Override
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 		authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -53,7 +74,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.cors().and().csrf().disable().exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
 				.antMatchers("/api/auth/**").permitAll().antMatchers("/api/test/**").permitAll().anyRequest()
-				.authenticated();
+				.authenticated().and().oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize").authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .and()
+            .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
+            .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+            .successHandler(oAuth2AuthenticationSuccessHandler)
+            .failureHandler(oAuth2AuthenticationFailureHandler);
+				
+				
+				
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 }

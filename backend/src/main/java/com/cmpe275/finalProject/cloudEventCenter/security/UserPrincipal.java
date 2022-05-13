@@ -5,6 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
 
 import java.util.Collection;
@@ -28,7 +29,9 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = Collections.
-                singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                singletonList(new SimpleGrantedAuthority(ERole.ROLE_PERSON.toString())
+                		);
+        authorities.add(new SimpleGrantedAuthority(ERole.ROLE_ORGANIZATION.toString()));
 
         return new UserPrincipal(
                 user.getId(),
