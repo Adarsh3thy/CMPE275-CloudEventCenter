@@ -12,205 +12,246 @@ import {
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { createEvent } from "../../controllers/events";
 
-export default function CreateEvent({ open, handleClose }) {
-  /*
-    1) Title: brief text to name the event.
-    2) Description: text to describe the event.
-    3) StartTime: date and time for the event to start. Must be in the future. 
-    4) EndTime: Must be after the start time.
-    5) Deadline: date and time that participants must sign up before. A deadline must be no later than the start time. 
-      This is also the time the sign-up forum closes for new postings and entering read-only mode.
-    6) Address: Street and number (optional), City, State, Zip Code. We are assuming US addresses only. You can provide 
-      default values for the latter three to simplify the registration process.
-    7) MinParticipants: (inclusive) the minimum number of participants that must sign up before the deadline, or the 
-      event will be canceled.  
-    8) MaxParticipants: (inclusive) capacity of the event; if reached, no  new sign-ups are accepted.
-    9) Fee: amount in USD. An event can either be free or paid - only an event created by an organization can require 
-      a fee.  
-    10) AdmissionPolicy: first-come-first-served, or approval-required. For the former, the approval is automatic - 
-        registrations are confirmed right away. For the latter, registrations are not confirmed until approved by the 
-        organizer.  
-  */
-
+export default function CreateEvent({ open, handleClose, userId }) {
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [deadline, setDeadline] = useState(new Date());
+  const [deadline, setDeadline] = useState(null);
+  const [address1, setAddress1] = useState(null);
+  const [address2, setAddress2] = useState(null);
+  const [city, setCity] = useState(null);
+  const [state, setState] = useState(null);
+  const [zip, setZip] = useState(null);
+  const [minParticipants, setMinParticipants] = useState(null);
+  const [maxParticipants, setMaxParticipants] = useState(null);
+  const [fee, setFee] = useState(null);
+  const [admissionPolicy, setAdmissionPolicy] = useState(null);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    // setIsSubmitted(true);
+    let data = {};
+    data.title = title;
+    data.description = description;
+    data.startTime = startTime.toISOString().replace("Z", "");
+    data.endTime = endTime.toISOString().replace("Z", "");
+    data.deadline = deadline.toISOString().replace("Z", "");
+    data.street = address1;
+    data.number = address2;
+    data.city = city;
+    data.state = state;
+    data.zip = zip;
+    data.minParticipants = minParticipants;
+    data.maxParticipants = maxParticipants;
+    data.fee = fee;
+    data.approvalReq = admissionPolicy;
+    data.organizerID = userId;
+    console.log(data);
+    createEvent(data)
+      .then((res) => {
+        console.log(res);
+        // setIsSubmitted(false);
+        // if ((res.status = 200))
+        //   setSuccessMessage("Successfully updated user details.");
+      })
+      .catch((err) => {
+        console.log(err);
+        // setIsSubmitted(false);
+        // setErrorMessage("Something went wrong");
+        // setOpen(true);
+      });
+  };
 
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create Event</DialogTitle>
-        <DialogContent>
-          <Grid
-            container
-            direction="column"
-            spacing={2}
-            sx={{ marginTop: "5px" }}
-          >
-            <Grid item>
-              <TextField
-                required
-                label="Title"
-                fullWidth
-                autoComplete="given-name"
-                variant="outlined"
-                autoFocus
-              />
-            </Grid>
-            <Grid item>
-              <TextField
-                required
-                label="Description"
-                fullWidth
-                autoComplete="given-name"
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item container direction="row" md={12} spacing={2}>
-              <Grid item md={4}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    renderInput={(props) => <TextField {...props} />}
-                    label="Start time"
-                    value={startTime}
-                    onChange={(newValue) => {
-                      setStartTime(newValue);
-                    }}
+        <form onSubmit={onSubmit}>
+          <DialogTitle>Create Event</DialogTitle>
+          <DialogContent>
+            <Grid
+              container
+              direction="column"
+              spacing={2}
+              sx={{ marginTop: "5px" }}
+            >
+              <Grid item>
+                <TextField
+                  required
+                  label="Title"
+                  fullWidth
+                  variant="outlined"
+                  autoFocus
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </Grid>
+              <Grid item>
+                <TextField
+                  required
+                  label="Description"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </Grid>
+              <Grid item container direction="row" md={12} spacing={2}>
+                <Grid item md={4}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DateTimePicker
+                      renderInput={(props) => <TextField {...props} />}
+                      label="Start time"
+                      value={startTime}
+                      onChange={(newValue) => {
+                        setStartTime(newValue);
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item md={4}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DateTimePicker
+                      renderInput={(props) => <TextField {...props} />}
+                      label="End time"
+                      value={endTime}
+                      onChange={(newValue) => {
+                        setEndTime(newValue);
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item md={4}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DateTimePicker
+                      renderInput={(props) => <TextField {...props} />}
+                      label="Deadline"
+                      value={deadline}
+                      onChange={(newValue) => {
+                        setDeadline(newValue);
+                      }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+              </Grid>
+              <Grid item container direction="row" spacing={2}>
+                <Grid item md={6}>
+                  <TextField
+                    required
+                    label="Address Line 1"
+                    fullWidth
+                    variant="outlined"
+                    onChange={(e) => setAddress1(e.target.value)}
                   />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item md={4}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    renderInput={(props) => <TextField {...props} />}
-                    label="End time"
-                    value={endTime}
-                    onChange={(newValue) => {
-                      setEndTime(newValue);
-                    }}
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    label="Address Line 2"
+                    fullWidth
+                    autoComplete="family-name"
+                    variant="outlined"
+                    onChange={(e) => setAddress2(e.target.value)}
                   />
-                </LocalizationProvider>
+                </Grid>
               </Grid>
-              <Grid item md={4}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    renderInput={(props) => <TextField {...props} />}
-                    label="Deadline"
-                    value={deadline}
-                    onChange={(newValue) => {
-                      setDeadline(newValue);
-                    }}
+              <Grid item container direction="row" spacing={2}>
+                <Grid item md={4}>
+                  <TextField
+                    required
+                    label="City"
+                    fullWidth
+                    variant="outlined"
+                    defaultValue={"San Jose"}
+                    onChange={(e) => setCity(e.target.value)}
                   />
-                </LocalizationProvider>
+                </Grid>
+                <Grid item md={4}>
+                  <TextField
+                    required
+                    label="State"
+                    fullWidth
+                    autoComplete="family-name"
+                    variant="outlined"
+                    defaultValue={"California"}
+                    onChange={(e) => setState(e.target.value)}
+                  />
+                </Grid>
+                <Grid item md={4}>
+                  <TextField
+                    required
+                    label="Zip Code"
+                    fullWidth
+                    autoComplete="family-name"
+                    variant="outlined"
+                    defaultValue={"95126"}
+                    onChange={(e) => setZip(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item container direction="row" md={12} spacing={2}>
+                <Grid item md={6}>
+                  <TextField
+                    required
+                    label="Min participants"
+                    fullWidth
+                    autoComplete="family-name"
+                    variant="outlined"
+                    onChange={(e) => setMinParticipants(e.target.value)}
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    required
+                    label="Max participants"
+                    fullWidth
+                    autoComplete="family-name"
+                    variant="outlined"
+                    onChange={(e) => setMaxParticipants(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item container direction="row" md={12} spacing={2}>
+                <Grid item md={6}>
+                  <TextField
+                    required
+                    label="Fee"
+                    fullWidth
+                    autoComplete="family-name"
+                    variant="outlined"
+                    onChange={(e) => setFee(e.target.value)}
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="Admission policy"
+                    onChange={(e) => setAdmissionPolicy(e.target.value)}
+                  >
+                    <MenuItem value={false}>First come first served</MenuItem>
+                    <MenuItem value={true}>Approval required</MenuItem>
+                  </TextField>
+                </Grid>
               </Grid>
             </Grid>
-            <Grid item container direction="row" spacing={2}>
-              <Grid item md={6}>
-                <TextField
-                  required
-                  label="Address Line 1"
-                  fullWidth
-                  autoComplete="given-name"
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  label="Address Line 2"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-            <Grid item container direction="row" spacing={2}>
-              <Grid item md={4}>
-                <TextField
-                  required
-                  label="City"
-                  fullWidth
-                  autoComplete="given-name"
-                  variant="outlined"
-                  defaultValue={"San Jose"}
-                />
-              </Grid>
-              <Grid item md={4}>
-                <TextField
-                  required
-                  label="State"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                  defaultValue={"California"}
-                />
-              </Grid>
-              <Grid item md={4}>
-                <TextField
-                  required
-                  label="Zip Code"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                  defaultValue={"95126"}
-                />
-              </Grid>
-            </Grid>
-            <Grid item container direction="row" md={12} spacing={2}>
-              <Grid item md={6}>
-                <TextField
-                  required
-                  label="Min participants"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  required
-                  label="Max participants"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-            <Grid item container direction="row" md={12} spacing={2}>
-              <Grid item md={6}>
-                <TextField
-                  required
-                  label="Fee"
-                  fullWidth
-                  autoComplete="family-name"
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField fullWidth select label="Admission policy">
-                  <MenuItem value="fcfs">First come first served</MenuItem>
-                  <MenuItem value="ar">Approval required</MenuItem>
-                </TextField>
-              </Grid>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            variant="contained"
-            sx={{ textTransform: "none" }}
-            onClick={handleClose}
-          >
-            Close
-          </Button>
-          <Button
-            variant="contained"
-            sx={{ textTransform: "none" }}
-            onClick={handleClose}
-          >
-            Create
-          </Button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              sx={{ textTransform: "none" }}
+              onClick={handleClose}
+            >
+              Close
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{ textTransform: "none" }}
+            >
+              Create
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </div>
   );

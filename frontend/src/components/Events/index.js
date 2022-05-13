@@ -119,105 +119,115 @@ const Events = ({ user }) => {
             </Button>
           </Stack>
 
-          {allEvents && allEvents.length > 0 ? (
-            <Card>
-              <UserListToolbar
-                numSelected={selected.length}
-                filterName={filterName}
-              />
+          {user && allEvents && allEvents.length > 0 ? (
+            <>
+              <Card>
+                <UserListToolbar
+                  numSelected={selected.length}
+                  filterName={filterName}
+                />
 
-              <Scrollbar>
-                <TableContainer sx={{ minWidth: 800 }}>
-                  <Table>
-                    <UserListHead headLabel={TABLE_HEAD} />
-                    <TableBody>
-                      {allEvents.map((item) => (
-                        <>
-                          <TableRow
-                            hover
-                            key={item.id}
-                            tabIndex={-1}
-                            role="checkbox"
-                            onClick={(e) => eventDetailsHandler(e, item.id)}
-                            sx={{ cursor: "pointer" }}
-                          >
-                            <TableCell padding="checkbox" />
-                            <TableCell
-                              component="th"
-                              scope="row"
-                              padding="none"
+                <Scrollbar>
+                  <TableContainer sx={{ minWidth: 800 }}>
+                    <Table>
+                      <UserListHead headLabel={TABLE_HEAD} />
+                      <TableBody>
+                        {allEvents.map((item) => (
+                          <>
+                            <TableRow
+                              hover
+                              key={item.id}
+                              tabIndex={-1}
+                              role="checkbox"
+                              onClick={(e) => eventDetailsHandler(e, item.id)}
+                              sx={{ cursor: "pointer" }}
                             >
-                              <Stack
-                                direction="row"
-                                alignItems="center"
-                                spacing={2}
+                              <TableCell padding="checkbox" />
+                              <TableCell
+                                component="th"
+                                scope="row"
+                                padding="none"
                               >
-                                <Typography variant="subtitle2" noWrap>
-                                  {item.title}
-                                </Typography>
-                              </Stack>
-                            </TableCell>
-                            <TableCell align="left">
-                              {item.startTime} - {item.endTime}
-                            </TableCell>
-                            <TableCell align="left">
-                              {item.address.street}, {item.address.number},{" "}
-                              {item.address.city}, {item.address.state},{" "}
-                              {item.address.zip}
-                            </TableCell>
-                            <TableCell align="left">
-                              {item.organizer.screenName}
-                            </TableCell>
-                            <TableCell align="left">
-                              <Label
-                                variant="ghost"
-                                color={
-                                  (item.status === "banned" && "error") ||
-                                  "success"
-                                }
-                              >
-                                {sentenceCase(item.status)}
-                              </Label>
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  spacing={2}
+                                >
+                                  <Typography variant="subtitle2" noWrap>
+                                    {item.title}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell align="left">
+                                {item.startTime} - {item.endTime}
+                              </TableCell>
+                              <TableCell align="left">
+                                {item.address.street}, {item.address.number},{" "}
+                                {item.address.city}, {item.address.state},{" "}
+                                {item.address.zip}
+                              </TableCell>
+                              <TableCell align="left">
+                                {item.organizer.screenName}
+                              </TableCell>
+                              <TableCell align="left">
+                                <Label
+                                  variant="ghost"
+                                  color={
+                                    (item.status === "banned" && "error") ||
+                                    "success"
+                                  }
+                                >
+                                  {sentenceCase(item.status)}
+                                </Label>
+                              </TableCell>
+                            </TableRow>
+                          </>
+                        ))}
+                      </TableBody>
+
+                      {allEvents && allEvents.length === 0 && (
+                        <TableBody>
+                          <TableRow>
+                            <TableCell
+                              align="center"
+                              colSpan={6}
+                              sx={{ py: 3 }}
+                            >
+                              <SearchNotFound searchQuery={filterName} />
                             </TableCell>
                           </TableRow>
-                        </>
-                      ))}
-                    </TableBody>
+                        </TableBody>
+                      )}
+                    </Table>
+                  </TableContainer>
+                </Scrollbar>
 
-                    {allEvents && allEvents.length === 0 && (
-                      <TableBody>
-                        <TableRow>
-                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                            <SearchNotFound searchQuery={filterName} />
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    )}
-                  </Table>
-                </TableContainer>
-              </Scrollbar>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25]}
+                  component="div"
+                  count={allEvents.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </Card>
 
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={allEvents.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+              <CreateEvent
+                open={open}
+                handleClose={handleClose}
+                userId={user.id}
               />
-            </Card>
+
+              <EventDetails
+                open={openEventDetails}
+                eventDetails={eventDetails}
+                handleClose={handleEventDetailsClose}
+                handleEventRegistration={handleEventRegistration}
+              />
+            </>
           ) : null}
         </Container>
-
-        <CreateEvent open={open} handleClose={handleClose} />
-
-        <EventDetails
-          open={openEventDetails}
-          eventDetails={eventDetails}
-          handleClose={handleEventDetailsClose}
-          handleEventRegistration={handleEventRegistration}
-        />
       </Page>
     </>
   );

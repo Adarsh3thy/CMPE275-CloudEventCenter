@@ -8,3 +8,7 @@ export function getEvents(page = 1) {
 export function getEventDetails(eventId) {
   return axios.get(semiEndpoint + "/api/event/" + eventId);
 }
+
+export function createEvent(dataJson) {
+  return axios.post(semiEndpoint + "/api/event", dataJson);
+}
