@@ -29,10 +29,11 @@ export default function CreateEvent({ open, handleClose, userId }) {
   const [maxParticipants, setMaxParticipants] = useState(null);
   const [fee, setFee] = useState(null);
   const [admissionPolicy, setAdmissionPolicy] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const onSubmit = (e) => {
     e.preventDefault();
-    // setIsSubmitted(true);
+    setIsSubmitted(true);
     let data = {};
     data.title = title;
     data.description = description;
@@ -53,15 +54,12 @@ export default function CreateEvent({ open, handleClose, userId }) {
     createEvent(data)
       .then((res) => {
         console.log(res);
-        // setIsSubmitted(false);
-        // if ((res.status = 200))
-        //   setSuccessMessage("Successfully updated user details.");
+        setIsSubmitted(false);
+        if ((res.status = 200)) handleClose();
       })
       .catch((err) => {
         console.log(err);
-        // setIsSubmitted(false);
-        // setErrorMessage("Something went wrong");
-        // setOpen(true);
+        setIsSubmitted(false);
       });
   };
 
@@ -247,8 +245,9 @@ export default function CreateEvent({ open, handleClose, userId }) {
               type="submit"
               variant="contained"
               sx={{ textTransform: "none" }}
+              disabled={isSubmitted ? true : false}
             >
-              Create
+              {isSubmitted ? "Please wait.." : "Create"}
             </Button>
           </DialogActions>
         </form>

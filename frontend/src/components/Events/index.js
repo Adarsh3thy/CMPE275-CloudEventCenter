@@ -1,6 +1,5 @@
-import { filter } from "lodash";
 import { sentenceCase } from "change-case";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
@@ -27,6 +26,8 @@ import CreateEvent from "./CreateEvent";
 import EventDetails from "./EventDetails";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
 import { getEvents, getEventDetails } from "../../controllers/events";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -37,28 +38,27 @@ const TABLE_HEAD = [
   { id: "" },
 ];
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Events = ({ user }) => {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState([]);
   const [filterName, setFilterName] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [open, setOpen] = useState(false);
+  const [openCreateEvent, setOpenCreateEvent] = useState(false);
   const [openEventDetails, setOpenEventDetails] = useState(false);
   const [allEvents, setAllEvents] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [openSnack, setOpenSnack] = useState(false);
 
   const handleClose = () => {
-    setOpen(false);
+    setOpenCreateEvent(false);
+    setSuccessMessage("Successfully created event");
+    setOpenSnack(true);
+    getEventsFunc();
   };
 
   const handleEventDetailsClose = () => {
@@ -89,12 +89,16 @@ const Events = ({ user }) => {
       .catch((err) => console.log(err));
   };
 
-  useEffect(() => {
+  const getEventsFunc = () => {
     getEvents(1)
       .then((res) => {
         setAllEvents(res.data.content);
       })
       .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getEventsFunc();
   }, []);
 
   return (
@@ -113,7 +117,7 @@ const Events = ({ user }) => {
             <Button
               variant="contained"
               startIcon={<Iconify icon="eva:plus-fill" />}
-              onClick={(e) => setOpen(true)}
+              onClick={(e) => setOpenCreateEvent(true)}
             >
               New Event
             </Button>
@@ -214,7 +218,7 @@ const Events = ({ user }) => {
               </Card>
 
               <CreateEvent
-                open={open}
+                open={openCreateEvent}
                 handleClose={handleClose}
                 userId={user.id}
               />
@@ -225,6 +229,16 @@ const Events = ({ user }) => {
                 handleClose={handleEventDetailsClose}
                 handleEventRegistration={handleEventRegistration}
               />
+
+              <Snackbar
+                open={openSnack}
+                autoHideDuration={6000}
+                onClose={handleClose}
+              >
+                <Alert severity="success" sx={{ width: "100%" }}>
+                  {successMessage}
+                </Alert>
+              </Snackbar>
             </>
           ) : null}
         </Container>
