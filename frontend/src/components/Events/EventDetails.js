@@ -30,7 +30,7 @@ export default function EventDetails({
           </DialogTitle>
           <DialogContent>
             {isSignUpModal ? (
-              <EventRegistration />
+              <EventRegistration eventDetails={eventDetails} />
             ) : (
               <Grid container direction="column">
                 <Grid item>
