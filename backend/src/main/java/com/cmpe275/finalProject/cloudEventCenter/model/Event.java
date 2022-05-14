@@ -2,6 +2,7 @@ package com.cmpe275.finalProject.cloudEventCenter.model;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.AttributeOverride;
@@ -19,6 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
@@ -73,7 +75,7 @@ public class Event {
 	private int minParticipants;
 	 
 	@Column(name="MAX_PARTICIPANTS")
-	private int MaxParticipants;
+	private int maxParticipants;
 	 
 	@Column(name="EVENT_FEE")
 	private double fee;
@@ -93,7 +95,8 @@ public class Event {
 	
 	@ManyToOne(fetch=FetchType.LAZY,cascade = CascadeType.ALL)
 	@JoinColumn(name="ORGANIZER_ID",referencedColumnName = "USER_ID")
-	@JsonIgnoreProperties({"events", "eventToOrganize"})
+	@JsonIgnoreProperties({"events", "eventToOrganize","address","roles",
+		"hibernateLazyInitializer"})
 	private User organizer;
 	
     @Embedded
@@ -106,8 +109,20 @@ public class Event {
     })
 	private Address address;
     
-    @ManyToMany(mappedBy = "events")
-    private Set<User> participants;
+//    @ManyToMany(mappedBy = "events", cascade = CascadeType.ALL)
+//    private Set<User> participants;
+    
+	/*
+	 * @ManyToMany(cascade = CascadeType.MERGE)
+	 * 
+	 * @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name =
+	 * "event_id"), inverseJoinColumns = @JoinColumn(name = "user_id")) private
+	 * List<User> participants;
+	 */
+    
+    @OneToMany(mappedBy="event",cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<EventParticipant> participants;
     
 	@Enumerated(EnumType.STRING)
 	@Column(name = "STATUS")

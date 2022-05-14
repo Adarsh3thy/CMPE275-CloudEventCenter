@@ -7,7 +7,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
+import org.springframework.web.bind.annotation.RequestParam;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
@@ -19,10 +25,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
+import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
+import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
+import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipentId;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.repository.EventParticipantRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 
@@ -40,6 +50,11 @@ public class EventService {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private EventParticipantRepository eventParticipantRepository;
+	
+	public static final int SEARCH_RESULT_PER_PAGE = 5;
 
 	/**
 	 * This method is used to add an Event
@@ -67,15 +82,16 @@ public class EventService {
 	@Transactional
 	public ResponseEntity<?> addEvent(EventData eventData) {
 		try {
-			Address address = new Address(eventData.getStreet(), eventData.getNumber(), eventData.getCity(),
-					eventData.getState(), eventData.getZip());
+			Address address = eventData.getAddress();
 
 			User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
 			// Event Organizer field is failing, retest after UserController is completed
 			// Switch eventData.getOrganizer() to null for successfull testing
+		
+			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, new HashSet<User>(),
+					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, null,
 					EEventStatus.REG_OPEN, true);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
@@ -144,5 +160,106 @@ public class EventService {
 			System.out.println("IN cancelEvent EXCEPTION BLOCK");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
 		}
+	}
+	
+	public ResponseEntity<?> addParticipant(String eventID, String userID) {
+		try {
+			
+			Event event = eventRepository.getById(eventID);
+			if(event==null) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid event ID!"));
+
+			}
+			
+			User user=userRepository.getById(userID);
+			if(user==null) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid user ID!"));
+
+			}
+			if(event.getOrganizer().getId().equals(userID)) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: event organizer cant be participant too!"));
+
+			}
+			
+			if(event.getMaxParticipants()==event.getParticipants().size()) {
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: max limit for the event reached!"));
+
+			}
+			
+			EventParticipant eventParticipant=new EventParticipant();
+			EventParticipentId eventParticipantId=new EventParticipentId(event.getId(),user.getId());
+			eventParticipant.setId(eventParticipantId);
+			eventParticipant.setEvent(event);
+			eventParticipant.setParticipant(user);
+			eventParticipant.setStatus("REGISTERED");
+			
+			EventParticipant reteventParticipant=eventParticipantRepository.save(eventParticipant);
+			
+		/*	Event event = eventRepository.getById(eventID);
+			List<User> participants = event.getParticipants();
+//			System.out.println("aaa" + participants.size());
+			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
+			event.setParticipants(participants);
+			eventRepository.save(event);
+//			System.out.println("aaa" + event.getParticipants().size());
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
+		*/
+			
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reteventParticipant);	
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN addParticipant EXCEPTION BLOCK");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+		}
+	}
+	
+	public ResponseEntity<?> searchEvent(String city, String status, String startTime, String endTime, String keyword,
+			String organizer,int page) {
+
+		int isActive = 0;
+		String reqStatus = status;
+
+		if (status == null) {
+			isActive = 1;
+			reqStatus = null;
+		} else {
+
+			if (status == "ACTIVE") {
+				isActive = 1;
+				reqStatus = null;
+			} else if (status.equals("OPENFORREGISTRATION")) {
+				isActive = 1;
+				reqStatus = "REG_OPEN";
+			} else if (status.equals("ALL")) {
+				isActive = 0;
+				reqStatus = null;
+			}
+		}
+		
+		ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
+		String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+		String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+		String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1,
+				mimicDateTime.lastIndexOf('-')-4);
+		String ConvertedDateTime=mimicDate+" "+mimicTime;
+		System.out.println("ConvertedDateTime: "+ConvertedDateTime);
+		
+		  System.out.println("keyword: "+keyword);
+		  System.out.println("isActive: "+isActive);
+		  System.out.println("startTime: "+startTime);
+		  System.out.println("status: "+reqStatus);
+		 
+
+		
+		
+		//List<Event> searchedEvents=eventRepository.searchForEvents(keyword, city, status, ConvertedDateTime, startTime, endTime, isActive);
+		
+		Pageable pageable = PageRequest.of(page - 1, SEARCH_RESULT_PER_PAGE); 
+		Page<Event> searchedEvents=eventRepository.searchForEvents( keyword,city,reqStatus,ConvertedDateTime,startTime,endTime,isActive,organizer,pageable);
+
+		
+		System.out.println(searchedEvents);
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(searchedEvents);
+
 	}
 }

@@ -6,6 +6,8 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.LogOutRequest;
@@ -23,10 +27,10 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.SignupRequest;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.TokenRefreshRequest;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.TokenRefreshResponse;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.UpdateUserRequest;
-import com.cmpe275.finalProject.cloudEventCenter.config.Config;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.service.RefreshTokenService;
 import com.cmpe275.finalProject.cloudEventCenter.service.UserService;
+import com.cmpe275.finalProject.cloudEventCenter.security.Config;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;
 import com.cmpe275.finalProject.cloudEventCenter.exception.TokenRefreshException;
 
@@ -89,7 +93,7 @@ public class AuthController {
 	public String verifyUser(@RequestParam("code") String code) {
 		if (userService.verify(code)) {
 			return "<html>\n" + "    <body>\n" + "        <p>Verification Successful.</p>\n" + "<a href="
-					+ urlConfig.getFrontEndURL() + " target='_blank'>Login</a>" + "    </body>\n" + "</html>\n";
+					+ urlConfig.getFrontEndURL() +"login"+ " target='_blank'>Login</a>" + "    </body>\n" + "</html>\n";
 		} else {
 			return "<html>\n" + "    <body>\n" + "        <p>Verification Failed</p>\n" + "    </body>\n" + "</html>\n";
 		}
@@ -115,5 +119,10 @@ public class AuthController {
 	                "Refresh token is not in database!"));
 	  }
 	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(value = "/event/{userID}", method = RequestMethod.GET, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<?> getAllEventsByUserID(@PathVariable("userID") String userID){
+		return userService.getAllEventsByUserID(userID);
+	}
 
 }

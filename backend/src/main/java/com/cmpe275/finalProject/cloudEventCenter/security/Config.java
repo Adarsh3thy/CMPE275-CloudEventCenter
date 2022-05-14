@@ -1,4 +1,4 @@
-package com.cmpe275.finalProject.cloudEventCenter.config;
+package com.cmpe275.finalProject.cloudEventCenter.security;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +12,6 @@ public class Config {
     @Value("${application.url.frontend:http://localhost:3000/}")
     private String frontEndURL;
 
-    @Value("${application.url.backend:http://localhost:8089/}")
+    @Value("${application.url.backend:http://localhost:8080/}")
     private String backEndURL;
 }
