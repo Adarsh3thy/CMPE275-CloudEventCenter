@@ -1,9 +1,6 @@
 package com.cmpe275.finalProject.cloudEventCenter.controller;
 
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,31 +11,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
-import com.cmpe275.finalProject.cloudEventCenter.model.Event;
-import com.cmpe275.finalProject.cloudEventCenter.model.User;
-import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
-import com.cmpe275.finalProject.cloudEventCenter.service.SignUpForumService;
+import com.cmpe275.finalProject.cloudEventCenter.service.ParticipantForumService;
 
 /**
  * 
  * @author supreeth
- *
- * Sign Up Forum
- * ALL users can post a question on the sign up forum
- * ALL users can reply to a question on the sign up forum
  */
 
 @RestController
 @RequestMapping("/api/forums")
-public class SignUpForumController {
+public class ParticipantForumController {
 	
 	@Autowired
-	private SignUpForumService signUpForumService;
+	private ParticipantForumService forumService;
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/sign_up/{eventId}/questions", 
+			value = "/participant/{eventId}/questions", 
 			method = RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
@@ -47,12 +36,12 @@ public class SignUpForumController {
 			@RequestParam("userId") String userId,
 			@RequestParam("text") String text
 	) {	
-			return signUpForumService.createQuestion(userId, eventId, text);
+			return forumService.createQuestion(userId, eventId, text);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/sign_up/questions/{questionId}/answers", 
+			value = "/participant/questions/{questionId}/answers", 
 			method = RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
@@ -61,30 +50,32 @@ public class SignUpForumController {
 			@RequestParam("userId") String userId,
 			@RequestParam("text") String text
 	) {
-			return signUpForumService.createAnswer(userId, questionId, text);
+			return forumService.createAnswer(userId, questionId, text);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/sign_up/{eventId}/questions", 
+			value = "/participant/{eventId}/questions", 
 			method = RequestMethod.GET, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<?> getSignUpForumQuestions(
+			@RequestParam("userId") String userId,
 			@PathVariable(value =  "eventId") String eventId
 	) {
-			return signUpForumService.getQuestions(eventId);
+			return forumService.getQuestions(userId, eventId);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/sign_up/questions/{questionId}/answers", 
+			value = "/participant/questions/{questionId}/answers", 
 			method = RequestMethod.GET, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
 	ResponseEntity<?> getSignUpForumQuestionsAnswers(
+			@RequestParam("userId") String userId,
 			@PathVariable(value =  "questionId") String questionId
 	) {
-			return signUpForumService.getQuestionAnswers(questionId);
+			return forumService.getQuestionAnswers(userId, questionId);
     }
 }

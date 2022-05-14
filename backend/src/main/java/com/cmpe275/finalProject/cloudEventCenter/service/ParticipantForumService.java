@@ -36,7 +36,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 
 @Service
 @Component
-public class SignUpForumService {
+public class ParticipantForumService {
 	
 	@Autowired
 	private ForumQuestionsRepository questions_repository;
@@ -50,13 +50,26 @@ public class SignUpForumService {
 	@Autowired
 	private UserRepository users_repository;
 	
+	private Boolean is_user_participant(User user,  Event event) {
+		return true;
+	};
+	
 	private Boolean can_user_post(User user, Event event) {
-		/**Becomes closed for posting of new messages 
-			once the event registration deadline passes
-				or 
-			the event has been canceled*/
-		if (!event.getStatus().equals(EEventStatus.REG_OPEN)) return false;
-		if (event.getDeadline().isBefore(LocalDateTime.now())) return false;
+		// Only participants and the organizer can view and post in the participant forum. 
+		//  open for posting until 72 hours after the end of the event
+		// 		or
+		// 	anytime the organizer manually closes the participant forum after the event finishes.
+		
+		// A closed participant forum is still readable to the participants and organizer.
+
+		if (!this.is_user_participant(user, event)) return false;
+		
+		if (event.getStatus().equals(EEventStatus.REG_OPEN) || event.getStatus().equals(EEventStatus.CANCELLED)) 	
+			return false;
+		
+		if (event.getStatus().equals(EEventStatus.CLOSED) && event.getDeadline().isBefore(LocalDateTime.now().minusDays(3))) 
+			return false;
+		
 		return true;
 	};
 	
@@ -83,18 +96,18 @@ public class SignUpForumService {
 			            .body("Unauthorized User");
 			};
 			
-			if (!this.can_user_post(user, event)) {
-				return ResponseEntity
-			            .status(HttpStatus.FORBIDDEN)
-			            .body("You are not permitted to do this action");
-			};
+//			if (!this.can_user_post(user, event)) {
+//				return ResponseEntity
+//			            .status(HttpStatus.FORBIDDEN)
+//			            .body("You are not permitted to do this action");
+//			};
 			
 			ForumQuestions question = new ForumQuestions(
 					null,
 					user,
 					event,
 					text,
-					ForumTypes.SIGN_UP_FORUM,
+					ForumTypes.PARTICIPANT_FORUM,
 					null,
 					null
 			);
@@ -116,7 +129,7 @@ public class SignUpForumService {
 	}
 	
 	@Transactional
-	public ResponseEntity<?> getQuestions(String eventId) {
+	public ResponseEntity<?> getQuestions(String userId, String eventId) {
 		try {
 			
 			Event event = events_repository.findById(eventId).orElse(null);
@@ -125,12 +138,26 @@ public class SignUpForumService {
 			            .status(HttpStatus.NOT_FOUND)
 			            .body("Event not found");
 			};
+						
+			User user = users_repository.findById(userId).orElse(null);
+			if (user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.UNAUTHORIZED)
+			            .body("Unauthorized User");
+			};
+			
+			if (!this.is_user_participant(user, event)) {
+				return ResponseEntity
+			            .status(HttpStatus.FORBIDDEN)
+			            .body("You are not permitted to do this action");
+			};
 			
 			List<ForumQuestions> questions = 
 					questions_repository.findByEventAndForumType(
 							event,
-							ForumTypes.SIGN_UP_FORUM,
-							Sort.by(Sort.Direction.DESC, "createdAt")); 
+							ForumTypes.PARTICIPANT_FORUM,
+							Sort.by(Sort.Direction.DESC, "createdAt")
+					); 
 			return ResponseEntity
 					.status(HttpStatus.OK)
 					.contentType(MediaType.APPLICATION_JSON)
@@ -145,16 +172,27 @@ public class SignUpForumService {
 	}
 	
 	@Transactional
-	public ResponseEntity<?> getQuestionAnswers(String questionId) {
+	public ResponseEntity<?> getQuestionAnswers(String userId, String questionId) {
 		try {
-			//TODO: Sort the data
-			
 			ForumQuestions question = questions_repository.findById(questionId).orElse(null);
 			if (question == null) {
 				return ResponseEntity
 			            .status(HttpStatus.NOT_FOUND)
 			            .body("Forum Question not found");
 			}
+			
+			User user = users_repository.findById(userId).orElse(null);
+			if (user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.UNAUTHORIZED)
+			            .body("Unauthorized User");
+			};
+			
+			if (!this.is_user_participant(user, question.getEvent())) {
+				return ResponseEntity
+			            .status(HttpStatus.FORBIDDEN)
+			            .body("You are not permitted to do this action");
+			};
 			
 			List<ForumQuestionsAnswers> answers = answers_repository
 					.findByQuestion(question, Sort.by(Sort.Direction.DESC, "createdAt")); 
@@ -196,11 +234,11 @@ public class SignUpForumService {
 			            .body("Event not found");
 			};
 			
-			if (!this.can_user_post(user, event)) {
-				return ResponseEntity
-			            .status(HttpStatus.FORBIDDEN)
-			            .body("You are not permitted to do this action");
-			};
+//			if (!this.can_user_post(user, event)) {
+//				return ResponseEntity
+//			            .status(HttpStatus.FORBIDDEN)
+//			            .body("You are not permitted to do this action");
+//			};
 			
 			ForumQuestionsAnswers answer = new ForumQuestionsAnswers(
 					null,
