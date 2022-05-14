@@ -12,3 +12,9 @@ export function getEventDetails(eventId) {
 export function createEvent(dataJson) {
   return axios.post(semiEndpoint + "/api/event", dataJson);
 }
+
+export function registerEvent(eventId, userId) {
+  return axios.put(
+    semiEndpoint + "/api/registration/" + eventId + "/" + userId
+  );
+}

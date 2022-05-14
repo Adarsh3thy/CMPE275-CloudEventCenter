@@ -25,7 +25,11 @@ import {
 import CreateEvent from "./CreateEvent";
 import EventDetails from "./EventDetails";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
-import { getEvents, getEventDetails } from "../../controllers/events";
+import {
+  getEvents,
+  getEventDetails,
+  registerEvent,
+} from "../../controllers/events";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
@@ -52,7 +56,9 @@ const Events = ({ user }) => {
   const [allEvents, setAllEvents] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [successMessageReg, setSuccessMessageReg] = useState(null);
   const [openSnack, setOpenSnack] = useState(false);
+  const [openRegSnack, setOpenRegSnack] = useState(false);
 
   const handleClose = () => {
     setOpenCreateEvent(false);
@@ -76,7 +82,15 @@ const Events = ({ user }) => {
 
   const handleEventRegistration = (e) => {
     e.preventDefault();
-    setOpenEventDetails(false);
+    registerEvent(eventDetails.id, user.id)
+      .then((res) => {
+        if (res.status === 200) {
+          setOpenEventDetails(false);
+          setOpenRegSnack(true);
+          setSuccessMessageReg("Registered for the event!");
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   const eventDetailsHandler = (e, eventId) => {
@@ -123,7 +137,7 @@ const Events = ({ user }) => {
             </Button>
           </Stack>
 
-          {user && allEvents && allEvents.length > 0 ? (
+          {user ? (
             <>
               <Card>
                 <UserListToolbar
@@ -136,57 +150,59 @@ const Events = ({ user }) => {
                     <Table>
                       <UserListHead headLabel={TABLE_HEAD} />
                       <TableBody>
-                        {allEvents.map((item) => (
-                          <>
-                            <TableRow
-                              hover
-                              key={item.id}
-                              tabIndex={-1}
-                              role="checkbox"
-                              onClick={(e) => eventDetailsHandler(e, item.id)}
-                              sx={{ cursor: "pointer" }}
-                            >
-                              <TableCell padding="checkbox" />
-                              <TableCell
-                                component="th"
-                                scope="row"
-                                padding="none"
+                        {allEvents &&
+                          allEvents.length > 0 &&
+                          allEvents.map((item) => (
+                            <>
+                              <TableRow
+                                hover
+                                key={item.id}
+                                tabIndex={-1}
+                                role="checkbox"
+                                onClick={(e) => eventDetailsHandler(e, item.id)}
+                                sx={{ cursor: "pointer" }}
                               >
-                                <Stack
-                                  direction="row"
-                                  alignItems="center"
-                                  spacing={2}
+                                <TableCell padding="checkbox" />
+                                <TableCell
+                                  component="th"
+                                  scope="row"
+                                  padding="none"
                                 >
-                                  <Typography variant="subtitle2" noWrap>
-                                    {item.title}
-                                  </Typography>
-                                </Stack>
-                              </TableCell>
-                              <TableCell align="left">
-                                {item.startTime} - {item.endTime}
-                              </TableCell>
-                              <TableCell align="left">
-                                {item.address.street}, {item.address.number},{" "}
-                                {item.address.city}, {item.address.state},{" "}
-                                {item.address.zip}
-                              </TableCell>
-                              <TableCell align="left">
-                                {item.organizer.screenName}
-                              </TableCell>
-                              <TableCell align="left">
-                                <Label
-                                  variant="ghost"
-                                  color={
-                                    (item.status === "banned" && "error") ||
-                                    "success"
-                                  }
-                                >
-                                  {sentenceCase(item.status)}
-                                </Label>
-                              </TableCell>
-                            </TableRow>
-                          </>
-                        ))}
+                                  <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    spacing={2}
+                                  >
+                                    <Typography variant="subtitle2" noWrap>
+                                      {item.title}
+                                    </Typography>
+                                  </Stack>
+                                </TableCell>
+                                <TableCell align="left">
+                                  {item.startTime} - {item.endTime}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {item.address.street}, {item.address.number},{" "}
+                                  {item.address.city}, {item.address.state},{" "}
+                                  {item.address.zip}
+                                </TableCell>
+                                <TableCell align="left">
+                                  {item.organizer.screenName}
+                                </TableCell>
+                                <TableCell align="left">
+                                  <Label
+                                    variant="ghost"
+                                    color={
+                                      (item.status === "banned" && "error") ||
+                                      "success"
+                                    }
+                                  >
+                                    {sentenceCase(item.status)}
+                                  </Label>
+                                </TableCell>
+                              </TableRow>
+                            </>
+                          ))}
                       </TableBody>
 
                       {allEvents && allEvents.length === 0 && (
@@ -209,7 +225,7 @@ const Events = ({ user }) => {
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25]}
                   component="div"
-                  count={allEvents.length}
+                  count={allEvents && allEvents.length}
                   rowsPerPage={rowsPerPage}
                   page={page}
                   onPageChange={handleChangePage}
@@ -232,6 +248,16 @@ const Events = ({ user }) => {
 
               <Snackbar
                 open={openSnack}
+                autoHideDuration={6000}
+                onClose={handleClose}
+              >
+                <Alert severity="success" sx={{ width: "100%" }}>
+                  {successMessageReg}
+                </Alert>
+              </Snackbar>
+
+              <Snackbar
+                open={openRegSnack}
                 autoHideDuration={6000}
                 onClose={handleClose}
               >

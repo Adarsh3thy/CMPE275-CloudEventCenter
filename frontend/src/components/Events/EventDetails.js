@@ -13,12 +13,6 @@ export default function EventDetails({
   handleClose,
   handleEventRegistration,
 }) {
-  /*
-    1) Description
-    2) Fee
-    3) Min/max sign-ups
-    4) current number of sign-ups
-  */
   const [isSignUpModal, setIsSignUpModal] = useState(false);
 
   return (
