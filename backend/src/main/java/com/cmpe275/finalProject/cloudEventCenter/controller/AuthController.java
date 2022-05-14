@@ -93,7 +93,7 @@ public class AuthController {
 	public String verifyUser(@RequestParam("code") String code) {
 		if (userService.verify(code)) {
 			return "<html>\n" + "    <body>\n" + "        <p>Verification Successful.</p>\n" + "<a href="
-					+ urlConfig.getFrontEndURL() + " target='_blank'>Login</a>" + "    </body>\n" + "</html>\n";
+					+ urlConfig.getFrontEndURL() +"login"+ " target='_blank'>Login</a>" + "    </body>\n" + "</html>\n";
 		} else {
 			return "<html>\n" + "    <body>\n" + "        <p>Verification Failed</p>\n" + "    </body>\n" + "</html>\n";
 		}
