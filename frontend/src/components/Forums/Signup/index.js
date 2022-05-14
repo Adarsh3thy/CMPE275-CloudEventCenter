@@ -1,29 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, Grid, Paper } from "@mui/material";
+import { getQuestionsByEvent } from "../../../controllers/signupForum";
+import { getEventDetails } from "../../../controllers/events";
+import { useLocation } from "react-router-dom";
 
 const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
 
 const SignupForum = () => {
-  return (
+  const [questions, setQuestions] = useState(null);
+  const [eventDetails, setEventDetails] = useState(null);
+
+  const search = useLocation().search;
+
+  useEffect(() => {
+    const eventId = new URLSearchParams(search).get("eventId");
+    getEventDetails(eventId)
+      .then((res) => {
+        setEventDetails(res.data);
+        return getQuestionsByEvent(eventId);
+      })
+      .then((res) => {
+        setQuestions(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  return eventDetails && questions ? (
     <div style={{ padding: 14 }} className="App">
       <h1
         style={{
           marginBottom: 50,
         }}
       >
-        Sign Up Forum
+        Sign Up Forum ({eventDetails.title})
       </h1>
-      {[1, 2, 3, 4].map((item, index) => (
+      {questions.map((item) => (
         <Paper
           style={{
             padding: "40px 20px",
             marginTop: 25,
             cursor: "pointer",
-            background: index === 0 ? "#E5E4E2" : null,
+            background:
+              item.user.id === eventDetails.organizer.id ? "#E5E4E2" : null,
           }}
           onClick={() => {
-            window.location.href = "/signup-forum-comments";
+            window.location.href =
+              "/signup-forum-comments?questionId=" + item.id;
           }}
         >
           <Grid container wrap="nowrap" spacing={2}>
@@ -37,23 +60,21 @@ const SignupForum = () => {
                   textAlign: "left",
                 }}
               >
-                Anay Naik {index === 0 ? "(Organizer)" : ""}
+                {item.user.screenName}{" "}
+                {item.user.id === eventDetails.organizer.id
+                  ? "(Organizer)"
+                  : ""}
               </h4>
-              <p style={{ textAlign: "left" }}>
-                How do i attach images while commenting on a particular forum?
-                Also, mastercard isn't getting processed as my default payment
-                method, need assistance with this. Any kind of help would be
-                appreciated. TIA
-              </p>
+              <p style={{ textAlign: "left" }}>{item.text}</p>
               <p style={{ textAlign: "left", color: "gray" }}>
-                posted 1 minute ago
+                posted on {item.createdAt}
               </p>
             </Grid>
           </Grid>
         </Paper>
       ))}
     </div>
-  );
+  ) : null;
 };
 
 export default SignupForum;

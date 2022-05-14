@@ -90,7 +90,10 @@ export default function EventDetails({
                   <Typography>
                     <p>
                       Have any questions?{" "}
-                      <Link sx={{ cursor: "pointer" }} href="/signup-forum">
+                      <Link
+                        sx={{ cursor: "pointer" }}
+                        href={"/signup-forum?eventId=" + eventDetails.id}
+                      >
                         Check out our sign up forum here
                       </Link>
                     </p>

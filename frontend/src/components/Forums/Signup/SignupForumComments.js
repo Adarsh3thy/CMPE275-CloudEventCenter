@@ -1,17 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, TextField, Typography, Button } from "@mui/material";
+import { getQuestionAnswers } from "../../../controllers/signupForum";
+import { useLocation } from "react-router-dom";
 
 const SignupForumComments = () => {
-  return (
+  const [answers, setAnswers] = useState(null);
+
+  const search = useLocation().search;
+
+  useEffect(() => {
+    const questionId = new URLSearchParams(search).get("questionId");
+    getQuestionAnswers(questionId)
+      .then((res) => {
+        setAnswers(res.data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  console.log("answers: ", answers);
+  return answers && answers.length > 0 ? (
     <Grid container direction="column">
       <Grid item>
         <Typography sx={{ fontSize: "24px", fontWeight: "bold" }}>
-          <i>
-            How do i attach images while commenting on a particular forum? Also,
-            mastercard isn't getting processed as my default payment method,
-            need assistance with this. Any kind of help would be appreciated.
-            TIA
-          </i>
+          <i>{answers[0].question.text}</i>
+          <p
+            style={{
+              textAlign: "left",
+              color: "gray",
+              margin: 0,
+              fontSize: "18px",
+            }}
+          >
+            asked by {answers[0].user.screenName}
+          </p>
         </Typography>
       </Grid>
       <Grid item sx={{ marginTop: "25px" }}>
@@ -46,7 +67,7 @@ const SignupForumComments = () => {
           <h1>All Comments</h1>
         </Typography>
       </Grid>
-      {[1, 2, 3, 4, 5, 6, 7].map((item, index) => (
+      {answers.map((item) => (
         <Grid
           item
           container
@@ -63,22 +84,19 @@ const SignupForumComments = () => {
                 marginBottom: "10px",
               }}
             >
-              Anay Naik
+              {item.user.screenName}
             </h4>
           </Grid>
           <Grid item style={{ textAlign: "left", marginBottom: "5px" }}>
-            How do i attach images while commenting on a particular forum? Also,
-            mastercard isn't getting processed as my default payment method,
-            need assistance with this. Any kind of help would be appreciated.
-            TIA
+            {item.text}
           </Grid>
           <Grid item style={{ textAlign: "left", color: "gray" }}>
-            commented 1 minute ago
+            commented on {item.createdAt}
           </Grid>
         </Grid>
       ))}
     </Grid>
-  );
+  ) : null;
 };
 
 export default SignupForumComments;
