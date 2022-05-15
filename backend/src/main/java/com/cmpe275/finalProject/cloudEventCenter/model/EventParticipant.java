@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
@@ -42,8 +44,9 @@ public class EventParticipant {
 	@JsonIgnoreProperties({"eventToOrganize","roles","events"})
     private User participant;
 	
+	@Enumerated(EnumType.STRING)
 	@Column(name="STATUS")
-	private String status;
+	private ParticipantStatus status;
 	
 	
 }
