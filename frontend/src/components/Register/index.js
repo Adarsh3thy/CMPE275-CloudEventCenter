@@ -7,6 +7,7 @@ import { TextField, Typography, Button, Grid, MenuItem } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { registerUser } from "../../controllers/authentication";
+import { GoogleLogin } from "react-google-login";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -51,6 +52,35 @@ const Register = ({ ...props }) => {
         setErrorMessage("Something went wrong");
         setOpen(true);
       });
+  };
+
+  const onSuccess = async (res) => {
+    console.log("[Login success]: ", res);
+    setIsSubmitted(true);
+    let data = {};
+    data.fullName = res.profileObj.name;
+    data.email = res.profileObj.email;
+    data.password = res.profileObj.googleId;
+    data.screenName = res.profileObj.name;
+    data.role = new Array("organizer");
+    registerUser(data)
+      .then((res) => {
+        setIsSubmitted(false);
+        setSuccessMessage("Success! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsSubmitted(false);
+        setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
+  };
+
+  const onFailure = async (res) => {
+    console.log("[Login failure]: ", res);
   };
 
   return (
@@ -240,7 +270,7 @@ const Register = ({ ...props }) => {
               marginTop: "25px",
             }}
           >
-            Or Sign Up with:
+            Or
           </div>
         </Grid>
         <Grid item container direction="row">
@@ -251,7 +281,7 @@ const Register = ({ ...props }) => {
               marginRight: "15px",
             }}
           >
-            <div
+            {/* <div
               style={{
                 width: "100px",
                 height: "68px",
@@ -273,7 +303,14 @@ const Register = ({ ...props }) => {
                   marginTop: "10px",
                 }}
               />
-            </div>
+            </div> */}
+            <GoogleLogin
+              clientId="857063878187-8os7dud08rq5prsjvss674o1pnuafcse.apps.googleusercontent.com"
+              buttonText="Sign In with Google"
+              onSuccess={onSuccess}
+              onFailure={onFailure}
+              cookiePolicy={"single_host_origin"}
+            />
           </Grid>
         </Grid>
         <Grid

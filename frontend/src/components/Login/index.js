@@ -8,6 +8,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
 import { loginUser } from "../../controllers/authentication";
+import { GoogleLogin } from "react-google-login";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -46,6 +47,14 @@ const Login = ({ processLogin, history }) => {
         else setErrorMessage("Something went wrong");
         setOpen(true);
       });
+  };
+
+  const onSuccess = async (res) => {
+    console.log("[Login success]: ", res);
+  };
+
+  const onFailure = async (res) => {
+    console.log("[Login failure]: ", res);
   };
 
   return (
@@ -203,7 +212,7 @@ const Login = ({ processLogin, history }) => {
               marginTop: "25px",
             }}
           >
-            Or Sign In with:
+            Or
           </div>
         </Grid>
         <Grid item container direction="row">
@@ -214,7 +223,7 @@ const Login = ({ processLogin, history }) => {
               marginRight: "15px",
             }}
           >
-            <div
+            {/* <div
               style={{
                 width: "100px",
                 height: "68px",
@@ -236,7 +245,14 @@ const Login = ({ processLogin, history }) => {
                   marginTop: "10px",
                 }}
               />
-            </div>
+            </div> */}
+            <GoogleLogin
+              clientId="857063878187-8os7dud08rq5prsjvss674o1pnuafcse.apps.googleusercontent.com"
+              buttonText="Sign In with Google"
+              onSuccess={onSuccess}
+              onFailure={onFailure}
+              cookiePolicy={"single_host_origin"}
+            />
           </Grid>
         </Grid>
         <Grid
