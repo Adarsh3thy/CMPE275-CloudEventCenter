@@ -66,7 +66,12 @@ const SignupForum = ({ user }) => {
           }}
           onClick={() => {
             window.location.href =
-              "/signup-forum-comments?questionId=" + item.id;
+              "/signup-forum-comments?questionId=" +
+              item.id +
+              "&text=" +
+              item.text +
+              "&screenName=" +
+              item.user.screenName;
           }}
         >
           <Grid container wrap="nowrap" spacing={2}>

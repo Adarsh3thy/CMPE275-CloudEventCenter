@@ -19,6 +19,18 @@ export function createQuestion(eventId, dataJson) {
   );
 }
 
+export function createAnswer(questionId, dataJson) {
+  return axios.post(
+    semiEndpoint +
+      "/api/forums/sign_up/questions/" +
+      questionId +
+      "/answers?text=" +
+      dataJson.text +
+      "&userId=" +
+      dataJson.userId
+  );
+}
+
 export function getQuestionAnswers(questionId) {
   return axios.get(
     semiEndpoint + "/api/forums/sign_up/questions/" + questionId + "/answers"
