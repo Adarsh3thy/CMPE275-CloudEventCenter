@@ -3,17 +3,26 @@ import { Avatar, Grid, Paper } from "@mui/material";
 import { getQuestionsByEvent } from "../../../controllers/signupForum";
 import { getEventDetails } from "../../../controllers/events";
 import { useLocation } from "react-router-dom";
+import { Button } from "@mui/material";
+import PostNewQuestion from "./PostNewQuestion";
+import { AuthConsumer } from "../../contexts/Auth/AuthContext";
 
 const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
 
-const SignupForum = () => {
+const SignupForum = ({ user }) => {
   const [questions, setQuestions] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
 
   const search = useLocation().search;
 
-  useEffect(() => {
+  const handleClose = () => {
+    setOpenModal(false);
+    getEventDetailsFunc();
+  };
+
+  const getEventDetailsFunc = () => {
     const eventId = new URLSearchParams(search).get("eventId");
     getEventDetails(eventId)
       .then((res) => {
@@ -24,6 +33,10 @@ const SignupForum = () => {
         setQuestions(res.data);
       })
       .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getEventDetailsFunc();
   }, []);
 
   return eventDetails && questions ? (
@@ -34,6 +47,13 @@ const SignupForum = () => {
         }}
       >
         Sign Up Forum ({eventDetails.title})
+        <Button
+          variant="contained"
+          sx={{ marginLeft: "350px" }}
+          onClick={() => setOpenModal(true)}
+        >
+          Add a question
+        </Button>
       </h1>
       {questions.map((item) => (
         <Paper
@@ -73,8 +93,19 @@ const SignupForum = () => {
           </Grid>
         </Paper>
       ))}
+      <PostNewQuestion
+        open={openModal}
+        handleClose={handleClose}
+        eventId={eventDetails.id}
+        eventDetails={eventDetails}
+        userId={user.id}
+      />
     </div>
   ) : null;
 };
 
-export default SignupForum;
+export default (props) => (
+  <AuthConsumer>
+    {({ user }) => <SignupForum user={user} {...props} />}
+  </AuthConsumer>
+);

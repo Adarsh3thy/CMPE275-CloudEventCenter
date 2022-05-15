@@ -62,7 +62,7 @@ const Register = ({ ...props }) => {
     data.email = res.profileObj.email;
     data.password = res.profileObj.googleId;
     data.screenName = res.profileObj.name;
-    data.role = new Array("organizer");
+    data.role = new Array("organization");
     registerUser(data)
       .then((res) => {
         setIsSubmitted(false);

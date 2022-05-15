@@ -51,6 +51,24 @@ const Login = ({ processLogin, history }) => {
 
   const onSuccess = async (res) => {
     console.log("[Login success]: ", res);
+    setIsSubmitted(true);
+    let data = {};
+    data.email = res.profileObj.email;
+    data.password = res.profileObj.googleId;
+    loginUser(data)
+      .then((result) => {
+        processLogin(result.data).then((res) => {
+          setIsSubmitted(false);
+          history.push(res);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsSubmitted(false);
+        if ((error.status = 401)) setErrorMessage("Invalid Username/Password.");
+        else setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
   };
 
   const onFailure = async (res) => {

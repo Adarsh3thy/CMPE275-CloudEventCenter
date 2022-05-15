@@ -8,7 +8,7 @@ export function getQuestionsByEvent(eventId) {
 }
 
 export function createQuestion(eventId, dataJson) {
-  return axios.put(
+  return axios.post(
     semiEndpoint +
       "/api/forums/sign_up/" +
       eventId +
