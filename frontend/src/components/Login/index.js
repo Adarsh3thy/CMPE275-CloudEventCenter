@@ -4,21 +4,76 @@ import UndrawImage from "../../assets/isometric.png";
 import arrowUp from "../../assets/arrow-up.svg";
 import { logo } from "../../utils/constants";
 import { TextField, Typography, Button, Grid } from "@mui/material";
-import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { AuthConsumer } from "../contexts/Auth/AuthContext";
+import { loginUser } from "../../controllers/authentication";
+import { GoogleLogin } from "react-google-login";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const Login = ({ ...props }) => {
+const Login = ({ processLogin, history }) => {
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
 
-  // TODO: handlers
+  const handleClose = (e) => {
+    e.preventDefault();
+    setOpen(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitted(true);
+    let data = {};
+    data.email = email;
+    data.password = password;
+    loginUser(data)
+      .then((result) => {
+        processLogin(result.data).then((res) => {
+          setIsSubmitted(false);
+          history.push(res);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsSubmitted(false);
+        if ((error.status = 401)) setErrorMessage("Invalid Username/Password.");
+        else setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
+  };
+
+  const onSuccess = async (res) => {
+    console.log("[Login success]: ", res);
+    setIsSubmitted(true);
+    let data = {};
+    data.email = res.profileObj.email;
+    data.password = res.profileObj.googleId;
+    loginUser(data)
+      .then((result) => {
+        processLogin(result.data).then((res) => {
+          setIsSubmitted(false);
+          history.push(res);
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsSubmitted(false);
+        if ((error.status = 401)) setErrorMessage("Invalid Username/Password.");
+        else setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
+  };
+
+  const onFailure = async (res) => {
+    console.log("[Login failure]: ", res);
+  };
 
   return (
     <Grid
@@ -66,12 +121,12 @@ const Login = ({ ...props }) => {
           </span>
         </Grid>
         <Snackbar
-          // open={errorMessage}
+          open={errorMessage}
           autoHideDuration={6000}
-          // onClose={handleClose}
+          onClose={handleClose}
         >
           <Alert severity="error" sx={{ width: "100%" }}>
-            {/* {errorMessage} */}
+            {errorMessage}
           </Alert>
         </Snackbar>
         <Grid item>
@@ -90,9 +145,7 @@ const Login = ({ ...props }) => {
             Sign In
           </Typography>
         </Grid>
-        <form
-        // onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit}>
           <Grid item>
             <TextField
               required
@@ -145,6 +198,7 @@ const Login = ({ ...props }) => {
                 fontSize: "18px",
                 marginTop: "12px",
               }}
+              disabled={isSubmitted ? true : false}
             >
               <img
                 src={arrowUp}
@@ -158,7 +212,7 @@ const Login = ({ ...props }) => {
                   margin: "0px 8px",
                 }}
               />
-              Sign In
+              {isSubmitted ? "Please wait.." : "Sign in"}
             </Button>
           </Grid>
         </form>
@@ -176,7 +230,7 @@ const Login = ({ ...props }) => {
               marginTop: "25px",
             }}
           >
-            Or Sign In with:
+            Or
           </div>
         </Grid>
         <Grid item container direction="row">
@@ -187,7 +241,7 @@ const Login = ({ ...props }) => {
               marginRight: "15px",
             }}
           >
-            <div
+            {/* <div
               style={{
                 width: "100px",
                 height: "68px",
@@ -198,7 +252,7 @@ const Login = ({ ...props }) => {
                 borderRadius: "5px",
                 textAlign: "center",
               }}
-              // onClick={handleSjsuLogin}
+              // onClick={handleGoogleLogin}
             >
               <img
                 src={Image52}
@@ -209,7 +263,14 @@ const Login = ({ ...props }) => {
                   marginTop: "10px",
                 }}
               />
-            </div>
+            </div> */}
+            <GoogleLogin
+              clientId="857063878187-8os7dud08rq5prsjvss674o1pnuafcse.apps.googleusercontent.com"
+              buttonText="Sign In with Google"
+              onSuccess={onSuccess}
+              onFailure={onFailure}
+              cookiePolicy={"single_host_origin"}
+            />
           </Grid>
         </Grid>
         <Grid
@@ -249,21 +310,6 @@ const Login = ({ ...props }) => {
             </a>
           </Grid>
         </Grid>
-        <Stack sx={{ width: "100%" }}>
-          <Snackbar
-            open={open}
-            autoHideDuration={6000}
-            // onClose={handleClose}
-          >
-            <Alert
-              // onClose={handleClose}
-              severity="error"
-              sx={{ width: "100%" }}
-            >
-              Invalid Username/Password
-            </Alert>
-          </Snackbar>
-        </Stack>
       </Grid>
       <Grid
         item
@@ -291,4 +337,10 @@ const Login = ({ ...props }) => {
   );
 };
 
-export default Login;
+export default (props) => (
+  <AuthConsumer>
+    {({ processLogin, history }) => (
+      <Login processLogin={processLogin} history={history} {...props} />
+    )}
+  </AuthConsumer>
+);

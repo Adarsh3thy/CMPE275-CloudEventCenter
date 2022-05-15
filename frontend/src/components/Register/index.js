@@ -3,21 +3,85 @@ import Image52 from "../../assets/google-logo.png";
 import UndrawImage from "../../assets/isometric.png";
 import arrowUp from "../../assets/arrow-up.svg";
 import { logo } from "../../utils/constants";
-import { TextField, Typography, Button, Grid } from "@mui/material";
+import { TextField, Typography, Button, Grid, MenuItem } from "@mui/material";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { registerUser } from "../../controllers/authentication";
+import { GoogleLogin } from "react-google-login";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const Register = ({ ...props }) => {
+  const [fullName, setFullName] = useState(null);
+  const [role, setRole] = useState(null);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   // Hook for the MUI snackbar alert
   const [open, setOpen] = useState(false);
 
-  // TODO: handlers
+  const handleClose = (e) => {
+    e.preventDefault();
+    setOpen(false);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitted(true);
+    let data = {};
+    data.fullName = fullName;
+    data.email = email;
+    data.password = password;
+    data.screenName = fullName;
+    data.role = new Array(role);
+    registerUser(data)
+      .then((res) => {
+        setIsSubmitted(false);
+        setSuccessMessage("Success! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsSubmitted(false);
+        setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
+  };
+
+  const onSuccess = async (res) => {
+    console.log("[Login success]: ", res);
+    setIsSubmitted(true);
+    let data = {};
+    data.fullName = res.profileObj.name;
+    data.email = res.profileObj.email;
+    data.password = res.profileObj.googleId;
+    data.screenName = res.profileObj.name;
+    data.role = new Array("organization");
+    registerUser(data)
+      .then((res) => {
+        setIsSubmitted(false);
+        setSuccessMessage("Success! Redirecting...");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsSubmitted(false);
+        setErrorMessage("Something went wrong");
+        setOpen(true);
+      });
+  };
+
+  const onFailure = async (res) => {
+    console.log("[Login failure]: ", res);
+  };
 
   return (
     <Grid
@@ -65,12 +129,12 @@ const Register = ({ ...props }) => {
           </span>
         </Grid>
         <Snackbar
-          // open={errorMessage}
+          open={errorMessage}
           autoHideDuration={6000}
-          // onClose={handleClose}
+          onClose={handleClose}
         >
           <Alert severity="error" sx={{ width: "100%" }}>
-            {/* {errorMessage} */}
+            {errorMessage}
           </Alert>
         </Snackbar>
         <Grid item>
@@ -88,22 +152,35 @@ const Register = ({ ...props }) => {
             Get started with CEC!
           </Typography>
         </Grid>
-        <form
-        // onSubmit={handleSubmit}
-        >
+        <form onSubmit={handleSubmit}>
           <Grid item>
             <TextField
               required
-              type="email"
-              autoComplete="email"
-              placeholder="Email Address"
-              value={email}
+              type="text"
+              autoComplete="fullName"
+              placeholder="Full Name"
               style={{
                 width: "395px",
                 height: "67px",
                 boxSizing: "border-box",
                 borderRadius: "5px",
                 marginTop: "30px",
+              }}
+              error={open ? true : false}
+              onChange={(e) => setFullName(e.target.value)}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              required
+              type="email"
+              autoComplete="email"
+              placeholder="Email Address"
+              style={{
+                width: "395px",
+                height: "67px",
+                boxSizing: "border-box",
+                borderRadius: "5px",
               }}
               error={open ? true : false}
               onChange={(e) => setEmail(e.target.value)}
@@ -122,9 +199,27 @@ const Register = ({ ...props }) => {
                 borderRadius: "5px",
                 marginTop: "5px",
               }}
-              onChange={(e) => setPassword(e.target.value)}
               error={open ? true : false}
+              onChange={(e) => setPassword(e.target.value)}
             />
+          </Grid>
+          <Grid item>
+            <TextField
+              required
+              select
+              label="Account type"
+              style={{
+                width: "395px",
+                height: "67px",
+                boxSizing: "border-box",
+                borderRadius: "5px",
+              }}
+              error={open ? true : false}
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <MenuItem value={"person"}>Person</MenuItem>
+              <MenuItem value={"organization"}>Organization</MenuItem>
+            </TextField>
           </Grid>
           <Grid item>
             <Button
@@ -143,6 +238,7 @@ const Register = ({ ...props }) => {
                 fontSize: "18px",
                 marginTop: "12px",
               }}
+              disabled={isSubmitted ? true : false}
             >
               <img
                 src={arrowUp}
@@ -156,7 +252,7 @@ const Register = ({ ...props }) => {
                   margin: "0px 8px",
                 }}
               />
-              Sign Up
+              {isSubmitted ? "Please wait.." : "Sign Up"}
             </Button>
           </Grid>
         </form>
@@ -174,7 +270,7 @@ const Register = ({ ...props }) => {
               marginTop: "25px",
             }}
           >
-            Or Sign Up with:
+            Or
           </div>
         </Grid>
         <Grid item container direction="row">
@@ -185,7 +281,7 @@ const Register = ({ ...props }) => {
               marginRight: "15px",
             }}
           >
-            <div
+            {/* <div
               style={{
                 width: "100px",
                 height: "68px",
@@ -196,7 +292,7 @@ const Register = ({ ...props }) => {
                 borderRadius: "5px",
                 textAlign: "center",
               }}
-              // onClick={handleSjsuLogin}
+              // onClick={handleGoogleRegister}
             >
               <img
                 src={Image52}
@@ -207,7 +303,14 @@ const Register = ({ ...props }) => {
                   marginTop: "10px",
                 }}
               />
-            </div>
+            </div> */}
+            <GoogleLogin
+              clientId="857063878187-8os7dud08rq5prsjvss674o1pnuafcse.apps.googleusercontent.com"
+              buttonText="Sign In with Google"
+              onSuccess={onSuccess}
+              onFailure={onFailure}
+              cookiePolicy={"single_host_origin"}
+            />
           </Grid>
         </Grid>
         <Grid
@@ -270,6 +373,15 @@ const Register = ({ ...props }) => {
           }}
         />
       </Grid>
+      <Snackbar
+        open={successMessage}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert severity="success" sx={{ width: "100%" }}>
+          {successMessage}
+        </Alert>
+      </Snackbar>
     </Grid>
   );
 };
