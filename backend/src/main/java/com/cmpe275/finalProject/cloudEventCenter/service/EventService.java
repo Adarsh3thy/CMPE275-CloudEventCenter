@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
+import com.cmpe275.finalProject.cloudEventCenter.model.Role;
+
 import org.springframework.web.bind.annotation.RequestParam;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -28,6 +30,7 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
+import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
 import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipentId;
@@ -82,12 +85,74 @@ public class EventService {
 	@Transactional
 	public ResponseEntity<?> addEvent(EventData eventData) {
 		try {
+			if(eventData.getTitle().isBlank() || eventData.getDescription().isBlank()) {
+//				throw new IllegalArgumentException("Enter a valid title and desciption");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a valid title and desciption");
+			}
+			
+			if(eventData.getStartTime() == null || eventData.getEndTime() == null){
+//				throw new IllegalArgumentException("Enter a valid startTime/endTime");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a valid startTime/endTime");
+			}
+			
+			if(eventData.getEndTime().isBefore(eventData.getStartTime()) || eventData.getEndTime().isEqual(eventData.getStartTime())) {
+//				throw new IllegalArgumentException("Enter a startTime before endTime");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a startTime before endTime");
+			}
+				
+			if(eventData.getStartTime().isBefore(eventData.getDeadline())) {
+//				throw new IllegalArgumentException("Enter a startTime after deadline");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a startTime after deadline");
+			}
+			
+			if(eventData.getAddress().getCity().isBlank() || eventData.getAddress().getState().isBlank() || eventData.getAddress().getZip().isBlank()) {
+//				throw new IllegalArgumentException("Enter a city, state and zipcode for the event");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a city, state and zipcode for the event");
+			}
+			
+			if(eventData.getMinParticipants() < 0) {
+//				throw new IllegalArgumentException("Enter a positive minimum number of participants");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a positive minimum number of participants");
+			}
+			
+			if(eventData.getMaxParticipants() > Integer.MAX_VALUE) {
+//				throw new IllegalArgumentException("Enter a valid number of max participants");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter a valid number of max participants");
+			}
+			
+			User organizer  = userRepository.findById(eventData.getOrganizerID()).orElse(null);
+			Role organizerRole = organizer.getRoles().iterator().next();
+			
+			if(eventData.getFee() > 0 && organizerRole.getName().equals(ERole.ROLE_PERSON)) {
+//				throw new IllegalArgumentException("Participant cant charge a fee");
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Participant cant charge a fee");
+			}
+			
 			Address address = eventData.getAddress();
 
 			User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
-			// Event Organizer field is failing, retest after UserController is completed
-			// Switch eventData.getOrganizer() to null for successfull testing
-		
+			
+			if(user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("User not found");
+			}
 			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
@@ -99,58 +164,80 @@ public class EventService {
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN addEvent EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
 
 	@Transactional
 	public ResponseEntity<?> getEventByID(String id) {
 		try {
-			Event event = eventRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Invalid event ID"));
+			if(id.isBlank()) {
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter an event ID");
+			}
+			Event event = eventRepository.findById(id).orElse(null);
+			
+			if(event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			}
+			
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN getEventByID EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
 
 	@Transactional
 	public ResponseEntity<?> getAllEventsByOrganizerID(String organizerID) {
 		try {
-			User organizer = userRepository.getById(organizerID);
-
+			if(organizerID.isBlank()) {
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter an organizerID");
+			}
+			User organizer = userRepository.findById(organizerID).orElse(null);
+			
+			if(organizer == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("organizer not found");
+			}		
+			
+			
 			List<Event> events = eventRepository.findByOrganizer(organizer);
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(events);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
-
-//	@Transactional
-//	public ResponseEntity<?> getAllEventsByUserID(String userID) {
-//		try {
-//
-//			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("");
-//
-//		} catch (Exception e) {
-//			e.printStackTrace(System.out);
-//			System.out.println("IN getEventsByOrganizerID EXCEPTION BLOCK");
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
-//		}
-//	}
 
 	@Transactional
 	public ResponseEntity<?> cancelEvent(String id) {
 		try {
-			Event event = eventRepository.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException("Invalid event ID"));
+			if(id.isBlank()) {
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter an event ID");
+			}
+			
+			Event event = eventRepository.findById(id).orElse(null);
+			
+			if(event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			}
+			
 			eventRepository.deleteById(id);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
@@ -158,7 +245,7 @@ public class EventService {
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN cancelEvent EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
 	
@@ -209,7 +296,7 @@ public class EventService {
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			System.out.println("IN addParticipant EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
 	
