@@ -1,5 +1,7 @@
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -104,6 +106,25 @@ public class EventRegistrationService {
 			System.out.println("IN RejectParticipant EXCEPTION BLOCK");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
+	}
+
+	public ResponseEntity<?> getAllPendingRegistrations(String eventID) {
+		try {
+			if(eventID.isBlank()) {
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("Enter an event ID");
+			}
+			
+			List<EventParticipant> eventParticipants = eventParticipantRepository.findByPending(eventID);
+			
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventParticipants);
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.out);
+			System.out.println("IN getAllPendingRegistrations EXCEPTION BLOCK");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
+		}		
 	}
 	
 }
