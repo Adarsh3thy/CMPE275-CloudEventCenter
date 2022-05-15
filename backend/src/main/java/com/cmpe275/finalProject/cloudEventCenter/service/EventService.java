@@ -264,6 +264,7 @@ public class EventService {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid user ID!"));
 
 			}
+			
 			if(event.getOrganizer().getId().equals(userID)) {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: event organizer cant be participant too!"));
 
@@ -272,6 +273,17 @@ public class EventService {
 			if(event.getMaxParticipants()==event.getParticipants().size()) {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: max limit for the event reached!"));
 
+			}
+			
+			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
+			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
+			String ConvertedDateTime=mimicDate+" "+mimicTime;
+			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+			
+			if(currDateTime.isAfter(event.getDeadline())) {
+				return ResponseEntity.badRequest().body(new MessageResponse("You cant register after deadline has passed"));
 			}
 			
 			EventParticipant eventParticipant=new EventParticipant();
@@ -327,8 +339,7 @@ public class EventService {
 		ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
 		String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
 		String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
-		String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1,
-				mimicDateTime.lastIndexOf('-')-4);
+		String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
 		String ConvertedDateTime=mimicDate+" "+mimicTime;
 		System.out.println("ConvertedDateTime: "+ConvertedDateTime);
 		
