@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
+import com.cmpe275.finalProject.cloudEventCenter.model.ParticipantStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -278,7 +279,7 @@ public class EventService {
 			eventParticipant.setId(eventParticipantId);
 			eventParticipant.setEvent(event);
 			eventParticipant.setParticipant(user);
-			eventParticipant.setStatus("REGISTERED");
+			eventParticipant.setStatus(ParticipantStatus.Pending);
 			
 			EventParticipant reteventParticipant=eventParticipantRepository.save(eventParticipant);
 			
