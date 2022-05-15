@@ -21,6 +21,6 @@ public interface EventParticipantRepository extends JpaRepository<EventParticipa
 	public List<EventParticipant>
 	findById_EventId(String eventId);
 	
-	@Query(value="select pe from participant_events pe where pe.event_event_id=?1 and pe.participant_user_id=?2", nativeQuery = true)
-	public EventParticipant findAttendee(String eventId, String userId);
+	@Query(value="select * from participant_events p where p.event_event_id=?1 and p.STATUS='Pending'", nativeQuery = true)
+	public List<EventParticipant> findByPending(String eventId);
 }

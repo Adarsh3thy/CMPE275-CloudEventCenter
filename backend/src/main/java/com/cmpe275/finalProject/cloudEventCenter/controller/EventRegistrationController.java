@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +43,10 @@ public class EventRegistrationController {
 	@PutMapping("/reject/{eventID}/{userID}")
 	ResponseEntity<?> rejectParticipant(@PathVariable("eventID") String eventID, @PathVariable("userID") String userID){
 		return eventRegistrationService.rejectParticipant(eventID, userID);
+	}
+	
+	@GetMapping("/{eventID}")
+	ResponseEntity<?> getAllPendingRegistrations(@PathVariable("eventID") String eventID){
+		return eventRegistrationService.getAllPendingRegistrations(eventID);
 	}
 }
