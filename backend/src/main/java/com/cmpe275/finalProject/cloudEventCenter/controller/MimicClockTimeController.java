@@ -2,10 +2,12 @@ package com.cmpe275.finalProject.cloudEventCenter.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cmpe275.finalProject.cloudEventCenter.POJOs.MimicTimeResponse;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 
 @RestController
@@ -24,9 +27,31 @@ public class MimicClockTimeController {
 			value = "/gettime", 
 			method = RequestMethod.GET
 	)
-	String getTime(){
+	public ResponseEntity<?> getTime(){
 		ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
-		return MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+		String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+		String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+		String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1,
+				mimicDateTime.lastIndexOf('-')-4);
+		String convertedDateTimeStr=mimicDate+"T"+mimicTime;
+		LocalDateTime convertedDateTime = LocalDateTime.parse(convertedDateTimeStr);
+		MimicTimeResponse mimicTimeResponse=new MimicTimeResponse();
+		mimicTimeResponse.setMimicDateTime(convertedDateTime);
+		
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mimicTimeResponse);
+		
+	}
+	
+	public LocalDateTime getMimicDateTime(){
+		ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
+		String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+		String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+		String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1,
+				mimicDateTime.lastIndexOf('-')-4);
+		String convertedDateTimeStr=mimicDate+"T"+mimicTime;
+		LocalDateTime convertedDateTime = LocalDateTime.parse(convertedDateTimeStr);
+		return convertedDateTime;
+		
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
