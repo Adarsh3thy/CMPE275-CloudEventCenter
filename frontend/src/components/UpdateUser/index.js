@@ -59,15 +59,19 @@ const UpdateUser = ({ user }) => {
     if (screenName) data.screenName = screenName;
     else data.screenName = userDetails.screenName;
     if (gender) data.gender = gender;
+    else data.gender = userDetails.gender;
     if (description) data.description = description;
+    else data.description = userDetails.description;
     if (address1) data.street = address1;
+    else data.street = userDetails.street;
     if (address2) data.number = address2;
+    else data.number = userDetails.number;
     if (city) data.city = city;
-    else data.city = "San Jose";
+    else data.city = userDetails.city;
     if (state) data.state = state;
-    else data.state = "California";
+    else data.state = userDetails.state;
     if (zipcode) data.zip = zipcode;
-    else data.zip = "95126";
+    else data.zip = userDetails.zip;
     updateUserDetails(user.id, data)
       .then((res) => {
         console.log(res);
@@ -260,7 +264,7 @@ const UpdateUser = ({ user }) => {
                     defaultValue={
                       userDetails.address && userDetails.address.city
                         ? userDetails.address.city
-                        : "San Jose"
+                        : null
                     }
                   />
                 </Grid>
@@ -274,7 +278,7 @@ const UpdateUser = ({ user }) => {
                     defaultValue={
                       userDetails.address && userDetails.address.state
                         ? userDetails.address.state
-                        : "California"
+                        : null
                     }
                   />
                 </Grid>
@@ -288,7 +292,7 @@ const UpdateUser = ({ user }) => {
                     defaultValue={
                       userDetails.address && userDetails.address.state
                         ? userDetails.address.state
-                        : "95126"
+                        : null
                     }
                   />
                 </Grid>

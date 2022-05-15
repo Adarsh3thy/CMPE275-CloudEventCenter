@@ -19,7 +19,7 @@ export default function CreateEvent({ open, handleClose, userId }) {
   const [description, setDescription] = useState(null);
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [deadline, setDeadline] = useState(null);
+  const [deadline, setDeadline] = useState(new Date());
   const [address1, setAddress1] = useState(null);
   const [address2, setAddress2] = useState(null);
   const [city, setCity] = useState(null);
@@ -159,7 +159,6 @@ export default function CreateEvent({ open, handleClose, userId }) {
                     label="City"
                     fullWidth
                     variant="outlined"
-                    defaultValue={"San Jose"}
                     onChange={(e) => setCity(e.target.value)}
                   />
                 </Grid>
@@ -170,7 +169,6 @@ export default function CreateEvent({ open, handleClose, userId }) {
                     fullWidth
                     autoComplete="family-name"
                     variant="outlined"
-                    defaultValue={"California"}
                     onChange={(e) => setState(e.target.value)}
                   />
                 </Grid>
@@ -181,7 +179,6 @@ export default function CreateEvent({ open, handleClose, userId }) {
                     fullWidth
                     autoComplete="family-name"
                     variant="outlined"
-                    defaultValue={"95126"}
                     onChange={(e) => setZip(e.target.value)}
                   />
                 </Grid>
