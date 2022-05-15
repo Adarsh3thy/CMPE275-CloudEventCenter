@@ -6,10 +6,12 @@ import java.util.Date;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 
 @SpringBootApplication
+@EnableScheduling
 public class CloudEventCenterApplication {
 
 	public static void main(String[] args) {

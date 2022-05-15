@@ -42,7 +42,7 @@ public class MimicClockTimeController {
 		
 	}
 	
-	public LocalDateTime getMimicDateTime(){
+	public static LocalDateTime getMimicDateTime(){
 		ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
 		String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
 		String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
