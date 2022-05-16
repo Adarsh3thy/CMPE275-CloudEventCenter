@@ -18,6 +18,11 @@ const navConfig = [
     path: "/registrations",
     icon: getIcon("eva:file-text-fill"),
   },
+  {
+    title: "My Events",
+    path: "/myevents",
+    icon: getIcon("eva:file-text-fill"),
+  },
 ];
 
 export default navConfig;

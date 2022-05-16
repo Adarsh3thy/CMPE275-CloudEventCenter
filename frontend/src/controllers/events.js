@@ -18,3 +18,11 @@ export function registerEvent(eventId, userId) {
     semiEndpoint + "/api/registration/" + eventId + "/" + userId
   );
 }
+
+export function getEventRegistrationsByParticipant(userId) {
+  return axios.get(semiEndpoint + "/api/auth/event/" + userId);
+}
+
+export function getEventRegistrationsByOrganizer(userId) {
+  return axios.get(semiEndpoint + "/api/event/organizer/" + userId);
+}
