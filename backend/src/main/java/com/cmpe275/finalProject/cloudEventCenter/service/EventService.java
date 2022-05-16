@@ -145,6 +145,18 @@ public class EventService {
 			            .body("Participant cant charge a fee");
 			}
 			
+			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
+			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
+			String ConvertedDateTime=mimicDate+"T"+mimicTime;
+			
+			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+			
+			if(currDateTime.isAfter(eventData.getDeadline()) || currDateTime.isAfter(eventData.getStartTime()) || currDateTime.isAfter(eventData.getEndTime())) {
+				return ResponseEntity.badRequest().body(new MessageResponse("You cannot create an event with deadline, startTime, or endTime in the past"));
+			}
+			
 			Address address = eventData.getAddress();
 
 			User user = userRepository.findById(eventData.getOrganizerID()).orElse(null);
@@ -257,6 +269,18 @@ public class EventService {
 			if(event==null) {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid event ID!"));
 
+			}
+			
+			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
+			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
+			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
+			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
+			String ConvertedDateTime=mimicDate+"T"+mimicTime;
+			
+			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+			
+			if(currDateTime.isAfter(event.getDeadline())) {
+				return ResponseEntity.badRequest().body(new MessageResponse("You cant register after deadline has passed"));
 			}
 			
 			User user=userRepository.getById(userID);
