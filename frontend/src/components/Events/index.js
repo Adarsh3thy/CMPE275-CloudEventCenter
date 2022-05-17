@@ -47,9 +47,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const Events = ({ user }) => {
-  const [page, setPage] = useState(0);
-  const [selected, setSelected] = useState([]);
-  const [filterName, setFilterName] = useState("");
+  const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openCreateEvent, setOpenCreateEvent] = useState(false);
   const [openEventDetails, setOpenEventDetails] = useState(false);
@@ -76,8 +74,8 @@ const Events = ({ user }) => {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setRowsPerPage(parseInt(event.target.value));
+    setPage(1);
   };
 
   const handleEventRegistration = (e) => {
@@ -104,7 +102,7 @@ const Events = ({ user }) => {
   };
 
   const getEventsFunc = () => {
-    getEvents(1)
+    getEvents(page)
       .then((res) => {
         setAllEvents(res.data.content);
       })
@@ -140,10 +138,7 @@ const Events = ({ user }) => {
           {user ? (
             <>
               <Card>
-                <UserListToolbar
-                  numSelected={selected.length}
-                  filterName={filterName}
-                />
+                <UserListToolbar />
 
                 <Scrollbar>
                   <TableContainer sx={{ minWidth: 800 }}>
@@ -207,7 +202,7 @@ const Events = ({ user }) => {
 
                       {allEvents && allEvents.length === 0 && (
                         <TableCell colSpan={8} sx={{ py: 5 }}>
-                          <SearchNotFound searchQuery={filterName} />
+                          <SearchNotFound />
                         </TableCell>
                       )}
                     </Table>

@@ -33,40 +33,25 @@ UserListToolbar.propTypes = {
   onFilterName: PropTypes.func,
 };
 
-export default function UserListToolbar({
-  numSelected,
-  filterName,
-  onFilterName,
-  isRegistration = false,
-}) {
+export default function UserListToolbar({ isRegistration = false }) {
   return !isRegistration ? (
     <RootStyle
       sx={{
-        ...(numSelected > 0 && {
-          color: "primary.main",
-          bgcolor: "primary.lighter",
-        }),
+        color: "primary.main",
+        bgcolor: "primary.lighter",
       }}
     >
-      {numSelected > 0 ? (
-        <Typography component="div" variant="subtitle1">
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <SearchStyle
-          value={filterName}
-          onChange={onFilterName}
-          placeholder="Search Event..."
-          startAdornment={
-            <InputAdornment position="start">
-              <Iconify
-                icon="eva:search-fill"
-                sx={{ color: "text.disabled", width: 20, height: 20 }}
-              />
-            </InputAdornment>
-          }
-        />
-      )}
+      <SearchStyle
+        placeholder="Search Event..."
+        startAdornment={
+          <InputAdornment position="start">
+            <Iconify
+              icon="eva:search-fill"
+              sx={{ color: "text.disabled", width: 20, height: 20 }}
+            />
+          </InputAdornment>
+        }
+      />
     </RootStyle>
   ) : null;
 }
