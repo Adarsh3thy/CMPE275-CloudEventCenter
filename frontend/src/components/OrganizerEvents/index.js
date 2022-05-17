@@ -21,7 +21,7 @@ import {
   UserListToolbar,
 } from "../../sections/@dashboard/events";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
-import { getEventRegistrationsByParticipant } from "../../controllers/events";
+import { getEventRegistrationsByOrganizer } from "../../controllers/events";
 import MuiAlert from "@mui/material/Alert";
 
 const TABLE_HEAD = [
@@ -36,7 +36,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const EventRegistrations = ({ user }) => {
+const OrganizerEvents = ({ user }) => {
   const [page, setPage] = useState(0);
   const [selected, setSelected] = useState([]);
   const [filterName, setFilterName] = useState("");
@@ -53,7 +53,7 @@ const EventRegistrations = ({ user }) => {
   };
 
   const getEventsFunc = (userId) => {
-    getEventRegistrationsByParticipant(userId)
+    getEventRegistrationsByOrganizer(userId)
       .then((res) => {
         setAllEvents(res.data);
       })
@@ -64,6 +64,7 @@ const EventRegistrations = ({ user }) => {
     if (user) getEventsFunc(user.id);
   }, [user]);
 
+  console.log("allEvents: ", allEvents);
   return (
     <>
       <Page title="User">
@@ -75,7 +76,7 @@ const EventRegistrations = ({ user }) => {
             mb={5}
           >
             <Typography variant="h4" gutterBottom>
-              Registrations
+              My Events
             </Typography>
           </Stack>
 
@@ -117,30 +118,27 @@ const EventRegistrations = ({ user }) => {
                                     spacing={2}
                                   >
                                     <Typography variant="subtitle2" noWrap>
-                                      {item.event.title}
+                                      {item.title}
                                     </Typography>
                                   </Stack>
                                 </TableCell>
                                 <TableCell align="left">
-                                  {item.event.startTime} - {item.event.endTime}
+                                  {item.startTime} - {item.endTime}
                                 </TableCell>
                                 <TableCell align="left">
-                                  {item.event.address.street},{" "}
-                                  {item.event.address.number},{" "}
-                                  {item.event.address.city},{" "}
-                                  {item.event.address.state},{" "}
-                                  {item.event.address.zip}
+                                  {item.address.street}, {item.address.number},{" "}
+                                  {item.address.city}, {item.address.state},{" "}
+                                  {item.address.zip}
                                 </TableCell>
                                 <TableCell align="left">
                                   <Label
                                     variant="ghost"
                                     color={
-                                      (item.event.status === "banned" &&
-                                        "error") ||
+                                      (item.status === "banned" && "error") ||
                                       "success"
                                     }
                                   >
-                                    {sentenceCase(item.event.status)}
+                                    {sentenceCase(item.status)}
                                   </Label>
                                 </TableCell>
                               </TableRow>
@@ -185,6 +183,6 @@ const EventRegistrations = ({ user }) => {
 
 export default (props) => (
   <AuthConsumer>
-    {({ user }) => <EventRegistrations user={user} {...props} />}
+    {({ user }) => <OrganizerEvents user={user} {...props} />}
   </AuthConsumer>
 );

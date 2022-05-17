@@ -83,7 +83,7 @@ public class User {
             orphanRemoval = true)
     private List<EventParticipant> events;
     
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "organizer")
+    @OneToMany(mappedBy = "organizer")
     @JsonIgnoreProperties({"participants","organizer"})
     private Set<Event> eventToOrganize;
 }

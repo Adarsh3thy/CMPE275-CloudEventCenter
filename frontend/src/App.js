@@ -6,6 +6,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import UpdateUser from "./components/UpdateUser";
 import EventRegistrations from "./components/EventRegistrations";
+import OrganizerEvents from "./components/OrganizerEvents";
 import Events from "./components/Events";
 import SignupForum from "./components/Forums/Signup";
 import ParticipationForum from "./components/Forums/Participation";
@@ -38,6 +39,11 @@ function App() {
             <Route exact path="/register" component={Register} />
             <DashboardRoute exact path="/events" component={Events} />
             <DashboardRoute exact path="/update-user" component={UpdateUser} />
+            <DashboardRoute
+              exact
+              path="/myevents"
+              component={OrganizerEvents}
+            />
             <DashboardRoute
               exact
               path="/registrations"
