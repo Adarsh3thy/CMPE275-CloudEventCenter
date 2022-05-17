@@ -3,6 +3,7 @@ import { alpha, styled } from "@mui/material/styles";
 import { Box, Stack, AppBar, Toolbar, IconButton } from "@mui/material";
 import Iconify from "../../mui_components/Iconify";
 import AccountPopover from "./AccountPopover";
+import VirtualClock from "../../utils/VirtualClock";
 
 const DRAWER_WIDTH = 280;
 const APPBAR_MOBILE = 64;
@@ -41,6 +42,7 @@ export default function DashboardNavbar({ onOpenSidebar }) {
           <Iconify icon="eva:menu-2-fill" />
         </IconButton>
         <Box sx={{ flexGrow: 1 }} />
+        <VirtualClock />
         <Stack
           direction="row"
           alignItems="center"
