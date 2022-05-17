@@ -2,8 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import { Box, Link, Drawer, Typography, Avatar } from "@mui/material";
-import account from "../../_mock/account";
+import { Box, Link, Drawer } from "@mui/material";
 import Logo from "../../mui_components/Logo";
 import Scrollbar from "../../mui_components/Scrollbar";
 import NavSection from "../../mui_components/NavSection";
@@ -16,14 +15,6 @@ const RootStyle = styled("div")(({ theme }) => ({
     flexShrink: 0,
     width: DRAWER_WIDTH,
   },
-}));
-
-const AccountStyle = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(2, 2.5),
-  borderRadius: Number(theme.shape.borderRadius) * 1.5,
-  backgroundColor: theme.palette.grey[500_12],
 }));
 
 DashboardSidebar.propTypes = {
@@ -58,19 +49,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
         <Logo />
       </Box>
       <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none" component={RouterLink} to="#">
-          {/* <AccountStyle>
-            <Avatar src={account.photoURL} alt="photoURL" />
-            <Box sx={{ ml: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: "text.primary" }}>
-                {account.displayName}
-              </Typography>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                {account.role}
-              </Typography>
-            </Box>
-          </AccountStyle> */}
-        </Link>
+        <Link underline="none" component={RouterLink} to="#"></Link>
       </Box>
       <NavSection navConfig={navConfig} />
       <Box sx={{ flexGrow: 1 }} />

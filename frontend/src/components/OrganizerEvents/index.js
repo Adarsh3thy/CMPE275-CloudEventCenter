@@ -37,9 +37,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const OrganizerEvents = ({ user }) => {
-  const [page, setPage] = useState(0);
-  const [selected, setSelected] = useState([]);
-  const [filterName, setFilterName] = useState("");
+  const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [allEvents, setAllEvents] = useState(null);
 
@@ -49,7 +47,7 @@ const OrganizerEvents = ({ user }) => {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setPage(1);
   };
 
   const getEventsFunc = (userId) => {
@@ -64,7 +62,6 @@ const OrganizerEvents = ({ user }) => {
     if (user) getEventsFunc(user.id);
   }, [user]);
 
-  console.log("allEvents: ", allEvents);
   return (
     <>
       <Page title="User">
@@ -83,11 +80,7 @@ const OrganizerEvents = ({ user }) => {
           {user ? (
             <>
               <Card>
-                <UserListToolbar
-                  numSelected={selected.length}
-                  filterName={filterName}
-                  isRegistration={true}
-                />
+                <UserListToolbar isRegistration={true} />
 
                 <Scrollbar>
                   <TableContainer sx={{ minWidth: 800 }}>
@@ -147,17 +140,9 @@ const OrganizerEvents = ({ user }) => {
                       </TableBody>
 
                       {allEvents && allEvents.length === 0 && (
-                        <TableBody>
-                          <TableRow>
-                            <TableCell
-                              align="center"
-                              colSpan={6}
-                              sx={{ py: 3 }}
-                            >
-                              <SearchNotFound searchQuery={filterName} />
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
+                        <TableCell colSpan={8} sx={{ py: 5 }}>
+                          <SearchNotFound />
+                        </TableCell>
                       )}
                     </Table>
                   </TableContainer>
