@@ -58,6 +58,10 @@ const OrganizerEvents = ({ user }) => {
       .catch((err) => console.log(err));
   };
 
+  const formatDate = (res) => {
+    return res.split("T")[0];
+  };
+
   useEffect(() => {
     if (user) getEventsFunc(user.id);
   }, [user]);
@@ -116,7 +120,8 @@ const OrganizerEvents = ({ user }) => {
                                   </Stack>
                                 </TableCell>
                                 <TableCell align="left">
-                                  {item.startTime} - {item.endTime}
+                                  {formatDate(item.startTime)} -{" "}
+                                  {formatDate(item.endTime)}
                                 </TableCell>
                                 <TableCell align="left">
                                   {item.address.street}, {item.address.number},{" "}

@@ -109,6 +109,10 @@ const Events = ({ user }) => {
       .catch((err) => console.log(err));
   };
 
+  const formatDate = (res) => {
+    return res.split("T")[0];
+  };
+
   useEffect(() => {
     getEventsFunc();
   }, []);
@@ -174,7 +178,8 @@ const Events = ({ user }) => {
                                   </Stack>
                                 </TableCell>
                                 <TableCell align="left">
-                                  {item.startTime} - {item.endTime}
+                                  {formatDate(item.startTime)} -{" "}
+                                  {formatDate(item.endTime)}
                                 </TableCell>
                                 <TableCell align="left">
                                   {item.address.street}, {item.address.number},{" "}

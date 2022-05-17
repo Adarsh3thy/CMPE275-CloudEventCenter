@@ -58,6 +58,10 @@ const EventRegistrations = ({ user }) => {
       .catch((err) => console.log(err));
   };
 
+  const formatDate = (res) => {
+    return res.split("T")[0];
+  };
+
   useEffect(() => {
     if (user) getEventsFunc(user.id);
   }, [user]);
@@ -116,7 +120,8 @@ const EventRegistrations = ({ user }) => {
                                   </Stack>
                                 </TableCell>
                                 <TableCell align="left">
-                                  {item.event.startTime} - {item.event.endTime}
+                                  {formatDate(item.startTime)} -{" "}
+                                  {formatDate(item.endTime)}
                                 </TableCell>
                                 <TableCell align="left">
                                   {item.event.address.street},{" "}
