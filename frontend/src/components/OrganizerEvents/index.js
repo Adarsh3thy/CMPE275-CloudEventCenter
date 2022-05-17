@@ -147,17 +147,9 @@ const OrganizerEvents = ({ user }) => {
                       </TableBody>
 
                       {allEvents && allEvents.length === 0 && (
-                        <TableBody>
-                          <TableRow>
-                            <TableCell
-                              align="center"
-                              colSpan={6}
-                              sx={{ py: 3 }}
-                            >
-                              <SearchNotFound searchQuery={filterName} />
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
+                        <TableCell colSpan={8} sx={{ py: 5 }}>
+                          <SearchNotFound searchQuery={filterName} />
+                        </TableCell>
                       )}
                     </Table>
                   </TableContainer>
