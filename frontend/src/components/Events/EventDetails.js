@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -19,6 +19,7 @@ export default function EventDetails({
   eventDetails,
   handleEventRegistration,
   isOrganizer,
+  getEventDetailsFunc = () => {},
 }) {
   const [isSignUpModal, setIsSignUpModal] = useState(false);
 
@@ -27,19 +28,23 @@ export default function EventDetails({
     if (action === "approve") {
       approveParticipant(ids.eventId, ids.participantId)
         .then(() => {
-          // getEventDetailsFunc()
+          getEventDetailsFunc(ids.eventId);
         })
         .catch((err) => console.log(err));
     } else if (action === "reject") {
       rejectParticipant(ids.eventId, ids.participantId)
         .then(() => {
-          // getEventDetailsFunc()
+          getEventDetailsFunc(ids.eventId);
         })
         .catch((err) => console.log(err));
     } else {
       return;
     }
   };
+
+  useEffect(() => {
+    return;
+  }, [eventDetails]);
 
   return (
     <div>

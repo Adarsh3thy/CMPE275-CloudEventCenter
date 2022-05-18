@@ -74,6 +74,10 @@ const OrganizerEvents = ({ user }) => {
 
   const eventDetailsHandler = (e, eventId) => {
     e.preventDefault();
+    getEventDetailsFunc(eventId);
+  };
+
+  const getEventDetailsFunc = (eventId) => {
     getEventDetails(eventId)
       .then((res) => {
         setEventDetails(res.data);
@@ -191,6 +195,7 @@ const OrganizerEvents = ({ user }) => {
           eventDetails={eventDetails}
           handleClose={handleEventDetailsClose}
           isOrganizer={true}
+          getEventDetailsFunc={getEventDetailsFunc}
         />
       </Page>
     </>
