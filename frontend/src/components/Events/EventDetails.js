@@ -133,7 +133,9 @@ export default function EventDetails({
                   </Grid>
                 ) : (
                   <Grid item>
-                    <Typography>Participants: </Typography>
+                    {eventDetails.participants.length === 0 ? null : (
+                      <Typography>Participants: </Typography>
+                    )}
                     {eventDetails.participants &&
                       eventDetails.participants.map((item, index) => (
                         <List sx={{ margin: 0, padding: 0 }}>
