@@ -26,3 +26,15 @@ export function getEventRegistrationsByParticipant(userId) {
 export function getEventRegistrationsByOrganizer(userId) {
   return axios.get(semiEndpoint + "/api/event/organizer/" + userId);
 }
+
+export function approveParticipant(eventId, userId) {
+  return axios.put(
+    semiEndpoint + "/api/registration/approve/" + eventId + "/" + userId
+  );
+}
+
+export function rejectParticipant(eventId, userId) {
+  return axios.put(
+    semiEndpoint + "/api/registration/reject/" + eventId + "/" + userId
+  );
+}

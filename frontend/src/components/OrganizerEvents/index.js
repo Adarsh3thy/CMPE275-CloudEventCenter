@@ -21,8 +21,12 @@ import {
   UserListToolbar,
 } from "../../sections/@dashboard/events";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
-import { getEventRegistrationsByOrganizer } from "../../controllers/events";
+import {
+  getEventRegistrationsByOrganizer,
+  getEventDetails,
+} from "../../controllers/events";
 import MuiAlert from "@mui/material/Alert";
+import EventDetails from "../Events/EventDetails";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -40,6 +44,8 @@ const OrganizerEvents = ({ user }) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [allEvents, setAllEvents] = useState(null);
+  const [eventDetails, setEventDetails] = useState(null);
+  const [openEventDetails, setOpenEventDetails] = useState(false);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -60,6 +66,20 @@ const OrganizerEvents = ({ user }) => {
 
   const formatDate = (res) => {
     return res.split("T")[0];
+  };
+
+  const handleEventDetailsClose = () => {
+    setOpenEventDetails(false);
+  };
+
+  const eventDetailsHandler = (e, eventId) => {
+    e.preventDefault();
+    getEventDetails(eventId)
+      .then((res) => {
+        setEventDetails(res.data);
+        setOpenEventDetails(true);
+      })
+      .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -85,7 +105,6 @@ const OrganizerEvents = ({ user }) => {
             <>
               <Card>
                 <UserListToolbar isRegistration={true} />
-
                 <Scrollbar>
                   <TableContainer sx={{ minWidth: 800 }}>
                     <Table>
@@ -100,7 +119,7 @@ const OrganizerEvents = ({ user }) => {
                                 key={item.id}
                                 tabIndex={-1}
                                 role="checkbox"
-                                // onClick={(e) => eventDetailsHandler(e, item.id)}
+                                onClick={(e) => eventDetailsHandler(e, item.id)}
                                 sx={{ cursor: "pointer" }}
                               >
                                 <TableCell padding="checkbox" />
@@ -166,6 +185,13 @@ const OrganizerEvents = ({ user }) => {
             </>
           ) : null}
         </Container>
+
+        <EventDetails
+          open={openEventDetails}
+          eventDetails={eventDetails}
+          handleClose={handleEventDetailsClose}
+          isOrganizer={true}
+        />
       </Page>
     </>
   );

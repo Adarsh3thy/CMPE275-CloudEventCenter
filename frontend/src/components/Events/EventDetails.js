@@ -1,19 +1,45 @@
 import React, { useState } from "react";
-import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Grid, Link, Typography } from "@mui/material";
+import { Grid, Link, Typography, Button } from "@mui/material";
 import EventRegistration from "./EventRegistration";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import {
+  approveParticipant,
+  rejectParticipant,
+} from "../../controllers/events";
 
 export default function EventDetails({
   open,
-  eventDetails,
   handleClose,
+  eventDetails,
   handleEventRegistration,
+  isOrganizer,
 }) {
   const [isSignUpModal, setIsSignUpModal] = useState(false);
+
+  const handleParticipant = (e, action, ids) => {
+    e.preventDefault();
+    if (action === "approve") {
+      approveParticipant(ids.eventId, ids.participantId)
+        .then(() => {
+          // getEventDetailsFunc()
+        })
+        .catch((err) => console.log(err));
+    } else if (action === "reject") {
+      rejectParticipant(ids.eventId, ids.participantId)
+        .then(() => {
+          // getEventDetailsFunc()
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return;
+    }
+  };
 
   return (
     <div>
@@ -86,44 +112,96 @@ export default function EventDetails({
                     <p>{eventDetails.participants.length}</p>
                   </Grid>
                 </Grid>
-                <Grid item>
-                  <Typography>
-                    <p>
-                      Have any questions?{" "}
-                      <Link
-                        sx={{ cursor: "pointer" }}
-                        href={"/signup-forum?eventId=" + eventDetails.id}
-                      >
-                        Check out our sign up forum here
-                      </Link>
-                    </p>
-                  </Typography>
-                </Grid>
+                {!isOrganizer ? (
+                  <Grid item>
+                    <Typography>
+                      <p>
+                        Have any questions?{" "}
+                        <Link
+                          sx={{ cursor: "pointer" }}
+                          href={"/signup-forum?eventId=" + eventDetails.id}
+                        >
+                          Check out our sign up forum here
+                        </Link>
+                      </p>
+                    </Typography>
+                  </Grid>
+                ) : (
+                  <Grid item>
+                    <Typography>Participants: </Typography>
+                    {eventDetails.participants &&
+                      eventDetails.participants.map((item, index) => (
+                        <List sx={{ margin: 0, padding: 0 }}>
+                          <ListItem sx={{ margin: 0, padding: 0 }}>
+                            <ListItemText
+                              primary={
+                                index +
+                                1 +
+                                ")" +
+                                item.participant.screenName +
+                                "(" +
+                                item.status +
+                                ")"
+                              }
+                            />
+                            {item.status === "Pending" ? (
+                              <Button
+                                sx={{ border: "15px" }}
+                                variant="contained"
+                                color="success"
+                                size={"small"}
+                                onClick={(e) =>
+                                  handleParticipant(e, "approve", item.id)
+                                }
+                              >
+                                Approve
+                              </Button>
+                            ) : null}
+                            {item.status === "Pending" ? (
+                              <Button
+                                sx={{ border: "15px" }}
+                                variant="outlined"
+                                color="error"
+                                size={"small"}
+                                onClick={(e) =>
+                                  handleParticipant(e, "reject", item.id)
+                                }
+                              >
+                                Reject
+                              </Button>
+                            ) : null}
+                          </ListItem>
+                        </List>
+                      ))}
+                  </Grid>
+                )}
               </Grid>
             )}
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              sx={{ textTransform: "none" }}
-              onClick={
-                isSignUpModal ? () => setIsSignUpModal(false) : handleClose
-              }
-            >
-              {isSignUpModal ? "Back" : "Close"}
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ textTransform: "none" }}
-              onClick={
-                isSignUpModal
-                  ? (e) => handleEventRegistration(e)
-                  : () => setIsSignUpModal(true)
-              }
-            >
-              {isSignUpModal ? "Confirm" : "Sign up for the event"}
-            </Button>
-          </DialogActions>
+          {!isOrganizer ? (
+            <DialogActions>
+              <Button
+                variant="contained"
+                sx={{ textTransform: "none" }}
+                onClick={
+                  isSignUpModal ? () => setIsSignUpModal(false) : handleClose
+                }
+              >
+                {isSignUpModal ? "Back" : "Close"}
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ textTransform: "none" }}
+                onClick={
+                  isSignUpModal
+                    ? (e) => handleEventRegistration(e)
+                    : () => setIsSignUpModal(true)
+                }
+              >
+                {isSignUpModal ? "Confirm" : "Sign up for the event"}
+              </Button>
+            </DialogActions>
+          ) : null}
         </Dialog>
       ) : null}
     </div>
