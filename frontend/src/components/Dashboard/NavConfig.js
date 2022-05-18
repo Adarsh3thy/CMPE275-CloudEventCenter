@@ -4,6 +4,11 @@ const getIcon = (name) => <Iconify icon={name} width={22} height={22} />;
 
 const navConfig = [
   {
+    title: "Reports",
+    path: "/reports",
+    icon: getIcon("eva:people-fill"),
+  },
+  {
     title: "Update User",
     path: "/update-user",
     icon: getIcon("eva:people-fill"),
