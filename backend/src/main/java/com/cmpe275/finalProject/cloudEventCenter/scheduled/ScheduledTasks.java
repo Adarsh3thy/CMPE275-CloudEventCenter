@@ -28,7 +28,7 @@ public class ScheduledTasks {
 	EventParticipantRepository eventParticipantRepository;
 
 	
-	@Scheduled(fixedDelay = 2000, initialDelay = 5000)
+	//@Scheduled(fixedDelay = 2000, initialDelay = 5000)
 	public void performTask() {
 		List<Event> allevents=eventRepository.findAll();
 		LocalDateTime mimicDateTime=MimicClockTimeController.getMimicDateTime();

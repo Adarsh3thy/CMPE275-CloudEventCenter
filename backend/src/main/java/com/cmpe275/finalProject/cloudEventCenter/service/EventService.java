@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
+import com.cmpe275.finalProject.cloudEventCenter.controller.MimicClockTimeController;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
@@ -170,7 +172,7 @@ public class EventService {
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
 					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, null,
-					EEventStatus.REG_OPEN, true);
+					EEventStatus.REG_OPEN, true,LocalDate.now());
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
@@ -271,13 +273,9 @@ public class EventService {
 
 			}
 			
-			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
-			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
-			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
-			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
-			String ConvertedDateTime=mimicDate+"T"+mimicTime;
+		
 			
-			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(event.getDeadline())) {
 				return ResponseEntity.badRequest().body(new MessageResponse("You cant register after deadline has passed"));
@@ -303,8 +301,13 @@ public class EventService {
 			eventParticipant.setId(eventParticipantId);
 			eventParticipant.setEvent(event);
 			eventParticipant.setParticipant(user);
+			eventParticipant.setRegistrationDate(currDateTime.toLocalDate());
+			eventParticipant.setFee(event.getFee());
+			if(event.isApprovalRequired()) {
 			eventParticipant.setStatus(ParticipantStatus.Pending);
-			
+			}else {
+				eventParticipant.setStatus(ParticipantStatus.Approved);
+			}
 			EventParticipant reteventParticipant=eventParticipantRepository.save(eventParticipant);
 			
 		/*	Event event = eventRepository.getById(eventID);

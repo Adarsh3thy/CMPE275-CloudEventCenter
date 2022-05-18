@@ -1,6 +1,7 @@
 package com.cmpe275.finalProject.cloudEventCenter.model;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -130,4 +131,7 @@ public class Event {
 	
 	@Column(name = "IS_ACTIVE")
 	private boolean isActive;
+	
+	@Column(name = "CREATED_ON")
+	private LocalDate createdOn;
 }
