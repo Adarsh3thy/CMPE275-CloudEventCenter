@@ -160,4 +160,16 @@ public class ReviewService {
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(avgRatings);
 	}
 
+	public ResponseEntity<?> getAvgParticipantReviews(String participantID) {
+		List<Reviews> participantReviews = reviewsRepository.findByReviewForAndReviewType(participantID, EEventRole.PARTICIPANT);
+		
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(participantReviews);
+	}
+
+	public ResponseEntity<?> getAvgOrganizerReviews(String organizerID) {
+		List<Reviews> organizerReviews = reviewsRepository.findByReviewForAndReviewType(organizerID, EEventRole.ORGANIZER);
+		
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(organizerReviews);
+	}
+
 }

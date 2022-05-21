@@ -75,7 +75,7 @@ public class ReviewController {
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
-	@GetMapping(value = "/participant/{participantID}")
+	@GetMapping(value = "/participant/ratings/{participantID}")
 	ResponseEntity<?> getAvgParticipantRatings(@PathVariable("participantID") String participantID){
 		
 		if(participantID.isBlank())
@@ -88,7 +88,7 @@ public class ReviewController {
 	}
 	
 	@ResponseStatus(HttpStatus.OK)
-	@GetMapping(value = "/organizer/{organizerID}")
+	@GetMapping(value = "/organizer/ratings/{organizerID}")
 	ResponseEntity<?> getAvgOrganizerRatings(@PathVariable("organizerID") String organizerID){
 		
 		if(organizerID.isBlank())
@@ -97,6 +97,32 @@ public class ReviewController {
 	            .body("Enter an organizerID");
 		
 		return reviewService.getAvgOrganizerRatings(organizerID);
+		
+	}
+	
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = "/participant/reviews/{participantID}")
+	ResponseEntity<?> getAvgParticipantReviews(@PathVariable("participantID") String participantID){
+		
+		if(participantID.isBlank())
+			return ResponseEntity
+	            .status(HttpStatus.BAD_REQUEST)
+	            .body("Enter an participantID");
+		
+		return reviewService.getAvgParticipantReviews(participantID);
+		
+	}
+	
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping(value = "/organizer/reviews/{organizerID}")
+	ResponseEntity<?> getAvgOrganizerReviews(@PathVariable("organizerID") String organizerID){
+		
+		if(organizerID.isBlank())
+			return ResponseEntity
+	            .status(HttpStatus.BAD_REQUEST)
+	            .body("Enter an organizerID");
+		
+		return reviewService.getAvgOrganizerReviews(organizerID);
 		
 	}
 }
