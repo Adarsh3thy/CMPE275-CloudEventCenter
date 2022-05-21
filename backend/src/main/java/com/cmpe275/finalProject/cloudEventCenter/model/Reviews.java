@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -78,8 +80,9 @@ public class Reviews {
 	 *  Alex		Blake			Participant
 	 *  Alex		Cathy			Participant
 	 */
+	@Enumerated(EnumType.STRING)
 	@Column(name = "REVIEW_TYPE")
-	private String reviewType;
+	private EEventRole reviewType;
 	
 	@Column(name = "text")
 	private String review;
