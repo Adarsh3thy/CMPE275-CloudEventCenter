@@ -36,6 +36,11 @@ public class ReviewController {
 	            .status(HttpStatus.BAD_REQUEST)
 	            .body("Enter an eventID or reviewerID");
 		
+		if(reviewRatingData.getRating() < 1 || reviewRatingData.getRating() > 5)
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body("Enter rating score between 1 - 5");
+		
 	    return reviewService.addReviewForOrganizer(eventID, reviewerID, reviewRatingData.getReview(), reviewRatingData.getRating());
 	}
 	
@@ -48,6 +53,11 @@ public class ReviewController {
 			return ResponseEntity
 	            .status(HttpStatus.BAD_REQUEST)
 	            .body("Enter an eventID or participantID");
+		
+		if(reviewRatingData.getRating() < 1 || reviewRatingData.getRating() > 5)
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body("Enter rating score between 1 - 5");
 		
 	    return reviewService.addReviewForParticipant(eventID, participantID, reviewRatingData.getReview(), reviewRatingData.getRating());
 	}
