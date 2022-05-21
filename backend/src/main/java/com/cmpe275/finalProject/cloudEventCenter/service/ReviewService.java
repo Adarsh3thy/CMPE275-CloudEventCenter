@@ -14,9 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventRole;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
+import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
+import com.cmpe275.finalProject.cloudEventCenter.model.ParticipantStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Reviews;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.repository.EventParticipantRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.ReviewsRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
@@ -33,6 +36,9 @@ public class ReviewService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private EventParticipantRepository eventParticipantRepository;
 	
 	public ResponseEntity<?> addReviewForOrganizer(@Valid String eventID, String reviewerID, String review, int rating) {
 		try {
@@ -51,6 +57,14 @@ public class ReviewService {
 			            .status(HttpStatus.BAD_REQUEST)
 			            .body("No such participant");
 			}
+			
+			EventParticipant ep = eventParticipantRepository.findById_EventIdAndId_ParticipantId(eventID, reviewerID);
+					
+			if(ep == null || ep.getStatus() == ParticipantStatus.Cancelled || ep.getStatus() == ParticipantStatus.Pending) {
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("You havent partipated in this event");
+			}		
 			
 			if(reviewsRepository.findByReviewerAndReviewForAndReviewTypeAndEventId(reviewerID, organizerID, EEventRole.ORGANIZER, eventID).size() > 0)
 				return ResponseEntity
@@ -94,6 +108,14 @@ public class ReviewService {
 		            .status(HttpStatus.BAD_REQUEST)
 		            .body("No such participant");
 		}
+		
+		EventParticipant ep = eventParticipantRepository.findById_EventIdAndId_ParticipantId(eventID, participantID);
+		
+		if(ep == null || ep.getStatus() == ParticipantStatus.Cancelled || ep.getStatus() == ParticipantStatus.Pending) {
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body("This participant hasnt attended your event to vote");
+		}	
 		
 		if(reviewsRepository.findByReviewerAndReviewForAndReviewTypeAndEventId(organizerID, participantID, EEventRole.PARTICIPANT, eventID).size() > 0)
 			return ResponseEntity
