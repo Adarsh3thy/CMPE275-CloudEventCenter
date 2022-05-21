@@ -79,6 +79,11 @@ public class ReviewService {
 			
 			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
 			
+			if(currDateTime.isBefore(event.getStartTime()) || currDateTime.isAfter(event.getEndTime().plusWeeks(1)))
+				return ResponseEntity
+			            .status(HttpStatus.BAD_REQUEST)
+			            .body("You can only post a review between the event’s start time and one week after its end time");
+			
 			Reviews newReview = new Reviews(null, reviewerID, organizerID, eventID, EEventRole.ORGANIZER, review, rating, currDateTime);
 			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewsRepository.save(newReview));
@@ -129,6 +134,12 @@ public class ReviewService {
 		String ConvertedDateTime=mimicDate+"T"+mimicTime;
 		
 		LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+		
+		if(currDateTime.isBefore(event.getStartTime()) || currDateTime.isAfter(event.getEndTime().plusWeeks(1)))
+			return ResponseEntity
+		            .status(HttpStatus.BAD_REQUEST)
+		            .body("You can only post a review between the event’s start time and one week after its end time");
+		
 		Reviews newReview = new Reviews(null, organizerID, participantID, eventID, EEventRole.ORGANIZER, review, rating, currDateTime);
 		
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewsRepository.save(newReview));
