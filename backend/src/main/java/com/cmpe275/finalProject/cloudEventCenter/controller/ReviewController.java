@@ -27,10 +27,8 @@ public class ReviewController {
 	private ReviewService reviewService;
 	
 	@PostMapping("/{eventID}/organizer/{reviewerID}")
-	public ResponseEntity<?> createReview(@Valid @PathVariable("eventID") String eventID,
+	public ResponseEntity<?> createReviewForOrganizer(@Valid @PathVariable("eventID") String eventID,
 			@PathVariable("reviewerID") String reviewerID,
-//			@RequestBody String review,
-//			@RequestBody int rating,
 			@RequestBody ReviewRatingData reviewRatingData){
 		
 		if(eventID.isBlank() || reviewerID.isBlank())
@@ -38,6 +36,19 @@ public class ReviewController {
 	            .status(HttpStatus.BAD_REQUEST)
 	            .body("Enter an eventID or reviewerID");
 		
-	    return reviewService.addReview(eventID, reviewerID, reviewRatingData.getReview(), reviewRatingData.getRating());
+	    return reviewService.addReviewForOrganizer(eventID, reviewerID, reviewRatingData.getReview(), reviewRatingData.getRating());
+	}
+	
+	@PostMapping("/{eventID}/participant/{participantID}")
+	public ResponseEntity<?> createReviewForParticipant(@Valid @PathVariable("eventID") String eventID,
+			@PathVariable("participantID") String participantID,
+			@RequestBody ReviewRatingData reviewRatingData){
+		
+		if(eventID.isBlank() || participantID.isBlank())
+			return ResponseEntity
+	            .status(HttpStatus.BAD_REQUEST)
+	            .body("Enter an eventID or participantID");
+		
+	    return reviewService.addReviewForParticipant(eventID, participantID, reviewRatingData.getReview(), reviewRatingData.getRating());
 	}
 }
