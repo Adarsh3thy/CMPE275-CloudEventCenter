@@ -2,6 +2,7 @@ package com.cmpe275.finalProject.cloudEventCenter.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -140,9 +141,23 @@ public class ReviewService {
 		            .status(HttpStatus.BAD_REQUEST)
 		            .body("You can only post a review between the event’s start time and one week after its end time");
 		
-		Reviews newReview = new Reviews(null, organizerID, participantID, eventID, EEventRole.ORGANIZER, review, rating, currDateTime);
+		Reviews newReview = new Reviews(null, organizerID, participantID, eventID, EEventRole.PARTICIPANT, review, rating, currDateTime);
 		
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewsRepository.save(newReview));
+	}
+
+	public ResponseEntity<?> getAvgParticipantRatings(String participantID) {
+		List<Reviews> participantReviews = reviewsRepository.findByReviewForAndReviewType(participantID, EEventRole.PARTICIPANT);
+		double avgRatings = participantReviews.stream().mapToDouble(pr -> pr.getRating()).average().orElse(0);
+		
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(avgRatings);
+	}
+
+	public ResponseEntity<?> getAvgOrganizerRatings(String organizerID) {
+		List<Reviews> organizerReviews = reviewsRepository.findByReviewForAndReviewType(organizerID, EEventRole.ORGANIZER);
+		double avgRatings = organizerReviews.stream().mapToDouble(pr -> pr.getRating()).average().orElse(0);
+		
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(avgRatings);
 	}
 
 }
