@@ -79,8 +79,8 @@ public class NotificationMailService {
 					"Best,<br>" + "CEC";
 			break;
 		case "eventCancel":
-			subject = "Event cancellation alert:(";
-			content = "Dear user,<br><br>"
+			subject = "Event cancellation alert :(";
+			content = "Dear participant,<br><br>"
 					+ "We are sorry to inform you that the event <b>[EVENT_NAME]</b> has been cancelled."
 					+ " Any fee paid for the event will be refunded in 7 business days."
 					+ "<br><br>" +

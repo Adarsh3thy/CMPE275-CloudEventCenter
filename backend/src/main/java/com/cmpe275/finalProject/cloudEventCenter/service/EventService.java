@@ -346,7 +346,7 @@ public class EventService {
 			 params.put("[USER_NAME]",user.getFullName());
 			 params.put("[EVENT_NAME]", event.getTitle());
 			
-			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(),"newsignup",params);
+			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(),"signupUser",params);
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reteventParticipant);	
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
