@@ -65,6 +65,12 @@ public class EventService {
 	@Autowired
 	NotificationMailService notificationMailService;
 	
+	@Autowired
+	ParticipantForumService participantForumService;
+	
+	@Autowired
+	SignUpForumService signUpForumService;
+	
 	public static final int SEARCH_RESULT_PER_PAGE = 5;
 
 	/**
@@ -258,6 +264,19 @@ public class EventService {
 			            .body("Event not found");
 			}
 			
+			// Post to the forum(s)
+			String postText = "(The event has been cancelled. The forums are now closed)";
+			participantForumService.persist(event.getOrganizer(), event, postText);
+			signUpForumService.persist(event.getOrganizer(), event, postText);
+			// Notify the organizer
+			notificationMailService
+						.sendNotificationEmail(
+								event.getOrganizer().getEmail(),
+								"event_cancel_forum_message", 
+								new HashMap<String, String>()
+						);
+			
+			// TODO Cancel event instead  of deleting it
 			eventRepository.deleteById(id);
 
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
