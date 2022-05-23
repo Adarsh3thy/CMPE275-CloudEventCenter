@@ -101,7 +101,7 @@ public class NotificationMailService {
 			break;
 		case "message":
 			subject = "Message posted in forum!";
-			content = "Dear user,<br><br>"
+			content = "Dear Organizer,<br><br>"
 					+ "A new message has been posted by the user, <b>[USER_NAME]</b> on the forum for the event <b>[EVENT_NAME]</b> <br>." +
 					"<br>Best,<br>" + "CEC";
 			break;
