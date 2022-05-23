@@ -4,6 +4,7 @@
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +42,7 @@ import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventParticipantRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
+import com.cmpe275.finalProject.cloudEventCenter.mail.service.NotificationMailService;
 
 /**
  * @author shrey
@@ -59,6 +61,9 @@ public class EventService {
 	
 	@Autowired
 	private EventParticipantRepository eventParticipantRepository;
+	
+	@Autowired
+	NotificationMailService notificationMailService;
 	
 	public static final int SEARCH_RESULT_PER_PAGE = 5;
 
@@ -272,9 +277,7 @@ public class EventService {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid event ID!"));
 
 			}
-			
-		
-			
+
 			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(event.getDeadline())) {
@@ -309,17 +312,11 @@ public class EventService {
 				eventParticipant.setStatus(ParticipantStatus.Approved);
 			}
 			EventParticipant reteventParticipant=eventParticipantRepository.save(eventParticipant);
+			 HashMap<String, String> params=new HashMap<>();
+			 params.put("[USER_NAME]",user.getFullName());
+			 params.put("[EVENT_NAME]", event.getTitle());
 			
-		/*	Event event = eventRepository.getById(eventID);
-			List<User> participants = event.getParticipants();
-//			System.out.println("aaa" + participants.size());
-			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
-			event.setParticipants(participants);
-			eventRepository.save(event);
-//			System.out.println("aaa" + event.getParticipants().size());
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
-		*/
-			
+			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(),"newsignup",params);
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reteventParticipant);	
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
