@@ -158,6 +158,7 @@ public class ReportService {
 		double cancelledEventsCase2 = 0;
 		List<Event> finishedEvents = new ArrayList<Event>();
 		double avgParticipantsFinishedEvents = 0;
+		double paidEventsPercent=0.0;
 
 		List<Event> findAllInRange = allEvents.stream().filter(event -> event.getCreatedOn().isAfter(ago_90))
 				.collect(Collectors.toList());
@@ -191,11 +192,12 @@ public class ReportService {
 				avgParticipantsFinishedEvents = finishedPaidEvents.stream().map(Event::getParticipants)
 						.mapToInt(Collection::size).average().getAsDouble();
 			}
+			paidEventsPercent =((paidEvents.size()* 100 )/ findAllInRange.size() );
 		}
 
 		SystemReport systemReport = new SystemReport();
 		systemReport.setCreatedEvents(findAllInRange.size());
-		double paidEventsPercent =((paidEvents.size()* 100 )/ findAllInRange.size() );
+		 
 		systemReport.setPaidEventsPercent(paidEventsPercent);
 		systemReport.setCancelledEvents(cancelledEvents.size());
 
