@@ -134,4 +134,7 @@ public class Event {
 	
 	@Column(name = "CREATED_ON")
 	private LocalDate createdOn;
+	
+	@Column(name = "PTS_FORUM_ACTIVE")
+	private boolean pForumOpen;
 }

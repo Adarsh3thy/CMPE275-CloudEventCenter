@@ -88,9 +88,9 @@ public class NotificationMailService {
 			break;
 		case "eventStart":
 			subject = "Event start alert";
-			content = "Dear user,<br><br>"
-					+ "The event <b>[EVENT_NAME]</b>, that you have registered for has begun now."
-					+ "<br>Hope you have a great time at the time! <br>" +
+			content = "Dear participant,<br><br>"
+					+ "The event <b>[EVENT_NAME]</b>, that you have registered for has begun."
+					+ "<br>Hope you have a great time at the event! Share your experience at the participant forum. <br>" +
 					"<br>Best,<br>" + "CEC";
 			break;
 		case "review":

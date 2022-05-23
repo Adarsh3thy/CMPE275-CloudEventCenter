@@ -2,7 +2,9 @@ package com.cmpe275.finalProject.cloudEventCenter.scheduled;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,46 +23,150 @@ import com.cmpe275.finalProject.cloudEventCenter.mail.service.NotificationMailSe
 
 @Component
 public class ScheduledTasks {
-	
+
 	@Autowired
 	EventRepository eventRepository;
-	
+
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	EventParticipantRepository eventParticipantRepository;
-	
+
 	@Autowired
 	NotificationMailService notificationMailService;
-
 	
+	Set<String> logCancelledEvents=new HashSet<>();
+	Set<String> logStartedEvents=new HashSet<>();
+	Set<String> logDoneEvents=new HashSet<>();
+	Set<String> logForumOpenEvents=new HashSet<>();
+	Set<String> logForumCloseEvents=new HashSet<>();
+
 	@Scheduled(fixedDelay = 2000, initialDelay = 5000)
 	public void cancelEvent() {
-		List<Event> allEvents=eventRepository.findAll();
-		LocalDateTime mimicDateTime=MimicClockTimeController.getMimicDateTime();
-
-		 
-		 List<Event> eventsToBeCancelled = allEvents.stream().filter(event -> event.getDeadline().isBefore(mimicDateTime)
-				 && event.getParticipants().size()<event.getMinParticipants()
-				 && !event.getStatus().equals(EEventStatus.CANCELLED))
-					.collect(Collectors.toList());
-		 
-		 for(Event event:eventsToBeCancelled) {
-			 event.setStatus(EEventStatus.CANCELLED);
-			 event.setActive(false);
-			 eventRepository.save(event);
-			 HashMap<String,String> params=new HashMap<>();
-			params.put("[EVENT_NAME]", event.getTitle());
-			 for(EventParticipant participant:event.getParticipants()) {
-				 	User user=userRepository.getById(participant.getId().getParticipantId());
-				 	
-					notificationMailService.sendNotificationEmail(user.getEmail(), "eventCancel", params);
-			 }
-		 }
-		 
-		 
+		List<Event> allEvents = eventRepository.findAll();
+		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
 		
+		
+		List<Event> eventsToBeCancelled = allEvents.stream()
+				.filter(event -> event.getDeadline().isBefore(mimicDateTime)
+						&& event.getParticipants().size() < event.getMinParticipants()
+						&& !event.getStatus().equals(EEventStatus.CANCELLED))
+				.collect(Collectors.toList());
+		for (Event event : eventsToBeCancelled) {
+			if(logCancelledEvents==null ||( logCancelledEvents!=null && !logCancelledEvents.contains(event.getId()))) {
+			event.setStatus(EEventStatus.CANCELLED);
+			event.setActive(false);
+			eventRepository.save(event);
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			for (EventParticipant participant : event.getParticipants()) {
+				User user = userRepository.getById(participant.getId().getParticipantId());
+
+				notificationMailService.sendNotificationEmail(user.getEmail(), "eventCancel", params);
+			}
+			logCancelledEvents.add(event.getId());
+		}
+		}
+
+	}
+	
+	@Scheduled(fixedDelay = 2000, initialDelay = 1000)
+	public void eventStart() {
+
+		List<Event> allEvents = eventRepository.findAll();
+		
+		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
+		List<Event> eventsinProgress = allEvents.stream()
+				.filter(event -> event.getStartTime().isBefore(mimicDateTime)
+						&& event.getParticipants().size() >= event.getMinParticipants()
+						&& !event.getStatus().equals(EEventStatus.EVENT_PROGRESS)
+						&& !event.getStatus().equals(EEventStatus.CLOSED)
+						&& !event.getStatus().equals(EEventStatus.CANCELLED))
+				.collect(Collectors.toList());
+		for (Event event : eventsinProgress) {
+			if(logStartedEvents==null||(logStartedEvents!=null && !logStartedEvents.contains(event.getId()))) {
+			event.setStatus(EEventStatus.EVENT_PROGRESS);
+			eventRepository.save(event);
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			for (EventParticipant participant : event.getParticipants()) {
+				User user = userRepository.getById(participant.getId().getParticipantId());
+				notificationMailService.sendNotificationEmail(user.getEmail(), "eventStart", params);
+			}
+			logStartedEvents.add(event.getId());
+			}
+			
+		}
+
+	}
+	
+	@Scheduled(fixedDelay = 2000, initialDelay = 2000)
+	public void eventDone() {
+
+		List<Event> allEvents = eventRepository.findAll();
+		
+		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
+		List<Event> eventsClosed = allEvents.stream()
+				.filter(event -> event.getEndTime().isBefore(mimicDateTime)
+						&& event.getParticipants().size() >= event.getMinParticipants()
+						&& !event.getStatus().equals(EEventStatus.CLOSED))
+				.collect(Collectors.toList());
+		for (Event event : eventsClosed) {
+			if(logDoneEvents!=null && !logDoneEvents.contains(event.getId())) {
+			event.setStatus(EEventStatus.CLOSED);
+			event.setActive(false);
+			eventRepository.save(event);
+			logDoneEvents.add(event.getId());
+			}
+		}
+
+	}
+	
+	
+	@Scheduled(fixedDelay = 2000, initialDelay = 3000)
+	public void OpenParticipantForum() {
+
+		List<Event> allEvents = eventRepository.findAll();
+		
+		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
+		List<Event> eventsPastDeadline = allEvents.stream()
+				.filter(event ->  event.getDeadline().isBefore(mimicDateTime)
+						&& event.getParticipants().size() >= event.getMinParticipants()
+						&& !event.isPForumOpen())
+				.collect(Collectors.toList());
+		for (Event event : eventsPastDeadline) {
+			if(logForumOpenEvents==null||(logForumOpenEvents!=null && !logForumOpenEvents.contains(event.getId()))) {
+			event.setPForumOpen(true);
+			eventRepository.save(event);
+			logForumOpenEvents.add(event.getId());
+			}
+		}
+
+	}
+	
+
+	@Scheduled(fixedDelay = 2000, initialDelay = 4000)
+	public void closeParticipantForum() {
+
+		List<Event> allEvents = eventRepository.findAll();
+		
+		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
+		List<Event> forumsToBeClosed = allEvents.stream()
+				.filter(event ->  event.getEndTime().plusDays(3).isBefore(mimicDateTime)
+						&& event.getParticipants().size() >= event.getMinParticipants()
+						&& event.isPForumOpen())
+				.collect(Collectors.toList());
+		System.out.println("forumsToBeClosed: "+forumsToBeClosed.size());
+		System.out.println("logForumCloseEvents: "+logForumCloseEvents.size());
+		for (Event event : forumsToBeClosed) {
+			if(logForumCloseEvents==null||(logForumCloseEvents!=null && !logForumCloseEvents.contains(event.getId()))) {
+			event.setPForumOpen(false);
+			eventRepository.save(event);
+			logForumCloseEvents.add(event.getId());
+			}
+		}
+
 	}
 
 }

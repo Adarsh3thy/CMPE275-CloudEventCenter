@@ -158,13 +158,8 @@ public class EventService {
 			            .body("Participant cant charge a fee");
 			}
 			
-			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
-			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
-			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
-			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
-			String ConvertedDateTime=mimicDate+"T"+mimicTime;
-			
-			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+	
+			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(eventData.getDeadline()) || currDateTime.isAfter(eventData.getStartTime()) || currDateTime.isAfter(eventData.getEndTime())) {
 				return ResponseEntity.badRequest().body(new MessageResponse("You cannot create an event with deadline, startTime, or endTime in the past"));
@@ -179,11 +174,10 @@ public class EventService {
 			            .status(HttpStatus.NOT_FOUND)
 			            .body("User not found");
 			}
-			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
 					eventData.getMaxParticipants(), eventData.getFee(), eventData.isApprovalReq(), user, address, null,
-					EEventStatus.REG_OPEN, true,LocalDate.now());
+					EEventStatus.REG_OPEN, true,currDateTime.toLocalDate(),false);
 			
 			HashMap<String, String> params = new HashMap<>();
 			params.put("[EVENT_NAME]", event.getTitle());
