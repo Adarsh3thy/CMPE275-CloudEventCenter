@@ -3,12 +3,9 @@
  */
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.springframework.data.domain.Page;
@@ -17,11 +14,7 @@ import org.springframework.data.domain.Pageable;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 import com.cmpe275.finalProject.cloudEventCenter.model.ParticipantStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

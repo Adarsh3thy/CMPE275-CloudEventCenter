@@ -3,6 +3,8 @@ package com.cmpe275.finalProject.cloudEventCenter.service;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +37,7 @@ public class EventRegistrationService {
 	@Autowired
 	NotificationMailService notificationMailService;
 	
+	@Transactional
 	public ResponseEntity<?> approveParticipant(String eventID, String userID) {
 		try {
 			if(eventID.isBlank() || userID.isBlank()) {
@@ -82,7 +85,8 @@ public class EventRegistrationService {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
-
+	
+	@Transactional
 	public ResponseEntity<?> rejectParticipant(String eventID, String userID) {
 		try {
 			if(eventID.isBlank() || userID.isBlank()) {
@@ -130,7 +134,8 @@ public class EventRegistrationService {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.toString());
 		}
 	}
-
+	
+	@Transactional
 	public ResponseEntity<?> getAllPendingRegistrations(String eventID) {
 		try {
 			if(eventID.isBlank()) {

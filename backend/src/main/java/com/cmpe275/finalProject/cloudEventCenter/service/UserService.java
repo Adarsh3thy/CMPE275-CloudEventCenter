@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.mail.MessagingException;
-
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -70,7 +70,8 @@ public class UserService {
 	
 	@Autowired
 	NotificationMailService notificationMailService;
-
+	
+	@Transactional
 	public ResponseEntity<?> createUser(String email, String password, String fullName, String screenName,
 			String gender, String description, Set<String> strRoles, String number, String street, String city,
 			String state, String zip, String siteURL)
@@ -118,7 +119,8 @@ public class UserService {
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 
 	}
-
+	
+	@Transactional
 	public ResponseEntity<?> login(String email, String password) {
 
 		Authentication authentication = authenticationManager
@@ -143,7 +145,8 @@ public class UserService {
 		return ResponseEntity.ok(jwtResp);
 
 	}
-
+	
+	@Transactional
 	public ResponseEntity<?> updateUser(String userId, String fullName, String screenName,
 			String gender, String description, String number, String street, String city, String state, String zip) {
 
@@ -217,6 +220,7 @@ public class UserService {
 	
 	
 	//TEST this after event registration
+	@Transactional
 	public ResponseEntity<?> getAllEventsByUserID(String userID) {
 		
 		try {
@@ -232,18 +236,5 @@ public class UserService {
 
 		}
 		
-		/*try {
-			System.out.println("Reached");
-			User user = userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID"));
-			System.out.println(user.getEmail());
-			List<Event> attending_events = user.getEvents();
-
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(attending_events);
-
-		} catch (Exception e) {
-			System.out.println(e.toString());
-			System.out.println("IN getAllEventsByUserID EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
-		}*/
 	}
 }
