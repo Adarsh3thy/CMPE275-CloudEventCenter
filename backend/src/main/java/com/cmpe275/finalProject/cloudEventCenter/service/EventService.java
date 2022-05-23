@@ -182,9 +182,14 @@ public class EventService {
 			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, null,
+					eventData.getMaxParticipants(), eventData.getFee(), eventData.isApprovalReq(), user, address, null,
 					EEventStatus.REG_OPEN, true,LocalDate.now());
-
+			
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			
+			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(), "eventCreation", params);
+			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
 		} catch (Exception e) {
@@ -276,10 +281,9 @@ public class EventService {
 								new HashMap<String, String>()
 						);
 			
-			// TODO Cancel event instead  of deleting it
-			eventRepository.deleteById(id);
+			event.setStatus(EEventStatus.CANCELLED);
 
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
@@ -296,7 +300,14 @@ public class EventService {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid event ID!"));
 
 			}
-
+			
+			for(EventParticipant ep : event.getParticipants()) {
+				if(ep.getParticipant().getId().compareTo(userID) == 0)
+					return ResponseEntity
+				            .status(HttpStatus.BAD_REQUEST)
+				            .body("You're already registered for this event");
+			}
+			
 			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(event.getDeadline())) {

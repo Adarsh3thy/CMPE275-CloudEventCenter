@@ -1,5 +1,6 @@
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.cmpe275.finalProject.cloudEventCenter.mail.service.NotificationMailService;
+import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
 import com.cmpe275.finalProject.cloudEventCenter.model.ParticipantStatus;
+import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventParticipantRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
@@ -27,6 +31,9 @@ public class EventRegistrationService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	NotificationMailService notificationMailService;
 	
 	public ResponseEntity<?> approveParticipant(String eventID, String userID) {
 		try {
@@ -58,6 +65,14 @@ public class EventRegistrationService {
 			
 			attendee.setStatus(ParticipantStatus.Approved);
 			eventParticipantRepository.save(attendee);
+			
+			User user = userRepository.findById(userID).orElse(null);
+			Event event = eventRepository.findById(eventID).orElse(null);
+			
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			
+			notificationMailService.sendNotificationEmail(user.getEmail(), "signupApproval", params);
 			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("Partipant: " + attendee.getParticipant().getId() + "\n is approved for event: " + attendee.getEvent().getId());
 
@@ -98,6 +113,14 @@ public class EventRegistrationService {
 			
 			attendee.setStatus(ParticipantStatus.Rejected);
 			eventParticipantRepository.save(attendee);
+			
+			User user = userRepository.findById(userID).orElse(null);
+			Event event = eventRepository.findById(eventID).orElse(null);
+			
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			
+			notificationMailService.sendNotificationEmail(user.getEmail(), "signupReject", params);
 			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("Partipant: " + attendee.getParticipant().getId() + "\n is rejected for event: " + attendee.getEvent().getId());
 

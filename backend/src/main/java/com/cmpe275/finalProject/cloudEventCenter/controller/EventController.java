@@ -90,7 +90,7 @@ public class EventController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(value = "/event/{eventID}", method = RequestMethod.PUT, produces=MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<?> DeleteEvent(@PathVariable("eventID") String id){
+	ResponseEntity<?> CancelEvent(@PathVariable("eventID") String id){
 		return eventService.cancelEvent(id);
 	}
 	
