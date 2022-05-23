@@ -258,9 +258,9 @@ public class EventService {
 			            .body("Event not found");
 			}
 			
-			eventRepository.deleteById(id);
+			event.setStatus(EEventStatus.CANCELLED);
 
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
