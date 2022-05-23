@@ -9,6 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -43,6 +46,12 @@ public class EventParticipant {
     @MapsId("id")
 	@JsonIgnoreProperties({"eventToOrganize","roles","events"})
     private User participant;
+	
+	@Column(name="REGISTRATION_DATE")
+	private LocalDate registrationDate;
+	
+	@Column(name="FEE")
+	double fee;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="STATUS")

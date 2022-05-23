@@ -2,30 +2,17 @@ package com.cmpe275.finalProject.cloudEventCenter.service;
 
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.mail.Authenticator;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,7 +25,6 @@ import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
 import com.cmpe275.finalProject.cloudEventCenter.mail.bean.Mail;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
-import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
 import com.cmpe275.finalProject.cloudEventCenter.model.RefreshToken;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
@@ -49,6 +35,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
 import com.cmpe275.finalProject.cloudEventCenter.security.jwt.JwtUtils;
 import com.cmpe275.finalProject.cloudEventCenter.mail.service.MailService;
 import net.bytebuddy.utility.RandomString;
+import com.cmpe275.finalProject.cloudEventCenter.mail.service.NotificationMailService;
 
 @Service
 public class UserService {
@@ -80,7 +67,11 @@ public class UserService {
 	
 	@Autowired
 	MailService mailService;
-
+	
+	@Autowired
+	NotificationMailService notificationMailService;
+	
+	@Transactional
 	public ResponseEntity<?> createUser(String email, String password, String fullName, String screenName,
 			String gender, String description, Set<String> strRoles, String number, String street, String city,
 			String state, String zip, String siteURL)
@@ -123,11 +114,13 @@ public class UserService {
 		 user.setEnabled(false);
 		user.setRoles(roles);
 		userRepository.save(user);
+		notificationMailService.sendNotificationEmail(user.getEmail(),"signup",null);
 		 sendVerificationEmail(user, siteURL);
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 
 	}
-
+	
+	@Transactional
 	public ResponseEntity<?> login(String email, String password) {
 
 		Authentication authentication = authenticationManager
@@ -152,7 +145,8 @@ public class UserService {
 		return ResponseEntity.ok(jwtResp);
 
 	}
-
+	
+	@Transactional
 	public ResponseEntity<?> updateUser(String userId, String fullName, String screenName,
 			String gender, String description, String number, String street, String city, String state, String zip) {
 
@@ -218,7 +212,7 @@ public class UserService {
 			user.setVerificationCode(null);
 			user.setEnabled(true);
 			userRepository.save(user);
-
+			notificationMailService.sendNotificationEmail(user.getEmail(),"verify",null);
 			return true;
 		}
 
@@ -226,6 +220,7 @@ public class UserService {
 	
 	
 	//TEST this after event registration
+	@Transactional
 	public ResponseEntity<?> getAllEventsByUserID(String userID) {
 		
 		try {
@@ -241,18 +236,5 @@ public class UserService {
 
 		}
 		
-		/*try {
-			System.out.println("Reached");
-			User user = userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID"));
-			System.out.println(user.getEmail());
-			List<Event> attending_events = user.getEvents();
-
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(attending_events);
-
-		} catch (Exception e) {
-			System.out.println(e.toString());
-			System.out.println("IN getAllEventsByUserID EXCEPTION BLOCK");
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.toString());
-		}*/
 	}
 }

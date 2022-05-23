@@ -68,19 +68,8 @@ public class User {
     @ManyToMany(cascade = CascadeType.MERGE)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
-	/*
-	 * @ManyToMany(mappedBy = "participants")
-	 * 
-	 * @JsonIgnoreProperties({"participants", "organizer"}) private List<Event>
-	 * events;
-	 */
-    
-//    @ManyToMany(cascade = CascadeType.MERGE)
-//    @JoinTable(name = "participant_events", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "event_id"))
-//    @JsonIgnoreProperties({"participants", "organizer"})
-//    private List<Event> events;
-    @OneToMany(mappedBy="participant",cascade = CascadeType.ALL,
-            orphanRemoval = true)
+
+    @OneToMany(mappedBy="participant")
     private List<EventParticipant> events;
     
     @OneToMany(mappedBy = "organizer")

@@ -3,10 +3,9 @@
  */
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.springframework.data.domain.Page;
@@ -15,11 +14,7 @@ import org.springframework.data.domain.Pageable;
 import com.cmpe275.finalProject.cloudEventCenter.model.MimicClockTime;
 import com.cmpe275.finalProject.cloudEventCenter.model.ParticipantStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Role;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.MessageResponse;
+import com.cmpe275.finalProject.cloudEventCenter.controller.MimicClockTimeController;
 import com.cmpe275.finalProject.cloudEventCenter.model.Address;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.ERole;
@@ -39,6 +35,7 @@ import com.cmpe275.finalProject.cloudEventCenter.model.User;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventParticipantRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
+import com.cmpe275.finalProject.cloudEventCenter.mail.service.NotificationMailService;
 
 /**
  * @author shrey
@@ -57,6 +54,15 @@ public class EventService {
 	
 	@Autowired
 	private EventParticipantRepository eventParticipantRepository;
+	
+	@Autowired
+	NotificationMailService notificationMailService;
+	
+	@Autowired
+	ParticipantForumService participantForumService;
+	
+	@Autowired
+	SignUpForumService signUpForumService;
 	
 	public static final int SEARCH_RESULT_PER_PAGE = 5;
 
@@ -145,13 +151,8 @@ public class EventService {
 			            .body("Participant cant charge a fee");
 			}
 			
-			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
-			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
-			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
-			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
-			String ConvertedDateTime=mimicDate+"T"+mimicTime;
-			
-			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+	
+			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(eventData.getDeadline()) || currDateTime.isAfter(eventData.getStartTime()) || currDateTime.isAfter(eventData.getEndTime())) {
 				return ResponseEntity.badRequest().body(new MessageResponse("You cannot create an event with deadline, startTime, or endTime in the past"));
@@ -166,12 +167,16 @@ public class EventService {
 			            .status(HttpStatus.NOT_FOUND)
 			            .body("User not found");
 			}
-			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, null,
-					EEventStatus.REG_OPEN, true);
-
+					eventData.getMaxParticipants(), eventData.getFee(), eventData.isApprovalReq(), user, address, null,
+					EEventStatus.REG_OPEN, true,currDateTime.toLocalDate(),false);
+			
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			
+			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(), "eventCreation", params);
+			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
 		} catch (Exception e) {
@@ -251,9 +256,21 @@ public class EventService {
 			            .body("Event not found");
 			}
 			
-			eventRepository.deleteById(id);
+			// Post to the forum(s)
+			String postText = "(The event has been cancelled. The forums are now closed)";
+			participantForumService.persist(event.getOrganizer(), event, postText);
+			signUpForumService.persist(event.getOrganizer(), event, postText);
+			// Notify the organizer
+			notificationMailService
+						.sendNotificationEmail(
+								event.getOrganizer().getEmail(),
+								"event_cancel_forum_message", 
+								new HashMap<String, String>()
+						);
+			
+			event.setStatus(EEventStatus.CANCELLED);
 
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
@@ -271,13 +288,14 @@ public class EventService {
 
 			}
 			
-			ZoneId zoneSingapore = ZoneId.of("America/Los_Angeles");  
-			String mimicDateTime= MimicClockTime.getCurrentTime().instant().atZone(zoneSingapore).toString();
-			String mimicDate=mimicDateTime.substring(0,mimicDateTime.indexOf('T'));
-			String mimicTime=mimicDateTime.substring(mimicDateTime.indexOf('T')+1, mimicDateTime.lastIndexOf('-')-4);
-			String ConvertedDateTime=mimicDate+"T"+mimicTime;
+			for(EventParticipant ep : event.getParticipants()) {
+				if(ep.getParticipant().getId().compareTo(userID) == 0)
+					return ResponseEntity
+				            .status(HttpStatus.BAD_REQUEST)
+				            .body("You're already registered for this event");
+			}
 			
-			LocalDateTime currDateTime = LocalDateTime.parse(ConvertedDateTime);
+			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(event.getDeadline())) {
 				return ResponseEntity.badRequest().body(new MessageResponse("You cant register after deadline has passed"));
@@ -303,20 +321,19 @@ public class EventService {
 			eventParticipant.setId(eventParticipantId);
 			eventParticipant.setEvent(event);
 			eventParticipant.setParticipant(user);
+			eventParticipant.setRegistrationDate(currDateTime.toLocalDate());
+			eventParticipant.setFee(event.getFee());
+			if(event.isApprovalRequired()) {
 			eventParticipant.setStatus(ParticipantStatus.Pending);
-			
+			}else {
+				eventParticipant.setStatus(ParticipantStatus.Approved);
+			}
 			EventParticipant reteventParticipant=eventParticipantRepository.save(eventParticipant);
+			 HashMap<String, String> params=new HashMap<>();
+			 params.put("[USER_NAME]",user.getFullName());
+			 params.put("[EVENT_NAME]", event.getTitle());
 			
-		/*	Event event = eventRepository.getById(eventID);
-			List<User> participants = event.getParticipants();
-//			System.out.println("aaa" + participants.size());
-			participants.add(userRepository.findById(userID).orElseThrow(() -> new EntityNotFoundException("Invalid User ID")));
-			event.setParticipants(participants);
-			eventRepository.save(event);
-//			System.out.println("aaa" + event.getParticipants().size());
-			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(event);
-		*/
-			
+			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(),"signupUser",params);
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reteventParticipant);	
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
