@@ -176,9 +176,14 @@ public class EventService {
 			
 			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
 					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), false, user, address, null,
+					eventData.getMaxParticipants(), eventData.getFee(), eventData.isApprovalReq(), user, address, null,
 					EEventStatus.REG_OPEN, true,LocalDate.now());
-
+			
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[EVENT_NAME]", event.getTitle());
+			
+			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(), "eventCreation", params);
+			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(eventRepository.save(event));
 
 		} catch (Exception e) {
