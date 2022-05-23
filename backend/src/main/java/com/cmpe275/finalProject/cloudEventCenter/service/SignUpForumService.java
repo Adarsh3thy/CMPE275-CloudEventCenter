@@ -60,6 +60,20 @@ public class SignUpForumService {
 		return true;
 	};
 	
+	public ForumQuestions persist(User user, Event event, String text) {
+		return questions_repository
+				.save(
+					new ForumQuestions(
+							null,
+							user,
+							event,
+							text,
+							ForumTypes.SIGN_UP_FORUM,
+							null,
+							null
+				));
+	};
+	
 	@Transactional
 	public ResponseEntity<?> createQuestion(
 			String userId, 
@@ -89,19 +103,8 @@ public class SignUpForumService {
 			            .body("You are not permitted to do this action");
 			};
 			
-			ForumQuestions question = new ForumQuestions(
-					null,
-					user,
-					event,
-					text,
-					ForumTypes.SIGN_UP_FORUM,
-					null,
-					null
-			);
+			ForumQuestions savedQuestion = this.persist(user, event, text);
 			
-			// TODO: What is the data type of the question
-			ForumQuestions savedQuestion = questions_repository.save(question);
-						
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
 					.contentType(MediaType.APPLICATION_JSON)

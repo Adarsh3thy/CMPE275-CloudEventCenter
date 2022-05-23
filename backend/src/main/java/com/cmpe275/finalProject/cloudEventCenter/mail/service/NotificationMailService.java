@@ -105,6 +105,13 @@ public class NotificationMailService {
 					+ "A new message has been posted by the user, <b>[USER_NAME]</b> on the forum for the event <b>[EVENT_NAME]</b> <br>." +
 					"<br>Best,<br>" + "CEC";
 			break;
+			
+		case "event_cancel_forum_message":
+				subject = "Cancellation message posted on forum(s)";
+				content = "Dear Organizer, <br><br>"
+						+ "An event cancelleation message has been posted on the signup and participant forum. The forums are now closed due to cancellation<br><br>"
+						+ "<br>Best,<br>" + "CEC";
+			break;
 		default:
 			break;
 		}
