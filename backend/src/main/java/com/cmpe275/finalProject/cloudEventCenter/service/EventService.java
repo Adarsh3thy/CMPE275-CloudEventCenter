@@ -282,7 +282,14 @@ public class EventService {
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: invalid event ID!"));
 
 			}
-
+			
+			for(EventParticipant ep : event.getParticipants()) {
+				if(ep.getParticipant().getId().compareTo(userID) == 0)
+					return ResponseEntity
+				            .status(HttpStatus.BAD_REQUEST)
+				            .body("You're already registered for this event");
+			}
+			
 			LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 			
 			if(currDateTime.isAfter(event.getDeadline())) {
