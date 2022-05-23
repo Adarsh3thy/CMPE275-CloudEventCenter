@@ -2,6 +2,7 @@ package com.cmpe275.finalProject.cloudEventCenter.service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.cmpe275.finalProject.cloudEventCenter.mail.service.NotificationMailService;
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventRole;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.EventParticipant;
@@ -40,6 +42,9 @@ public class ReviewService {
 	
 	@Autowired
 	private EventParticipantRepository eventParticipantRepository;
+	
+	@Autowired
+	NotificationMailService notificationMailService;
 	
 	public ResponseEntity<?> addReviewForOrganizer(@Valid String eventID, String reviewerID, String review, int rating) {
 		try {
@@ -86,6 +91,14 @@ public class ReviewService {
 			            .body("You can only post a review between the event’s start time and one week after its end time");
 			
 			Reviews newReview = new Reviews(null, reviewerID, organizerID, eventID, EEventRole.ORGANIZER, review, rating, currDateTime);
+			
+			User reviewer = userRepository.findById(reviewerID).orElse(null);
+			
+			HashMap<String, String> params = new HashMap<>();
+			params.put("[USER_NAME]", reviewer.getScreenName());
+			params.put("[EVENT_NAME]", event.getTitle());
+			
+			notificationMailService.sendNotificationEmail(organizer.getEmail(), "review", params);
 			
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewsRepository.save(newReview));
 		}
@@ -142,6 +155,15 @@ public class ReviewService {
 		            .body("You can only post a review between the event’s start time and one week after its end time");
 		
 		Reviews newReview = new Reviews(null, organizerID, participantID, eventID, EEventRole.PARTICIPANT, review, rating, currDateTime);
+		
+		User reviewer = userRepository.findById(organizer.getId()).orElse(null);
+		User participant = userRepository.findById(participantID).orElse(null);
+		
+		HashMap<String, String> params = new HashMap<>();
+		params.put("[USER_NAME]", reviewer.getScreenName());
+		params.put("[EVENT_NAME]", event.getTitle());
+		
+		notificationMailService.sendNotificationEmail(participant.getEmail(), "review", params);
 		
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewsRepository.save(newReview));
 	}
