@@ -39,7 +39,7 @@ export function getQuestionAnswers(questionId, userId) {
 
 export function closeForum(userId, eventId, text) {
   return axios.post(
-    `${semiEndpoint}/api/forums/participant/${eventId}/cancel?text=${text}&userId=${userId}`
+    `${semiEndpoint}/api/forums/participant/${eventId}/close?text=${text}&userId=${userId}`
   )
 };
 

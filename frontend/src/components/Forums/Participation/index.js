@@ -76,11 +76,10 @@ const ParticipationForum = ({ user }) => {
 
       <div>
         {
-          true || eventDetails && eventDetails.pForumOpen === false && eventDetails.pForumCancelDesc ?
+          eventDetails && eventDetails.pForumOpen === false && eventDetails.pForumCancelDesc ?
           (
             <div>
-              <p> Forum is closed </p>  
-              <p> {eventDetails.pForumCancelDesc}</p>
+              <p> Forum closed: {eventDetails.pForumCancelDesc}</p>
             </div>
           ) : null
         }
@@ -88,7 +87,7 @@ const ParticipationForum = ({ user }) => {
 
       <div>
         {
-          true || eventDetails && eventDetails.pForumOpen === true && eventDetails.organizer.id === user.id ?
+          eventDetails && eventDetails.pForumOpen === true && eventDetails.organizer.id === user.id ?
           (
             <div>
               <Button
