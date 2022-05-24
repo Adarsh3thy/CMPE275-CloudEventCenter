@@ -137,4 +137,7 @@ public class Event {
 	
 	@Column(name = "PTS_FORUM_ACTIVE")
 	private boolean pForumOpen;
+	
+	@Column(name = "PTS_FORUM_CANCEL_DESC")
+	private String pForumCancelDesc;
 }

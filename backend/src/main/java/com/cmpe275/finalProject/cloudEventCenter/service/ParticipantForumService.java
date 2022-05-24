@@ -266,4 +266,43 @@ public class ParticipantForumService {
 		            .body(e.toString());
 		}
 	}
+
+	public ResponseEntity<?> closeForum(String userId, String eventId, String description) {
+		try {
+			Event event = events_repository.findById(eventId).orElse(null);
+			if (event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			};
+			
+			User user = users_repository.findById(userId).orElse(null);
+			if (user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.UNAUTHORIZED)
+			            .body("Unauthorized User");
+			};
+			
+	//		if (!this.can_user_post(user, event)) {
+	//		return ResponseEntity
+	//	            .status(HttpStatus.FORBIDDEN)
+	//	            .body("You are not permitted to do this action");
+			
+			//
+			event.setPForumOpen(false);
+			event.setPForumCancelDesc(description);
+			
+			Event updatedEvent = events_repository.save(event);
+			
+			return ResponseEntity
+		            .status(HttpStatus.OK)
+		            .body(updatedEvent);
+			
+		} catch(Exception ex) {
+			System.out.println(ex.getStackTrace());
+			return ResponseEntity
+		            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		            .body("Internal Server Error");
+		}
+	};
 }
