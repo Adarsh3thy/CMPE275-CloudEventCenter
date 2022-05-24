@@ -13,6 +13,8 @@ import SignupForum from "./components/Forums/Signup";
 import ParticipationForum from "./components/Forums/Participation";
 import ParticipationForumComments from "./components/Forums/Participation/ParticipationForumComments";
 import SignupForumComments from "./components/Forums/Signup/SignupForumComments";
+import OrganizerReviews from "./components/Reviews/Organizer";
+import ParticipantReviews from "./components/Reviews/Participant";
 import DashboardLayout from "./components/Dashboard";
 import PrivateRoute from "./utils/PrivateRoute";
 
@@ -70,6 +72,16 @@ function App() {
               exact
               path="/participation-forum-comments"
               component={ParticipationForumComments}
+            />
+            <DashboardRoute
+              exact
+              path="/organizer-reviews"
+              component={OrganizerReviews}
+            />
+            <DashboardRoute
+              exact
+              path="/participant-reviews"
+              component={ParticipantReviews}
             />
           </Switch>
         </BrowserRouter>
