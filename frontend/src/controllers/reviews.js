@@ -3,14 +3,14 @@ import axios from "axios";
 
 export function createOrganizerReview(eventId, reviewerId, dataJson) {
   return axios.post(
-    semiEndpoint + "/api/reviews/" + eventId + "/organizer" + reviewerId,
+    semiEndpoint + "/api/reviews/" + eventId + "/organizer/" + reviewerId,
     dataJson
   );
 }
 
 export function createParticipantReview(eventId, participantId, dataJson) {
   return axios.post(
-    semiEndpoint + "/api/reviews/" + eventId + "/participant" + participantId,
+    semiEndpoint + "/api/reviews/" + eventId + "/participant/" + participantId,
     dataJson
   );
 }

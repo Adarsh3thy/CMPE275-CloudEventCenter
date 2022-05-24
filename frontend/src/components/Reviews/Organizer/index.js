@@ -2,22 +2,32 @@ import React, { useEffect, useState } from "react";
 import { Grid, Paper, Typography, Rating, Button } from "@mui/material";
 import { getOrganizerReviews } from "../../../controllers/reviews";
 import { useLocation } from "react-router-dom";
+import PostReview from "./PostReview";
+import { AuthConsumer } from "../../contexts/Auth/AuthContext";
 
-const OrganizerReviews = () => {
+const OrganizerReviews = ({ user }) => {
   const [organizerReviews, setOrganizerReviews] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
   const search = useLocation().search;
 
-  useEffect(() => {
+  const handleClose = () => {
+    setOpenModal(false);
+  };
+
+  const getOrganizerReviewsFunc = () => {
     const organizerId = new URLSearchParams(search).get("organizerId");
     getOrganizerReviews(organizerId)
       .then((res) => setOrganizerReviews(res.data))
       .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    getOrganizerReviewsFunc();
   }, []);
 
-  return (
-    <div>
+  return user ? (
+    <>
       <Grid container sx={{ mt: 3 }} alignItems="left">
         <Grid item container direction="row" md={12}>
           <Grid item>
@@ -76,8 +86,19 @@ const OrganizerReviews = () => {
           ))
         )}
       </Grid>
-    </div>
-  );
+      <PostReview
+        open={openModal}
+        handleClose={handleClose}
+        organizerId={new URLSearchParams(search).get("organizerId")}
+        userId={user.id}
+        getOrganizerReviewsFunc={getOrganizerReviewsFunc}
+      />
+    </>
+  ) : null;
 };
 
-export default OrganizerReviews;
+export default (props) => (
+  <AuthConsumer>
+    {({ user }) => <OrganizerReviews user={user} {...props} />}
+  </AuthConsumer>
+);
