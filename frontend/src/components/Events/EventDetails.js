@@ -12,6 +12,7 @@ import {
   approveParticipant,
   rejectParticipant,
 } from "../../controllers/events";
+import { getAverageOrganizerRatings } from "../../controllers/reviews";
 
 export default function EventDetails({
   open,
@@ -22,6 +23,7 @@ export default function EventDetails({
   getEventDetailsFunc = () => {},
 }) {
   const [isSignUpModal, setIsSignUpModal] = useState(false);
+  const [organizerRating, setOrganizerRating] = useState(null);
 
   const handleParticipant = (e, action, ids) => {
     e.preventDefault();
@@ -43,7 +45,11 @@ export default function EventDetails({
   };
 
   useEffect(() => {
-    return;
+    if (eventDetails) {
+      getAverageOrganizerRatings(eventDetails.organizer.id)
+        .then((res) => setOrganizerRating(res.data))
+        .catch((err) => console.log(err));
+    }
   }, [eventDetails]);
 
   return (
@@ -59,6 +65,28 @@ export default function EventDetails({
             ) : (
               <Grid container direction="column">
                 <Grid item>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                      marginBottom: "15px",
+                      background: "#E5E4E2",
+                    }}
+                  >
+                    Organizer Rating:{" "}
+                    {organizerRating !== 0 ? organizerRating : "-"}/5{" "}
+                    <a
+                      style={{
+                        cursor: "pointer",
+                        color: "blue",
+                      }}
+                      href={
+                        "/organizer-reviews?organizerId=" +
+                        eventDetails.organizer.id
+                      }
+                    >
+                      <i>(See all reviews)</i>
+                    </a>
+                  </Typography>
                   <Typography
                     sx={{
                       textDecoration: "underline",
