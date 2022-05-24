@@ -21,8 +21,12 @@ import {
   UserListToolbar,
 } from "../../sections/@dashboard/events";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
-import { getEventRegistrationsByParticipant } from "../../controllers/events";
+import {
+  getEventRegistrationsByParticipant,
+  getEventDetails,
+} from "../../controllers/events";
 import MuiAlert from "@mui/material/Alert";
+import EventDetails from "../Events/EventDetails";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -40,6 +44,8 @@ const EventRegistrations = ({ user }) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [allEvents, setAllEvents] = useState(null);
+  const [openEventDetails, setOpenEventDetails] = useState(false);
+  const [eventDetails, setEventDetails] = useState(null);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -51,7 +57,6 @@ const EventRegistrations = ({ user }) => {
   };
 
   const getEventsFunc = (userId) => {
-    console.log("here in api call func");
     getEventRegistrationsByParticipant(userId)
       .then((res) => {
         setAllEvents(res.data);
@@ -63,8 +68,21 @@ const EventRegistrations = ({ user }) => {
     return res.split("T")[0];
   };
 
+  const eventDetailsHandler = (e, eventId) => {
+    e.preventDefault();
+    getEventDetails(eventId)
+      .then((res) => {
+        setEventDetails(res.data);
+        setOpenEventDetails(true);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleEventDetailsClose = () => {
+    setOpenEventDetails(false);
+  };
+
   useEffect(() => {
-    console.log("here in useeffect");
     if (user) getEventsFunc(user.id);
   }, [user]);
 
@@ -101,7 +119,9 @@ const EventRegistrations = ({ user }) => {
                                 key={item.id}
                                 tabIndex={-1}
                                 role="checkbox"
-                                // onClick={(e) => eventDetailsHandler(e, item.id)}
+                                onClick={(e) =>
+                                  eventDetailsHandler(e, item.id.eventId)
+                                }
                                 sx={{ cursor: "pointer" }}
                               >
                                 <TableCell padding="checkbox" />
@@ -170,6 +190,12 @@ const EventRegistrations = ({ user }) => {
             </>
           ) : null}
         </Container>
+        <EventDetails
+          open={openEventDetails}
+          eventDetails={eventDetails}
+          handleClose={handleEventDetailsClose}
+          isParticipationForum={true}
+        />
       </Page>
     </>
   );

@@ -24,6 +24,7 @@ export default function EventDetails({
   handleEventRegistration,
   isOrganizer,
   getEventDetailsFunc = () => {},
+  isParticipationForum = false,
 }) {
   const [isSignUpModal, setIsSignUpModal] = useState(false);
   const [organizerRating, setOrganizerRating] = useState(null);
@@ -247,10 +248,21 @@ export default function EventDetails({
                       ))}
                   </Grid>
                 )}
+                {isParticipationForum ? (
+                  <Typography>
+                    Already enrolled?{" "}
+                    <Link
+                      sx={{ cursor: "pointer" }}
+                      href={"/participation-forum?eventId=" + eventDetails.id}
+                    >
+                      Check out our participation forum here
+                    </Link>
+                  </Typography>
+                ) : null}
               </Grid>
             )}
           </DialogContent>
-          {!isOrganizer ? (
+          {!isOrganizer && !isParticipationForum ? (
             <DialogActions>
               <Button
                 variant="contained"
