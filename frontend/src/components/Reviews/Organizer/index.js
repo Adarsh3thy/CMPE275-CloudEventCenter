@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Avatar, Paper, Typography, Rating } from "@mui/material";
+import { Grid, Paper, Typography, Rating, Button } from "@mui/material";
 import { getOrganizerReviews } from "../../../controllers/reviews";
 import { useLocation } from "react-router-dom";
 
 const OrganizerReviews = () => {
   const [organizerReviews, setOrganizerReviews] = useState([]);
-
-  const imgLink =
-    "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
+  const [openModal, setOpenModal] = useState(false);
 
   const search = useLocation().search;
 
@@ -21,14 +19,25 @@ const OrganizerReviews = () => {
   return (
     <div>
       <Grid container sx={{ mt: 3 }} alignItems="left">
-        <Grid item md={12}>
-          <Typography
-            align="left"
-            md={5}
-            style={{ fontSize: 35, fontWeight: 650 }}
-          >
-            Organizer Reviews
-          </Typography>
+        <Grid item container direction="row" md={12}>
+          <Grid item>
+            <Typography
+              align="left"
+              md={5}
+              style={{ fontSize: 35, fontWeight: 650 }}
+            >
+              Organizer Reviews
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              sx={{ marginLeft: "600px" }}
+              onClick={() => setOpenModal(true)}
+            >
+              Post a Review!
+            </Button>
+          </Grid>
         </Grid>
         {organizerReviews && organizerReviews.length === 0 ? (
           <Grid container sx={{ mt: 5 }} alignItems="center">
@@ -52,18 +61,7 @@ const OrganizerReviews = () => {
                 }}
               >
                 <Grid container wrap="nowrap" spacing={2}>
-                  <Grid item>
-                    <Avatar alt="Remy Sharp" src={imgLink} />
-                  </Grid>
                   <Grid justifyContent="left" item xs zeroMinWidth>
-                    <h4
-                      style={{
-                        margin: 0,
-                        textAlign: "left",
-                      }}
-                    >
-                      Anay Naik (for Google Cloud Event)
-                    </h4>
                     <p>
                       <Rating value={review.rating} readOnly />
                     </p>
