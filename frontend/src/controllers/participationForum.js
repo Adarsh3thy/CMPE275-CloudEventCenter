@@ -1,25 +1,46 @@
 import { semiEndpoint } from "../utils/ApiEndpoint";
 import axios from "axios";
 
-export function getQuestionsByEvent(eventId, userId) {
+export function getQuestionsByEvent(
+  eventId,
+  userId,
+  token = JSON.parse(localStorage.getItem("user")).token
+) {
+  axios.defaults.headers.common["authorization"] = "Bearer " + token;
   return axios.get(
-    semiEndpoint + "/api/forums/participant/" + eventId + "/questions" + "?userId=" + userId
+    semiEndpoint +
+      "/api/forums/participant/" +
+      eventId +
+      "/questions" +
+      "?userId=" +
+      userId
   );
 }
 
-export function createQuestion(eventId, userId, dataJson) {
+export function createQuestion(
+  eventId,
+  userId,
+  dataJson,
+  token = JSON.parse(localStorage.getItem("user")).token
+) {
+  axios.defaults.headers.common["authorization"] = "Bearer " + token;
   return axios.post(
     semiEndpoint +
       "/api/forums/participant/" +
       eventId +
       "/questions?text=" +
       dataJson.text +
-      "&userId=" + 
+      "&userId=" +
       userId
   );
 }
 
-export function createAnswer(questionId, dataJson) {
+export function createAnswer(
+  questionId,
+  dataJson,
+  token = JSON.parse(localStorage.getItem("user")).token
+) {
+  axios.defaults.headers.common["authorization"] = "Bearer " + token;
   return axios.post(
     semiEndpoint +
       "/api/forums/participant/questions/" +
@@ -31,30 +52,44 @@ export function createAnswer(questionId, dataJson) {
   );
 }
 
-export function getQuestionAnswers(questionId, userId) {
+export function getQuestionAnswers(
+  questionId,
+  userId,
+  token = JSON.parse(localStorage.getItem("user")).token
+) {
+  axios.defaults.headers.common["authorization"] = "Bearer " + token;
   return axios.get(
-    semiEndpoint + "/api/forums/participant/questions/" + questionId + "/answers" + "?userId=" + userId
+    semiEndpoint +
+      "/api/forums/participant/questions/" +
+      questionId +
+      "/answers" +
+      "?userId=" +
+      userId
   );
 }
 
-export function closeForum(userId, eventId, text) {
+export function closeForum(
+  userId,
+  eventId,
+  text,
+  token = JSON.parse(localStorage.getItem("user")).token
+) {
+  axios.defaults.headers.common["authorization"] = "Bearer " + token;
   return axios.post(
     `${semiEndpoint}/api/forums/participant/${eventId}/close?text=${text}&userId=${userId}`
-  )
-};
+  );
+}
 
-export function canPostToForum(event) {
+export function canPostToForum(
+  event,
+  token = JSON.parse(localStorage.getItem("user")).token
+) {
+  axios.defaults.headers.common["authorization"] = "Bearer " + token;
   if (!event) return false;
-  const {pForumOpen, endTime} = event;
-
-  if (pForumOpen === false)
-    return false;
-
+  const { pForumOpen, endTime } = event;
+  if (pForumOpen === false) return false;
   let eventEndTime = new Date(endTime);
-  eventEndTime.setTime(eventEndTime.getTime() + (1000 * 60 * 60 * 24 * 3));
-
-  if (new Date().getTime() > eventEndTime) 
-    return false;
-
+  eventEndTime.setTime(eventEndTime.getTime() + 1000 * 60 * 60 * 24 * 3);
+  if (new Date().getTime() > eventEndTime) return false;
   return true;
-};
+}
