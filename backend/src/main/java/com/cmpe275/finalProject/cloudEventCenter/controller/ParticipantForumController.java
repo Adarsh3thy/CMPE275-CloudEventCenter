@@ -78,4 +78,18 @@ public class ParticipantForumController {
 	) {
 			return forumService.getQuestionAnswers(userId, questionId);
     }
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(
+			value = "/participant/{eventId}/close", 
+			method = RequestMethod.POST, 
+			produces=MediaType.APPLICATION_JSON_VALUE
+	)
+	ResponseEntity<?> closeForum(
+			@PathVariable(value =  "eventId") String eventId,
+			@RequestParam("userId") String userId,
+			@RequestParam("text") String text
+	) {
+			return forumService.closeForum(userId, eventId, text);
+    }
 }

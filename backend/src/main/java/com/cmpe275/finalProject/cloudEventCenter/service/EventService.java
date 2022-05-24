@@ -167,10 +167,27 @@ public class EventService {
 			            .status(HttpStatus.NOT_FOUND)
 			            .body("User not found");
 			}
-			Event event = new Event(null, eventData.getTitle(), eventData.getDescription(), eventData.getStartTime(),
-					eventData.getEndTime(), eventData.getDeadline(), eventData.getMinParticipants(),
-					eventData.getMaxParticipants(), eventData.getFee(), eventData.isApprovalReq(), user, address, null,
-					EEventStatus.REG_OPEN, true,currDateTime.toLocalDate(),false);
+			
+			Event event = new Event(
+					null, 
+					eventData.getTitle(), 
+					eventData.getDescription(), 
+					eventData.getStartTime(),
+					eventData.getEndTime(), 
+					eventData.getDeadline(), 
+					eventData.getMinParticipants(),
+					eventData.getMaxParticipants(), 
+					eventData.getFee(), 
+					eventData.isApprovalReq(), 
+					user, 
+					address, 
+					null,
+					EEventStatus.REG_OPEN, 
+					true,
+					currDateTime.toLocalDate(),
+					false,
+					""
+			);
 			
 			HashMap<String, String> params = new HashMap<>();
 			params.put("[EVENT_NAME]", event.getTitle());
