@@ -87,4 +87,17 @@ public class SignUpForumController {
 	) {
 			return signUpForumService.getQuestionAnswers(questionId);
     }
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(
+			value = "/sign_up/questions/{questionId}/images", 
+			method = RequestMethod.POST, 
+			produces=MediaType.APPLICATION_JSON_VALUE
+	)
+	ResponseEntity<?> getImageUploadURL(
+			@PathVariable(value =  "questionId") String questionId,
+			@RequestParam("userId") String userId
+	) {
+			return signUpForumService.uploadImage(userId, questionId);
+    }
 }

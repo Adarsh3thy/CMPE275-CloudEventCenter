@@ -4,6 +4,8 @@
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -23,6 +25,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsReposi
 import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsAnswersRepository;
 import com.cmpe275.finalProject.cloudEventCenter.model.ForumQuestionsAnswers;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.amazonaws.HttpMethod;
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
@@ -49,6 +52,9 @@ public class ParticipantForumService {
 	
 	@Autowired
 	private UserRepository users_repository;
+	
+	@Autowired
+	private AwsS3Service s3_service;
 	
 	private Boolean is_user_participant(User user,  Event event) {
 		return true;
@@ -266,4 +272,47 @@ public class ParticipantForumService {
 		            .body(e.toString());
 		}
 	}
+
+	@Transactional
+	public ResponseEntity<?> uploadImage(
+			String userId,
+			String questionId
+	) {
+		ForumQuestions question = questions_repository.findById(questionId).orElse(null);
+		if (question == null) {
+			return ResponseEntity
+		            .status(HttpStatus.NOT_FOUND)
+		            .body("Forum Question not found");
+		}
+		
+		if (!userId.equals(question.getUser().getId())) {
+			return ResponseEntity
+		            .status(HttpStatus.FORBIDDEN)
+		            .body("You are not permitted to perform this action");
+		};
+		
+		String filePath = "cec/events/" + 
+					question.getEvent().getId() + 
+					"/forums/participant/" + 
+					question.getId();
+		
+		// TODO: Bucket Name
+		String bucketName = "us-east-2";
+		String preSignedUrl = s3_service.generatePreSignedURL(
+				filePath, 
+				bucketName, 
+				HttpMethod.PUT
+		);
+		
+		HashMap<String, ArrayList<String>> response = new HashMap<>();
+		ArrayList<String> urls = new ArrayList<String>();
+		urls.add(preSignedUrl);
+		response.put("data", urls);
+		
+//		TODO: Set the question with said image
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(response);
+	};
 }
