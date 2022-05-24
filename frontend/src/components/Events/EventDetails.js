@@ -12,7 +12,10 @@ import {
   approveParticipant,
   rejectParticipant,
 } from "../../controllers/events";
-import { getAverageOrganizerRatings } from "../../controllers/reviews";
+import {
+  getAverageOrganizerRatings,
+  getAverageParticipantRatings,
+} from "../../controllers/reviews";
 
 export default function EventDetails({
   open,
@@ -24,6 +27,7 @@ export default function EventDetails({
 }) {
   const [isSignUpModal, setIsSignUpModal] = useState(false);
   const [organizerRating, setOrganizerRating] = useState(null);
+  const [participantRatingObj, setParticipantRatingObj] = useState({});
 
   const handleParticipant = (e, action, ids) => {
     e.preventDefault();
@@ -52,6 +56,25 @@ export default function EventDetails({
     }
   }, [eventDetails]);
 
+  useEffect(() => {
+    eventDetails &&
+      eventDetails.participants &&
+      eventDetails.participants.map((item) => {
+        getAverageParticipantRatings(item.participant.id)
+          .then((res) => {
+            let updatedValue = {};
+            updatedValue = {
+              [item.participant.id]: res.data,
+            };
+            setParticipantRatingObj((participantRatingObj) => ({
+              ...participantRatingObj,
+              ...updatedValue,
+            }));
+          })
+          .catch((err) => console.log(err));
+      });
+  }, [eventDetails]);
+
   return (
     <div>
       {eventDetails ? (
@@ -72,8 +95,7 @@ export default function EventDetails({
                       background: "#E5E4E2",
                     }}
                   >
-                    Organizer Rating:{" "}
-                    {organizerRating !== 0 ? organizerRating : "-"}/5{" "}
+                    Organizer Rating: {organizerRating}/5{" "}
                     <a
                       style={{
                         cursor: "pointer",
@@ -176,9 +198,24 @@ export default function EventDetails({
                                 item.participant.screenName +
                                 "(" +
                                 item.status +
-                                ")"
+                                ")" +
+                                " Rating: " +
+                                participantRatingObj[item.participant.id] +
+                                "/5"
                               }
                             />
+                            <a
+                              style={{
+                                cursor: "pointer",
+                                color: "blue",
+                              }}
+                              href={
+                                "/participant-reviews?participantId=" +
+                                item.participant.id
+                              }
+                            >
+                              <i>(See all reviews)</i>
+                            </a>
                             {item.status === "Pending" ? (
                               <Button
                                 sx={{ border: "15px" }}
