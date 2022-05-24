@@ -44,7 +44,19 @@ const Reports = ({ user }) => {
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {key}
+                      {key === "createdEvents"
+                        ? "Created Events"
+                        : key === "paidEventsPercent"
+                        ? "Paid Events (%)"
+                        : key === "cancelledEvents"
+                        ? "Cancelled Events"
+                        : key === "cancelEventPartciReq"
+                        ? "Participant Event Cancel Requests"
+                        : key === "finishedEvents"
+                        ? "Finished Events"
+                        : key === "finishedEventsAvgPartici"
+                        ? "Finished Events Average Participants"
+                        : null}
                     </TableCell>
                     <TableCell align="right">{systemReport[key]}</TableCell>
                   </TableRow>
@@ -66,7 +78,15 @@ const Reports = ({ user }) => {
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {key}
+                    {key === "signedUpeventsCount"
+                      ? "Signed Up Events"
+                      : key === "rejectsCount"
+                      ? "Rejects"
+                      : key === "approvalCount"
+                      ? "Approvals"
+                      : key === "finishedEventsCount"
+                      ? "Finished Events"
+                      : null}
                   </TableCell>
                   <TableCell align="right">{participantReport[key]}</TableCell>
                 </TableRow>
@@ -87,7 +107,25 @@ const Reports = ({ user }) => {
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {key}
+                    {key === "createdEvents"
+                      ? "Created Events"
+                      : key === "paidEvents"
+                      ? "Paid Events"
+                      : key === "percentagePaidEvents"
+                      ? "Paid Events (%)"
+                      : key === "cancelledEvents"
+                      ? "Cancelled Events"
+                      : key === "participationRequestsbyMin"
+                      ? "Participation Requests by Minimum"
+                      : key === "finishedEvents"
+                      ? "Finished Events"
+                      : key === "avgParticipantsFshedEvts"
+                      ? "Finished Events Average Participants"
+                      : key === "finishedPaidEvents"
+                      ? "Finished Paid Events"
+                      : key === "finishedPaidEventsRevenue"
+                      ? "Finished Paid Events Revenue"
+                      : null}
                   </TableCell>
                   <TableCell align="right">{organizerReport[key]}</TableCell>
                 </TableRow>
