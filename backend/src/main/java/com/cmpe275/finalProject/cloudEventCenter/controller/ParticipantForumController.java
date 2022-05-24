@@ -81,7 +81,7 @@ public class ParticipantForumController {
 	
 	@ResponseStatus(HttpStatus.OK)
 	@RequestMapping(
-			value = "/participant/{eventId}/cancel", 
+			value = "/participant/{eventId}/close", 
 			method = RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE
 	)
