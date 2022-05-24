@@ -51,6 +51,7 @@ const EventRegistrations = ({ user }) => {
   };
 
   const getEventsFunc = (userId) => {
+    console.log("here in api call func");
     getEventRegistrationsByParticipant(userId)
       .then((res) => {
         setAllEvents(res.data);
@@ -63,6 +64,7 @@ const EventRegistrations = ({ user }) => {
   };
 
   useEffect(() => {
+    console.log("here in useeffect");
     if (user) getEventsFunc(user.id);
   }, [user]);
 
@@ -85,7 +87,6 @@ const EventRegistrations = ({ user }) => {
             <>
               <Card>
                 <UserListToolbar isRegistration={true} />
-
                 <Scrollbar>
                   <TableContainer sx={{ minWidth: 800 }}>
                     <Table>
@@ -120,8 +121,8 @@ const EventRegistrations = ({ user }) => {
                                   </Stack>
                                 </TableCell>
                                 <TableCell align="left">
-                                  {formatDate(item.startTime)} -{" "}
-                                  {formatDate(item.endTime)}
+                                  {formatDate(item.event.startTime)} -{" "}
+                                  {formatDate(item.event.endTime)}
                                 </TableCell>
                                 <TableCell align="left">
                                   {item.event.address.street},{" "}
