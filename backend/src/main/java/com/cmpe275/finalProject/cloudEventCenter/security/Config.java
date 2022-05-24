@@ -12,6 +12,6 @@ public class Config {
     @Value("${application.url.frontend:http://localhost:3000/}")
     private String frontEndURL;
 
-    @Value("${application.url.backend:http://localhost:8080/}")
+    @Value("${application.url.backend:http://cmpe275cloudeventcenter-env.eba-gvrtiqb8.us-west-1.elasticbeanstalk.com/}")
     private String backEndURL;
 }
