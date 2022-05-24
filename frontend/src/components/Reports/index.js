@@ -1,13 +1,5 @@
 import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-} from "@mui/material";
+import { Table, TableBody, TableCell, TableRow, Grid } from "@mui/material";
 import { useState, useEffect } from "react";
 import {
   getSystemReport,
@@ -43,29 +35,31 @@ const Reports = ({ user }) => {
     <>
       <h1>System Report</h1>
       {systemReport ? (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 450 }} aria-label="simple table">
-            <TableBody>
-              {Object.keys(systemReport).map((key) => (
-                <TableRow
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {key}
-                  </TableCell>
-                  <TableCell align="right">{systemReport[key]}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Grid container direction="row">
+          <Grid item sx={{ border: 1, width: 450 }}>
+            <Table sx={{ width: 450 }} aria-label="simple table">
+              <TableBody>
+                {Object.keys(systemReport).map((key) => (
+                  <TableRow
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {key}
+                    </TableCell>
+                    <TableCell align="right">{systemReport[key]}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Grid>
+        </Grid>
       ) : null}
       <br />
       <br />
       <h1>Participant Report</h1>
       {participantReport ? (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 450 }} aria-label="simple table">
+        <Grid sx={{ border: 1, width: 450 }}>
+          <Table sx={{ width: 450 }} aria-label="simple table">
             <TableBody>
               {Object.keys(participantReport).map((key) => (
                 <TableRow
@@ -79,14 +73,14 @@ const Reports = ({ user }) => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </Grid>
       ) : null}
       <br />
       <br />
       <h1>Organizer Report</h1>
       {organizerReport ? (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 450 }} aria-label="simple table">
+        <Grid sx={{ border: 1, width: 450 }}>
+          <Table sx={{ width: 450 }} aria-label="simple table">
             <TableBody>
               {Object.keys(organizerReport).map((key) => (
                 <TableRow
@@ -100,7 +94,7 @@ const Reports = ({ user }) => {
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
+        </Grid>
       ) : null}
     </>
   );
