@@ -23,6 +23,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsReposi
 import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsAnswersRepository;
 import com.cmpe275.finalProject.cloudEventCenter.model.ForumQuestionsAnswers;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.controller.MimicClockTimeController;
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
@@ -55,8 +56,10 @@ public class SignUpForumService {
 			once the event registration deadline passes
 				or 
 			the event has been canceled*/
+		LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
 		if (!event.getStatus().equals(EEventStatus.REG_OPEN)) return false;
-		if (event.getDeadline().isBefore(LocalDateTime.now())) return false;
+		if (currDateTime.isAfter(event.getDeadline())) return false;
+//		if (event.getDeadline().isBefore(LocalDateTime.now())) return false;
 		return true;
 	};
 	
