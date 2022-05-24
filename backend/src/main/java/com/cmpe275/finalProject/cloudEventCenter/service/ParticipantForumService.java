@@ -23,6 +23,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsReposi
 import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsAnswersRepository;
 import com.cmpe275.finalProject.cloudEventCenter.model.ForumQuestionsAnswers;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
+import com.cmpe275.finalProject.cloudEventCenter.controller.MimicClockTimeController;
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
@@ -62,13 +63,22 @@ public class ParticipantForumService {
 		
 		// A closed participant forum is still readable to the participants and organizer.
 
+		LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
+		
 		if (!this.is_user_participant(user, event)) return false;
 		
 		if (event.getStatus().equals(EEventStatus.REG_OPEN) || event.getStatus().equals(EEventStatus.CANCELLED)) 	
 			return false;
 		
-		if (event.getStatus().equals(EEventStatus.CLOSED) && event.getDeadline().isBefore(LocalDateTime.now().minusDays(3))) 
-			return false;
+		if (event.getStatus().equals(EEventStatus.CLOSED)) {
+			if (currDateTime.isAfter(event.getEndTime().plusDays(3))) {
+//			if (event.getDeadline().isBefore(LocalDateTime.now().minusDays(3))) {
+				return false;
+			}
+		}
+		
+		// If participation forum has been closed
+//		if (event.getPForumOpen() == false) return false;
 		
 		return true;
 	};
