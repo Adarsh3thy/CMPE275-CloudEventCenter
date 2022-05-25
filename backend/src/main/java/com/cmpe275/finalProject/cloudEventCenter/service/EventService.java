@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -351,6 +353,13 @@ public class EventService {
 			 params.put("[EVENT_NAME]", event.getTitle());
 			
 			notificationMailService.sendNotificationEmail(event.getOrganizer().getEmail(),"signupUser",params);
+			 DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+			params.clear();
+			params.put("[EVENT_NAME]", event.getTitle());
+			params.put("[START_TIME]", event.getStartTime().format(formatter));
+			params.put("[DEADLINE_TIME]", event.getDeadline().format(formatter));
+			notificationMailService.sendNotificationEmail(user.getEmail(),"signupThanks",params);
+
 			return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reteventParticipant);	
 		} catch (Exception e) {
 			e.printStackTrace(System.out);

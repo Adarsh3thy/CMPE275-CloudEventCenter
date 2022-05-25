@@ -15,45 +15,46 @@ public class TransactionalScheduledService {
 	@Autowired
 	EventRepository eventRepository;
 
+
 	
 	@Transactional
 	public void updateCancelledEventStatus(Event event) {
 		event.setStatus(EEventStatus.CANCELLED);
 		event.setActive(false);
-		eventRepository.save(event);
+		eventRepository.saveAndFlush(event);
 		
 	}
 	
 	@Transactional
 	public void maxRegistrations(Event event) {
 		event.setStatus(EEventStatus.REG_CLOSED);
-		eventRepository.save(event);
+		eventRepository.saveAndFlush(event);
 	}
 	
 	@Transactional
 	public void eventStart(Event event) {
 		event.setStatus(EEventStatus.EVENT_PROGRESS);
-		eventRepository.save(event);
+		eventRepository.saveAndFlush(event);
 	}
 	
 	@Transactional
 	public void eventDone(Event event) {
 		event.setStatus(EEventStatus.CLOSED);
 		event.setActive(false);
-		eventRepository.save(event);
+		eventRepository.saveAndFlush(event);
 	}
 	
 	@Transactional
 	public void OpenParticipantForum(Event event) {
 		event.setPForumOpen(true);
-		eventRepository.save(event);
+		eventRepository.saveAndFlush(event);
 		
 	}
 	
 	@Transactional
 	public void closeParticipantForum(Event event) {
 		event.setPForumOpen(false);
-		eventRepository.save(event);
+		eventRepository.saveAndFlush(event);
 		
 	}
 
