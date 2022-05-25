@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -39,15 +41,10 @@ public class ScheduledTasks {
 	@Autowired
 	TransactionalScheduledService transactionalScheduledService;
 	
-	Set<String> logCancelledEvents=new HashSet<>();
-	Set<String> logRegClosedEvents=new HashSet<>();
-	Set<String> logStartedEvents=new HashSet<>();
-	Set<String> logDoneEvents=new HashSet<>();
-	Set<String> logForumOpenEvents=new HashSet<>();
-	Set<String> logForumCloseEvents=new HashSet<>();
 
 	@Scheduled(fixedDelay = 2000, initialDelay = 5000)
 	public void cancelEvent() {
+		
 		List<Event> allEvents = eventRepository.findAll();
 		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
 		
@@ -58,7 +55,6 @@ public class ScheduledTasks {
 						&& !event.getStatus().equals(EEventStatus.CANCELLED))
 				.collect(Collectors.toList());
 		for (Event event : eventsToBeCancelled) {
-			if(logCancelledEvents==null ||( logCancelledEvents!=null && !logCancelledEvents.contains(event.getId()))) {
 
 			transactionalScheduledService.updateCancelledEventStatus(event);
 			HashMap<String, String> params = new HashMap<>();
@@ -68,28 +64,26 @@ public class ScheduledTasks {
 
 				notificationMailService.sendNotificationEmail(user.getEmail(), "eventCancel", params);
 			}
-			logCancelledEvents.add(event.getId());
-		}
+
 		}
 
 	}
 	
 	@Scheduled(fixedDelay = 2000, initialDelay = 1500)
-	public void maxRegistrations() {
-
-		List<Event> allEvents = eventRepository.findAll();
+	public void maxRegistrationsOrdeadline() {
 		
+		
+		List<Event> allEvents = eventRepository.findAll();
+		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
+
 		List<Event> eventsRegsToBeClosed = allEvents.stream()
-				.filter(event -> event.getParticipants().size() >= event.getMaxParticipants()
+				.filter(event -> (event.getParticipants().size() >= event.getMaxParticipants()|| event.getDeadline().isBefore(mimicDateTime))
 						&& !event.getStatus().equals(EEventStatus.REG_CLOSED)
 						&& event.getStatus().equals(EEventStatus.REG_OPEN))
 				.collect(Collectors.toList());
 		for (Event event : eventsRegsToBeClosed) {
-			if(logRegClosedEvents==null||(logRegClosedEvents!=null && !logRegClosedEvents.contains(event.getId()))) {
 			transactionalScheduledService.maxRegistrations(event);
-			logRegClosedEvents.add(event.getId());
-			}
-			
+
 		}
 
 	}
@@ -99,7 +93,8 @@ public class ScheduledTasks {
 	
 	@Scheduled(fixedDelay = 2000, initialDelay = 1000)
 	public void eventStart() {
-
+		
+		
 		List<Event> allEvents = eventRepository.findAll();
 		
 		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
@@ -111,8 +106,6 @@ public class ScheduledTasks {
 						&& !event.getStatus().equals(EEventStatus.CANCELLED))
 				.collect(Collectors.toList());
 		for (Event event : eventsinProgress) {
-			if(logStartedEvents==null||(logStartedEvents!=null && !logStartedEvents.contains(event.getId()))) {
-
 			transactionalScheduledService.eventStart(event);
 			HashMap<String, String> params = new HashMap<>();
 			params.put("[EVENT_NAME]", event.getTitle());
@@ -120,8 +113,7 @@ public class ScheduledTasks {
 				User user = userRepository.getById(participant.getId().getParticipantId());
 				notificationMailService.sendNotificationEmail(user.getEmail(), "eventStart", params);
 			}
-			logStartedEvents.add(event.getId());
-			}
+
 			
 		}
 
@@ -129,7 +121,7 @@ public class ScheduledTasks {
 	
 	@Scheduled(fixedDelay = 2000, initialDelay = 2000)
 	public void eventDone() {
-
+		
 		List<Event> allEvents = eventRepository.findAll();
 		
 		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
@@ -141,12 +133,8 @@ public class ScheduledTasks {
 						&& event.getStatus().equals(EEventStatus.EVENT_PROGRESS))
 				.collect(Collectors.toList());
 		for (Event event : eventsClosed) {
-			if(logDoneEvents!=null && !logDoneEvents.contains(event.getId())) {
-
 			transactionalScheduledService.eventDone(event);
 
-			logDoneEvents.add(event.getId());
-			}
 		}
 
 	}
@@ -154,7 +142,7 @@ public class ScheduledTasks {
 	
 	@Scheduled(fixedDelay = 2000, initialDelay = 3000)
 	public void OpenParticipantForum() {
-
+		
 		List<Event> allEvents = eventRepository.findAll();
 		
 		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
@@ -166,11 +154,8 @@ public class ScheduledTasks {
 						&& !event.isPForumOpen())
 				.collect(Collectors.toList());
 		for (Event event : eventsPastDeadline) {
-			if(logForumOpenEvents==null||(logForumOpenEvents!=null && !logForumOpenEvents.contains(event.getId()))) {
-
 			transactionalScheduledService.OpenParticipantForum(event);
-			logForumOpenEvents.add(event.getId());
-			}
+
 		}
 
 	}
@@ -178,7 +163,7 @@ public class ScheduledTasks {
 
 	@Scheduled(fixedDelay = 2000, initialDelay = 4000)
 	public void closeParticipantForum() {
-
+		
 		List<Event> allEvents = eventRepository.findAll();
 		
 		LocalDateTime mimicDateTime = MimicClockTimeController.getMimicDateTime();
@@ -189,13 +174,9 @@ public class ScheduledTasks {
 						&& event.isPForumOpen())
 				.collect(Collectors.toList());
 		System.out.println("forumsToBeClosed: "+forumsToBeClosed.size());
-		System.out.println("logForumCloseEvents: "+logForumCloseEvents.size());
 		for (Event event : forumsToBeClosed) {
-			if(logForumCloseEvents==null||(logForumCloseEvents!=null && !logForumCloseEvents.contains(event.getId()))) {
-
 			transactionalScheduledService.closeParticipantForum(event);
-			logForumCloseEvents.add(event.getId());
-			}
+
 		}
 
 	}

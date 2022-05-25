@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.HttpMethod;
+
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
 import com.cmpe275.finalProject.cloudEventCenter.model.ForumQuestions;
@@ -25,7 +27,7 @@ import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsReposi
 import com.cmpe275.finalProject.cloudEventCenter.repository.ForumQuestionsAnswersRepository;
 import com.cmpe275.finalProject.cloudEventCenter.model.ForumQuestionsAnswers;
 import com.cmpe275.finalProject.cloudEventCenter.model.User;
-import com.amazonaws.HttpMethod;
+import com.cmpe275.finalProject.cloudEventCenter.controller.MimicClockTimeController;
 import com.cmpe275.finalProject.cloudEventCenter.enums.ForumTypes;
 import com.cmpe275.finalProject.cloudEventCenter.repository.EventRepository;
 import com.cmpe275.finalProject.cloudEventCenter.repository.UserRepository;
@@ -68,13 +70,22 @@ public class ParticipantForumService {
 		
 		// A closed participant forum is still readable to the participants and organizer.
 
+		LocalDateTime currDateTime = MimicClockTimeController.getMimicDateTime();
+		
 		if (!this.is_user_participant(user, event)) return false;
 		
 		if (event.getStatus().equals(EEventStatus.REG_OPEN) || event.getStatus().equals(EEventStatus.CANCELLED)) 	
 			return false;
 		
-		if (event.getStatus().equals(EEventStatus.CLOSED) && event.getDeadline().isBefore(LocalDateTime.now().minusDays(3))) 
-			return false;
+		if (event.getStatus().equals(EEventStatus.CLOSED)) {
+			if (currDateTime.isAfter(event.getEndTime().plusDays(3))) {
+//			if (event.getDeadline().isBefore(LocalDateTime.now().minusDays(3))) {
+				return false;
+			}
+		}
+		
+		// If participation forum has been closed
+//		if (event.getPForumOpen() == false) return false;
 		
 		return true;
 	};
@@ -314,5 +325,45 @@ public class ParticipantForumService {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(response);
+	}
+
+	@Transactional
+	public ResponseEntity<?> closeForum(String userId, String eventId, String description) {
+		try {
+			Event event = events_repository.findById(eventId).orElse(null);
+			if (event == null) {
+				return ResponseEntity
+			            .status(HttpStatus.NOT_FOUND)
+			            .body("Event not found");
+			};
+			
+			User user = users_repository.findById(userId).orElse(null);
+			if (user == null) {
+				return ResponseEntity
+			            .status(HttpStatus.UNAUTHORIZED)
+			            .body("Unauthorized User");
+			};
+			
+	//		if (!this.can_user_post(user, event)) {
+	//		return ResponseEntity
+	//	            .status(HttpStatus.FORBIDDEN)
+	//	            .body("You are not permitted to do this action");
+			
+			//
+			event.setPForumOpen(false);
+			event.setPForumCancelDesc(description);
+			
+			Event updatedEvent = events_repository.save(event);
+			
+			return ResponseEntity
+		            .status(HttpStatus.OK)
+		            .body(updatedEvent);
+			
+		} catch(Exception ex) {
+			System.out.println(ex.getStackTrace());
+			return ResponseEntity
+		            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+		            .body("Internal Server Error");
+		}
 	};
 }

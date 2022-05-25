@@ -3,16 +3,13 @@ import { Grid, TextField, Typography, Button } from "@mui/material";
 import {
   getQuestionAnswers,
   createAnswer,
-  canPostToForum,
-} from "../../../controllers/participationForum";
+} from "../../../controllers/signupForum";
 import { useLocation } from "react-router-dom";
 import { AuthConsumer } from "../../contexts/Auth/AuthContext";
-import { getEventDetails } from "../../../controllers/events";
 
-const ParticipationForumComments = ({ user }) => {
+const SignupForumComments = ({ user }) => {
   const [answers, setAnswers] = useState(null);
   const [comment, setComment] = useState(null);
-  const [eventDetails, setEventDetails] = useState(null);
 
   const search = useLocation().search;
 
@@ -31,23 +28,19 @@ const ParticipationForumComments = ({ user }) => {
 
   const getAnswersFunc = () => {
     const questionId = new URLSearchParams(search).get("questionId");
-    const eventId = new URLSearchParams(search).get("eventId");
-    getQuestionAnswers(questionId, user.id)
+    getQuestionAnswers(questionId)
       .then((res) => {
         setAnswers(res.data);
-        return getEventDetails(eventId)
-      }).then((res) => {
-        setEventDetails(res.data);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    if (user)
-      getAnswersFunc();
-  }, [ user ]);
+    getAnswersFunc();
+  }, []);
 
-  return eventDetails ? (
+  console.log("user: ", user);
+  return (
     <Grid container direction="column">
       <form onSubmit={handleSubmit} id="commentForm">
         <Grid item>
@@ -65,53 +58,44 @@ const ParticipationForumComments = ({ user }) => {
             </p>
           </Typography>
         </Grid>
-        {
-          canPostToForum(eventDetails) || true ? 
-          <div>
-            <Grid item sx={{ marginTop: "25px" }}>
-              <TextField
-                required
-                variant="filled"
-                multiline
-                fullWidth
-                rows="3"
-                placeholder="Add a comment..."
-                onChange={(e) => setComment(e.target.value)}
-              />
-            </Grid>
-            <Grid
-              item
-              container
-              direction="row"
-              justifyContent={"right"}
-              sx={{ marginTop: "5px" }}
-              spacing={2}
+        <Grid item sx={{ marginTop: "25px" }}>
+          <TextField
+            required
+            variant="filled"
+            multiline
+            fullWidth
+            rows="3"
+            placeholder="Add a comment..."
+            onChange={(e) => setComment(e.target.value)}
+          />
+        </Grid>
+        <Grid
+          item
+          container
+          direction="row"
+          justifyContent={"right"}
+          sx={{ marginTop: "5px" }}
+          spacing={2}
+        >
+          <Grid item>
+            <Button
+              variant="outlined"
+              sx={{ textTransform: "none" }}
+              size="large"
+              type="submit"
             >
-              <Grid item>
-                <Button
-                  variant="outlined"
-                  sx={{ textTransform: "none" }}
-                  size="large"
-                  type="submit"
-                >
-                  Comment
-                </Button>
-              </Grid>
-            </Grid>
-          </div>
-          :
-          null
-        }
-
+              Comment
+            </Button>
+          </Grid>
+        </Grid>
         <Grid item>
           <Typography>
             <h1>All Comments</h1>
           </Typography>
         </Grid>
         {answers &&
-          answers.map((item, index) => (
+          answers.map((item) => (
             <Grid
-              key = {index}
               item
               container
               direction="column"
@@ -140,12 +124,11 @@ const ParticipationForumComments = ({ user }) => {
           ))}
       </form>
     </Grid>
-  ) : null;
+  );
 };
 
 export default (props) => (
   <AuthConsumer>
-    {({ user }) => <ParticipationForumComments user={user} {...props} />}
+    {({ user }) => <SignupForumComments user={user} {...props} />}
   </AuthConsumer>
 );
-

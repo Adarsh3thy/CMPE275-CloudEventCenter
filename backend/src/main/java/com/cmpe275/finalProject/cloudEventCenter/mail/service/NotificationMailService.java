@@ -62,7 +62,15 @@ public class NotificationMailService {
 					+ "<br><br>" +
 					"Best,<br>" + "CEC";
 			break;	
-		
+		case "signupThanks":
+			subject = "Thank you for signing up to the event!";
+			content = "Dear user,<br><br>"
+					+ "Thank you for signing up for the event,"
+					+ " <b>[EVENT_NAME]</b>. The event starts at <b>[START_TIME]</b>, and you can access the participant forum on <b>[DEADLINE_TIME]</b>. "
+					+ "<br>See you soon at the event!"
+					+ "<br><br>" +
+					"Best,<br>" + "CEC";
+			break;	
 		case "signupApproval":
 			subject = "Event registration approved!";
 			content = "Dear user,<br><br>"

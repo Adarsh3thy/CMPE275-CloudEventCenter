@@ -138,10 +138,10 @@ public class UserService {
 
 		System.out.println("userDetails.getId(): " + userDetails.getId());
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-
+		String city=userRepository.getById(userDetails.getId()).getAddress().getCity();
 		System.out.println(roles);
 		JwtResponse jwtResp = new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
-				userDetails.getUsername(), userDetails.getEmail(), roles);
+				userDetails.getUsername(), userDetails.getEmail(),city, roles);
 		return ResponseEntity.ok(jwtResp);
 
 	}
