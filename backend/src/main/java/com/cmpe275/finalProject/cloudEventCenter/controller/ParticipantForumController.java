@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cmpe275.finalProject.cloudEventCenter.service.ParticipantForumService;
 
@@ -34,9 +35,10 @@ public class ParticipantForumController {
 	ResponseEntity<?> createSignUpForumQuestion(
 			@PathVariable(value =  "eventId") String eventId,
 			@RequestParam("userId") String userId,
-			@RequestParam("text") String text
+			@RequestParam("text") String text,
+			@RequestParam(value = "file", required = false) MultipartFile file
 	) {	
-			return forumService.createQuestion(userId, eventId, text);
+			return forumService.createQuestion(userId, eventId, text, file);
     }
 	
 	@ResponseStatus(HttpStatus.OK)

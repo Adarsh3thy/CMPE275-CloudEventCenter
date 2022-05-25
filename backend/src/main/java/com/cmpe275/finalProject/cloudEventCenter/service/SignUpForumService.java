@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -17,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.HttpMethod;
 
@@ -59,6 +63,8 @@ public class SignUpForumService {
 	@Autowired
 	private AwsS3Service s3_service;
 	
+	private String bucketName = "cloudeventcenter";
+	
 	private Boolean can_user_post(User user, Event event) {
 		/**Becomes closed for posting of new messages 
 			once the event registration deadline passes
@@ -71,13 +77,14 @@ public class SignUpForumService {
 		return true;
 	};
 	
-	public ForumQuestions persist(User user, Event event, String text) {
+	public ForumQuestions persist(User user, Event event, String text, String path) {
 		return questions_repository
 				.save(
 					new ForumQuestions(
 							null,
 							user,
 							event,
+							path,
 							text,
 							ForumTypes.SIGN_UP_FORUM,
 							null,
@@ -89,7 +96,8 @@ public class SignUpForumService {
 	public ResponseEntity<?> createQuestion(
 			String userId, 
 			String eventId,
-			String text
+			String text,
+			MultipartFile file 
 		) {
 		
 		try {
@@ -114,7 +122,34 @@ public class SignUpForumService {
 			            .body("You are not permitted to do this action");
 			};
 			
-			ForumQuestions savedQuestion = this.persist(user, event, text);
+			// Upload an image
+			String S3URL = "";
+			if (file != null) {
+				Map<String, String> metadata = new HashMap<String, String>();
+		        metadata.put("Content-Type", file.getContentType());
+		        metadata.put("Content-Length", String.valueOf(file.getSize()));
+		        
+		        Optional<Map<String, String>> md = Optional.ofNullable(metadata);
+	
+		        String bucketPath = "/events/" + 
+						eventId + 
+						"/forums/sign_up/" + 
+						UUID.randomUUID();
+		        String filePath = this.bucketName + bucketPath;
+		        String fileName = String.format("%s", file.getOriginalFilename());
+		        S3URL = "https://" + this.bucketName + ".s3." + 
+		        		"us-east-2" + 
+		        		".amazonaws.com" + 
+		        		bucketPath + "/" + fileName;
+		        s3_service.upload(filePath, fileName, file.getInputStream(), md);
+			};
+			
+			ForumQuestions savedQuestion = this.persist(
+					user, 
+					event, 
+					text, 
+					S3URL
+			);
 			
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
@@ -263,10 +298,10 @@ public class SignUpForumService {
 					question.getId();
 		
 		// TODO: Bucket Name
-		String bucketName = "us-east-2";
+//		String bucketName = "us-east-2";
 		String preSignedUrl = s3_service.generatePreSignedURL(
 				filePath, 
-				bucketName, 
+				this.bucketName, 
 				HttpMethod.PUT
 		);
 		
