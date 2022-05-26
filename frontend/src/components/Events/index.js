@@ -12,16 +12,16 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  Grid,
+  TextField,
+  MenuItem,
 } from "@mui/material";
 import Page from "../../mui_components/Page";
 import Label from "../../mui_components/Label";
 import Scrollbar from "../../mui_components/Scrollbar";
 import Iconify from "../../mui_components/Iconify";
 import SearchNotFound from "../../mui_components/SearchNotFound";
-import {
-  UserListHead,
-  UserListToolbar,
-} from "../../sections/@dashboard/events";
+import { UserListHead } from "../../sections/@dashboard/events";
 import CreateEvent from "./CreateEvent";
 import EventDetails from "./EventDetails";
 import { AuthConsumer } from "../contexts/Auth/AuthContext";
@@ -32,6 +32,9 @@ import {
 } from "../../controllers/events";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -57,6 +60,13 @@ const Events = ({ user }) => {
   const [successMessageReg, setSuccessMessageReg] = useState(null);
   const [openSnack, setOpenSnack] = useState(false);
   const [openRegSnack, setOpenRegSnack] = useState(false);
+  // filters
+  const [city, setCity] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [keyword, setKeyword] = useState(null);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [organizer, setOrganizer] = useState(null);
 
   const handleClose = () => {
     setOpenCreateEvent(false);
@@ -102,8 +112,18 @@ const Events = ({ user }) => {
   };
 
   const getEventsFunc = () => {
-    getEvents(page)
+    getEvents(
+      page,
+      city,
+      status,
+      keyword,
+      startTime ? startTime.toISOString().replace("Z", "") : null,
+      endTime ? endTime.toISOString().replace("Z", "") : null,
+      organizer
+    )
       .then((res) => {
+        console.log("triggered");
+        console.log(res);
         setAllEvents(res.data.content);
       })
       .catch((err) => console.log(err));
@@ -115,7 +135,7 @@ const Events = ({ user }) => {
 
   useEffect(() => {
     getEventsFunc();
-  }, []);
+  }, [city, status, keyword, startTime, endTime, organizer]);
 
   return (
     <>
@@ -141,9 +161,78 @@ const Events = ({ user }) => {
 
           {user ? (
             <>
+              <Grid
+                container
+                direction="column"
+                sx={{ marginBottom: "50px" }}
+                spacing={2}
+              >
+                <Grid item container direction="row" spacing={2}>
+                  <Grid item>
+                    <TextField
+                      placeholder="City"
+                      defaultValue={user.city}
+                      onChange={(e) => setCity(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      placeholder="Keyword"
+                      onChange={(e) => setKeyword(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      fullWidth
+                      select
+                      label="Status"
+                      sx={{ width: "250px" }}
+                      onChange={(e) => setStatus(e.target.value)}
+                    >
+                      <MenuItem value="ACTIVE">Active</MenuItem>
+                      <MenuItem value="OPENFORREGISTRATION">
+                        Open for Registration
+                      </MenuItem>
+                      <MenuItem value="ALL" selected>
+                        All
+                      </MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+                <Grid item container direction="row" spacing={2}>
+                  <Grid item>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DateTimePicker
+                        renderInput={(props) => <TextField {...props} />}
+                        label="Start time"
+                        value={startTime}
+                        onChange={(newValue) => {
+                          setStartTime(newValue);
+                        }}
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <DateTimePicker
+                        renderInput={(props) => <TextField {...props} />}
+                        label="End time"
+                        value={endTime}
+                        onChange={(newValue) => {
+                          setEndTime(newValue);
+                        }}
+                      />
+                    </LocalizationProvider>
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      placeholder="Organizer"
+                      onChange={(e) => setOrganizer(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
               <Card>
-                <UserListToolbar />
-
                 <Scrollbar>
                   <TableContainer sx={{ minWidth: 800 }}>
                     <Table>

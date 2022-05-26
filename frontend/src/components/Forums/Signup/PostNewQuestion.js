@@ -14,12 +14,14 @@ export default function PostNewQuestion({
   userId,
 }) {
   const [questionText, setQuestionText] = useState(null);
+  const [file, setFile] = useState(null);
 
   const onSubmit = (e) => {
     e.preventDefault();
     let data = {};
     data.text = questionText;
     data.userId = userId;
+    if (file) data.file = file;
     createQuestion(eventId, data)
       .then(() => {
         handleClose();
@@ -45,6 +47,13 @@ export default function PostNewQuestion({
                   autoComplete="family-name"
                   variant="outlined"
                   onChange={(e) => setQuestionText(e.target.value)}
+                />
+              </Grid>
+              <Grid item sx={{ marginTop: "15px" }}>
+                Upload Image&nbsp;&nbsp;
+                <input
+                  type="file"
+                  onChange={(e) => setFile(e.target.files[0])}
                 />
               </Grid>
             </Grid>
