@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Component
 public class Config {
-    @Value("${application.url.frontend:http://localhost:3000/}")
+    @Value("${application.url.frontend:http://54.147.1.156:3000/}")
     private String frontEndURL;
 
     @Value("${application.url.backend:http://cmpe275cloudeventcenter-env.eba-gvrtiqb8.us-west-1.elasticbeanstalk.com/}")

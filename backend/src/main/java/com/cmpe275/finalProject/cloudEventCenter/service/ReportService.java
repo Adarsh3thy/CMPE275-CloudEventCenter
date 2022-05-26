@@ -51,7 +51,7 @@ public class ReportService {
 		System.out.println(ago_90);
 		List<EventParticipant> findAllInRange = registeredEvents.stream()
 				.filter(registration -> registration.getRegistrationDate().isAfter(ago_90)
-						&& registration.getRegistrationDate().isBefore(currentMimicTime))
+						)
 				.collect(Collectors.toList());
 		List<EventParticipant> eventRejects = findAllInRange.stream()
 				.filter(registration -> registration.getStatus().equals(ParticipantStatus.Rejected))
