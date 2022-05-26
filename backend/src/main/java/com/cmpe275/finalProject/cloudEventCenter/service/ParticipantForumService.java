@@ -4,7 +4,12 @@
 package com.cmpe275.finalProject.cloudEventCenter.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -15,6 +20,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.amazonaws.HttpMethod;
 
 import com.cmpe275.finalProject.cloudEventCenter.model.EEventStatus;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
@@ -51,6 +59,11 @@ public class ParticipantForumService {
 	@Autowired
 	private UserRepository users_repository;
 	
+	@Autowired
+	private AwsS3Service s3_service;
+	
+	private String bucketName = "cloudeventcenter";
+	
 	private Boolean is_user_participant(User user,  Event event) {
 		return true;
 	};
@@ -83,13 +96,14 @@ public class ParticipantForumService {
 		return true;
 	};
 	
-	public ForumQuestions persist(User user, Event event, String text) {
+	public ForumQuestions persist(User user, Event event, String text, String filePath) {
 		return questions_repository
 				.save(
 					new ForumQuestions(
 						null,
 						user,
 						event,
+						filePath,
 						text,
 						ForumTypes.PARTICIPANT_FORUM,
 						null,
@@ -101,7 +115,8 @@ public class ParticipantForumService {
 	public ResponseEntity<?> createQuestion(
 			String userId, 
 			String eventId,
-			String text
+			String text,
+			MultipartFile file
 		) {
 		
 		try {
@@ -126,7 +141,29 @@ public class ParticipantForumService {
 //			            .body("You are not permitted to do this action");
 //			};
 			
-			ForumQuestions savedQuestion = this.persist(user, event, text);
+			// Upload an image
+			String S3URL = "";
+			if (file != null) {
+				Map<String, String> metadata = new HashMap<String, String>();
+		        metadata.put("Content-Type", file.getContentType());
+		        metadata.put("Content-Length", String.valueOf(file.getSize()));
+		        
+		        Optional<Map<String, String>> md = Optional.ofNullable(metadata);
+	
+		        String bucketPath = "/events/" + 
+						eventId + 
+						"/forums/sign_up/" + 
+						UUID.randomUUID();
+		        String filePath = this.bucketName + bucketPath;
+		        String fileName = String.format("%s", file.getOriginalFilename());
+		        S3URL = "https://" + this.bucketName + ".s3." + 
+		        		"us-east-2" + 
+		        		".amazonaws.com" + 
+		        		bucketPath + "/" + fileName;
+		        s3_service.upload(filePath, fileName, file.getInputStream(), md);
+			};
+			
+			ForumQuestions savedQuestion = this.persist(user, event, text, "");
 						
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
@@ -277,6 +314,50 @@ public class ParticipantForumService {
 		}
 	}
 
+	@Transactional
+	public ResponseEntity<?> uploadImage(
+			String userId,
+			String questionId
+	) {
+		ForumQuestions question = questions_repository.findById(questionId).orElse(null);
+		if (question == null) {
+			return ResponseEntity
+		            .status(HttpStatus.NOT_FOUND)
+		            .body("Forum Question not found");
+		}
+		
+		if (!userId.equals(question.getUser().getId())) {
+			return ResponseEntity
+		            .status(HttpStatus.FORBIDDEN)
+		            .body("You are not permitted to perform this action");
+		};
+		
+		String filePath = "cec/events/" + 
+					question.getEvent().getId() + 
+					"/forums/participant/" + 
+					question.getId();
+		
+		// TODO: Bucket Name
+		String bucketName = "us-east-2";
+		String preSignedUrl = s3_service.generatePreSignedURL(
+				filePath, 
+				bucketName, 
+				HttpMethod.PUT
+		);
+		
+		HashMap<String, ArrayList<String>> response = new HashMap<>();
+		ArrayList<String> urls = new ArrayList<String>();
+		urls.add(preSignedUrl);
+		response.put("data", urls);
+		
+//		TODO: Set the question with said image
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(response);
+	}
+
+	@Transactional
 	public ResponseEntity<?> closeForum(String userId, String eventId, String description) {
 		try {
 			Event event = events_repository.findById(eventId).orElse(null);

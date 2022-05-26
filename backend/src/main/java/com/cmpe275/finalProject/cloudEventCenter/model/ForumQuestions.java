@@ -59,8 +59,9 @@ public class ForumQuestions {
 //	@Column(name = "EVENT_ID")
 	private Event event;
 	
-//	@Column(name = "ASSETS")
-//	private List<String> assets;
+	@Column(name = "IMAMGE_URL")
+	private String imageUrl;
+	
 	@Column(name = "TEXT")
 	private String text;
 	

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cmpe275.finalProject.cloudEventCenter.POJOs.EventData;
 import com.cmpe275.finalProject.cloudEventCenter.model.Event;
@@ -45,9 +46,10 @@ public class SignUpForumController {
 	ResponseEntity<?> createSignUpForumQuestion(
 			@PathVariable(value =  "eventId") String eventId,
 			@RequestParam("userId") String userId,
-			@RequestParam("text") String text
+			@RequestParam("text") String text,
+			@RequestParam(value = "file", required = false) MultipartFile file
 	) {	
-			return signUpForumService.createQuestion(userId, eventId, text);
+			return signUpForumService.createQuestion(userId, eventId, text, file);
     }
 	
 	@ResponseStatus(HttpStatus.OK)
@@ -86,5 +88,18 @@ public class SignUpForumController {
 			@PathVariable(value =  "questionId") String questionId
 	) {
 			return signUpForumService.getQuestionAnswers(questionId);
+    }
+	
+	@ResponseStatus(HttpStatus.OK)
+	@RequestMapping(
+			value = "/sign_up/questions/{questionId}/images", 
+			method = RequestMethod.POST, 
+			produces=MediaType.APPLICATION_JSON_VALUE
+	)
+	ResponseEntity<?> getImageUploadURL(
+			@PathVariable(value =  "questionId") String questionId,
+			@RequestParam("userId") String userId
+	) {
+			return signUpForumService.uploadImage(userId, questionId);
     }
 }
