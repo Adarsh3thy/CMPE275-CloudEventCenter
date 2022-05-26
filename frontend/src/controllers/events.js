@@ -12,23 +12,6 @@ export function getEvents(
   token = JSON.parse(localStorage.getItem("user")).token
 ) {
   axios.defaults.headers.common["authorization"] = "Bearer " + token;
-  console.log(
-    semiEndpoint +
-      "/api/event/" +
-      page +
-      "/search?city=" +
-      city +
-      "&status=" +
-      status +
-      "&keyword=" +
-      keyword +
-      "&startTime=" +
-      startTime +
-      "&endTime=" +
-      endTime +
-      "&organizer=" +
-      organizer
-  );
   return axios.get(
     semiEndpoint +
       "/api/event/" +
