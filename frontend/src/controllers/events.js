@@ -3,10 +3,49 @@ import axios from "axios";
 
 export function getEvents(
   page = 1,
+  city,
+  status,
+  keyword,
+  startTime,
+  endTime,
+  organizer,
   token = JSON.parse(localStorage.getItem("user")).token
 ) {
   axios.defaults.headers.common["authorization"] = "Bearer " + token;
-  return axios.get(semiEndpoint + "/api/event/" + page + "/search");
+  console.log(
+    semiEndpoint +
+      "/api/event/" +
+      page +
+      "/search?city=" +
+      city +
+      "&status=" +
+      status +
+      "&keyword=" +
+      keyword +
+      "&startTime=" +
+      startTime +
+      "&endTime=" +
+      endTime +
+      "&organizer=" +
+      organizer
+  );
+  return axios.get(
+    semiEndpoint +
+      "/api/event/" +
+      page +
+      "/search?city=" +
+      city +
+      "&status=" +
+      status +
+      "&keyword=" +
+      keyword +
+      "&startTime=" +
+      startTime +
+      "&endTime=" +
+      endTime +
+      "&organizer=" +
+      organizer
+  );
 }
 
 export function getEventDetails(

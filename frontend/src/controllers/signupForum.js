@@ -17,6 +17,11 @@ export function createQuestion(
   token = JSON.parse(localStorage.getItem("user")).token
 ) {
   axios.defaults.headers.common["authorization"] = "Bearer " + token;
+  
+  const formData = new FormData();
+  if (dataJson.file)
+    formData.append("file", dataJson.file);
+
   return axios.post(
     semiEndpoint +
       "/api/forums/sign_up/" +
@@ -24,7 +29,9 @@ export function createQuestion(
       "/questions?text=" +
       dataJson.text +
       "&userId=" +
-      dataJson.userId
+      dataJson.userId,
+    formData,
+    
   );
 }
 

@@ -6,6 +6,7 @@ import { getQuestionsByEvent, canPostToForum, closeForum } from "../../../contro
 import { AuthConsumer } from "../../contexts/Auth/AuthContext";
 import { Button } from "@mui/material";
 import PostNewQuestion from "./PostNewQuestion";
+import CancelForum from "./CancelForum";
 
 const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
@@ -15,11 +16,17 @@ const ParticipationForum = ({ user }) => {
   const [questions, setQuestions] = useState([]);
   const [eventDetails, setEventDetails] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [ openCancelForumModal, setOpenCancelForumModal ] = useState(false);
 
   const search = useLocation().search;
 
   const handleClose = () => {
     setOpenModal(false);
+    getEventDetailsFunc();
+  };
+
+  const handleCancelForumClose = () => {
+    setOpenCancelForumModal(false);
     getEventDetailsFunc();
   };
 
@@ -36,16 +43,16 @@ const ParticipationForum = ({ user }) => {
       .catch((err) => console.log(err));
   };
 
-  const closeParticipantForum = (userId, eventId, text) => {
-    closeForum(userId, eventId, text)
-    .then(() => {
-      alert("Forum closed");
-      window.location.reload();
-    }).catch((err) => {
-      alert("Failed to close forum. Please try again");
-      window.location.reload();
-    })
-  };
+  // const closeParticipantForum = (userId, eventId, text) => {
+  //   closeForum(userId, eventId, text)
+  //   .then(() => {
+  //     alert("Forum closed");
+  //     window.location.reload();
+  //   }).catch((err) => {
+  //     alert("Failed to close forum. Please try again");
+  //     window.location.reload();
+  //   })
+  // };
 
   useEffect(() => {
     if (user) 
@@ -87,11 +94,12 @@ const ParticipationForum = ({ user }) => {
 
       <div>
         {
-          eventDetails && eventDetails.pForumOpen === true && eventDetails.organizer.id === user.id ?
+          true || eventDetails && eventDetails.pForumOpen === true && eventDetails.organizer.id === user.id ?
           (
             <div>
               <Button
-              onClick = {() => closeParticipantForum(eventDetails.organizer.id, eventDetails.id, "Forum manually closed")}
+              // onClick = {() => closeParticipantForum(eventDetails.organizer.id, eventDetails.id, "Forum manually closed")}
+              onClick = {() => setOpenCancelForumModal(true)}
               >
                 Close Participant Forum
               </Button>
@@ -139,6 +147,9 @@ const ParticipationForum = ({ user }) => {
                   : ""}
               </h4>
               <p style={{ textAlign: "left" }}>{item.text}</p>
+              <p style={{ textAlign: "left" }}>
+                <img src={item.imageUrl} />
+              </p>
               <p style={{ textAlign: "left", color: "gray" }}>
                 posted on {item.createdAt}
               </p>
@@ -152,6 +163,13 @@ const ParticipationForum = ({ user }) => {
         eventId={eventDetails.id}
         eventDetails={eventDetails}
         userId={user.id}
+      />
+      <CancelForum
+      open = {openCancelForumModal}
+      handleClose = {handleCancelForumClose}
+      eventId = {eventDetails.id}
+      eventDetails = {eventDetails}
+      userId = {user.id}
       />
     </div>
   ) : null;

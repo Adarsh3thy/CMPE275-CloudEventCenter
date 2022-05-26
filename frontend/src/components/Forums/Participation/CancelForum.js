@@ -5,41 +5,41 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Grid, TextField } from "@mui/material";
-import { createQuestion } from "../../../controllers/signupForum";
+import { closeForum } from "../../../controllers/participationForum";
 
-export default function PostNewQuestion({
+export default function CancelForum({
   open,
   eventId,
   handleClose,
   userId,
 }) {
   const [questionText, setQuestionText] = useState(null);
-  const [file, setFile] = useState(null);
 
   const onSubmit = (e) => {
     e.preventDefault();
     let data = {};
     data.text = questionText;
-    data.userId = userId;
-    if (file) data.file = file;
-    createQuestion(eventId, data)
+
+    closeForum(userId, eventId, questionText)
       .then(() => {
         handleClose();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("CancelForumError", err);
+      });
   };
 
   return (
     <div>
       <Dialog open={open} onClose={handleClose}>
         <form onSubmit={onSubmit}>
-          <DialogTitle>Post new question</DialogTitle>
+          <DialogTitle>Add a reason for cancellation</DialogTitle>
           <DialogContent>
             <Grid container>
               <Grid item>
                 <TextField
                   required
-                  label="Ask your question here"
+                  label="Participation Forum Cancel description"
                   fullWidth
                   multiline
                   sx={{ width: "500px", marginTop: "15px" }}
@@ -47,13 +47,6 @@ export default function PostNewQuestion({
                   autoComplete="family-name"
                   variant="outlined"
                   onChange={(e) => setQuestionText(e.target.value)}
-                />
-              </Grid>
-              <Grid item sx={{ marginTop: "15px" }}>
-                Upload Image&nbsp;&nbsp;
-                <input
-                  type="file"
-                  onChange={(e) => setFile(e.target.files[0])}
                 />
               </Grid>
             </Grid>

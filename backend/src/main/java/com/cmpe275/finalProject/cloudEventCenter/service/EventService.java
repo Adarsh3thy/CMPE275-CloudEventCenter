@@ -277,8 +277,8 @@ public class EventService {
 			
 			// Post to the forum(s)
 			String postText = "(The event has been cancelled. The forums are now closed)";
-			participantForumService.persist(event.getOrganizer(), event, postText);
-			signUpForumService.persist(event.getOrganizer(), event, postText);
+			participantForumService.persist(event.getOrganizer(), event, postText, "");
+			signUpForumService.persist(event.getOrganizer(), event, postText, "");
 			// Notify the organizer
 			notificationMailService
 						.sendNotificationEmail(
