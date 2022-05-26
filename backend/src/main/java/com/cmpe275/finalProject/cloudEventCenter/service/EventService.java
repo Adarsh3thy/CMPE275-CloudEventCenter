@@ -373,8 +373,28 @@ public class EventService {
 
 		int isActive = 0;
 		String reqStatus = status;
-
-		if (status == null) {
+		
+		if(city!=null && city.equals("null")) {
+			city=null;
+		}
+		
+		if(startTime!=null && startTime.equals("null")) {
+			startTime=null;
+		}
+		
+		if(endTime!=null && endTime.equals("null")) {
+			endTime=null;
+		}
+		
+		if(organizer!=null && organizer.equals("null")) {
+			organizer=null;
+		}
+		
+		if(keyword!=null && keyword.equals("null")) {
+			keyword=null;
+		}
+		int all = 0;
+		if (status == null|| (status!=null && status.equals("null"))) {
 			isActive = 1;
 			reqStatus = null;
 		} else {
@@ -382,12 +402,14 @@ public class EventService {
 			if (status == "ACTIVE") {
 				isActive = 1;
 				reqStatus = null;
+				all=0;
 			} else if (status.equals("OPENFORREGISTRATION")) {
 				isActive = 1;
 				reqStatus = "REG_OPEN";
+				all=0;
 			} else if (status.equals("ALL")) {
-				isActive = 0;
 				reqStatus = null;
+				isActive=2;
 			}
 		}
 		

@@ -81,6 +81,10 @@ public class UserService {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
 		}
 		
+		if (userRepository.existsByScreenName(screenName)) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: Screen Name is already in use!"));
+		}
+		
 		if(strRoles==null || strRoles.isEmpty()) {
 			return ResponseEntity.badRequest().body(new MessageResponse("Error: No roles are specified for the user"));
 		}
@@ -138,7 +142,11 @@ public class UserService {
 
 		System.out.println("userDetails.getId(): " + userDetails.getId());
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-		String city=userRepository.getById(userDetails.getId()).getAddress().getCity();
+		String city="";
+		Address address=userRepository.getById(userDetails.getId()).getAddress();
+		if(address!=null) {
+		city=address.getCity();
+		}
 		System.out.println(roles);
 		JwtResponse jwtResp = new JwtResponse(jwt, refreshToken.getToken(), userDetails.getId(),
 				userDetails.getUsername(), userDetails.getEmail(),city, roles);

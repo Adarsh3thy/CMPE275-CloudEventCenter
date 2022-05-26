@@ -35,7 +35,7 @@ public interface EventRepository extends JpaRepository<Event, String>{
 			+ "and ((?5 is null and event_start_time>=DATE_FORMAT(?4,'%Y-%m-%d %H:%i:%s')) "
 			+ "or (?5 is not null and event_start_time>=DATE_FORMAT(?5,'%Y-%m-%d %H:%i:%s'))) "
 			+ "and (?6 is null or event_end_time<=DATE_FORMAT(?6,'%Y-%m-%d %H:%i:%s')) "
-			+ "and is_active=?7"
+			+ "and (((?7=0 || ?7=1 ) && is_active=?7)||((?7=2) && (is_active=1||is_active=0)))"
 			+" and (?8 is null or lower(u.screen_name) like %?8%)",
 			countQuery="select count(*) from event e, user u where e.organizer_id=u.user_id and "
 					+ "(?1 is null or (MATCH (e.event_title,e.event_desc) AGAINST (?1))"
@@ -45,7 +45,7 @@ public interface EventRepository extends JpaRepository<Event, String>{
 					+ "and ((?5 is null and event_start_time>=DATE_FORMAT(?4,'%Y-%m-%d %H:%i:%s')) "
 					+ "or (?5 is not null and event_start_time>=DATE_FORMAT(?5,'%Y-%m-%d %H:%i:%s'))) "
 					+ "and (?6 is null or event_end_time<=DATE_FORMAT(?6,'%Y-%m-%d %H:%i:%s')) "
-					+ "and is_active=?7"
+					+ "and (((?7=0 || ?7=1 ) && is_active=?7)||((?7=2) && (is_active=1||is_active=0)))"
 					+" and (?8 is null or lower(u.screen_name) like %?8%)",
 			
 			
