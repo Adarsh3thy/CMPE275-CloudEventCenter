@@ -173,7 +173,7 @@ public class ScheduledTasks {
 						&& event.getParticipants().size() >= event.getMinParticipants()
 						&& event.isPForumOpen())
 				.collect(Collectors.toList());
-		System.out.println("forumsToBeClosed: "+forumsToBeClosed.size());
+		//System.out.println("forumsToBeClosed: "+forumsToBeClosed.size());
 		for (Event event : forumsToBeClosed) {
 			transactionalScheduledService.closeParticipantForum(event);
 
