@@ -163,7 +163,7 @@ public class ParticipantForumService {
 		        s3_service.upload(filePath, fileName, file.getInputStream(), md);
 			};
 			
-			ForumQuestions savedQuestion = this.persist(user, event, text, "");
+			ForumQuestions savedQuestion = this.persist(user, event, text, S3URL);
 						
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
