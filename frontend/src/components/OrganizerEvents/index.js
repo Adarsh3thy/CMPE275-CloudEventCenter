@@ -27,6 +27,7 @@ import {
 } from "../../controllers/events";
 import MuiAlert from "@mui/material/Alert";
 import EventDetails from "../Events/EventDetails";
+import { canUserViewParticipantForum } from "../../utils/EventAuthorization";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -46,6 +47,7 @@ const OrganizerEvents = ({ user }) => {
   const [allEvents, setAllEvents] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
   const [openEventDetails, setOpenEventDetails] = useState(false);
+  const [canViewParticipantForum, setCanViewParticipantForum ] = useState(false);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -69,6 +71,7 @@ const OrganizerEvents = ({ user }) => {
   };
 
   const handleEventDetailsClose = () => {
+    setCanViewParticipantForum(false);
     setOpenEventDetails(false);
   };
 
@@ -82,6 +85,9 @@ const OrganizerEvents = ({ user }) => {
       .then((res) => {
         setEventDetails(res.data);
         setOpenEventDetails(true);
+        setCanViewParticipantForum(
+          canUserViewParticipantForum(user.id, res.data)
+        );
       })
       .catch((err) => console.log(err));
   };
@@ -196,6 +202,7 @@ const OrganizerEvents = ({ user }) => {
           handleClose={handleEventDetailsClose}
           isOrganizer={true}
           getEventDetailsFunc={getEventDetailsFunc}
+          canViewParticipantForum = {canViewParticipantForum}
         />
       </Page>
     </>

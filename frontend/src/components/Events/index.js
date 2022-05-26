@@ -35,6 +35,7 @@ import MuiAlert from "@mui/material/Alert";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { canUserViewParticipantForum } from "../../utils/EventAuthorization";
 
 const TABLE_HEAD = [
   { id: "name", label: "Title", alignRight: false },
@@ -67,6 +68,7 @@ const Events = ({ user }) => {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [organizer, setOrganizer] = useState(null);
+  const [canViewParticipantForum, setCanViewParticipantForum ] = useState(false);
 
   const handleClose = () => {
     setOpenCreateEvent(false);
@@ -77,6 +79,7 @@ const Events = ({ user }) => {
 
   const handleEventDetailsClose = () => {
     setOpenEventDetails(false);
+    setCanViewParticipantForum(false);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -107,6 +110,9 @@ const Events = ({ user }) => {
       .then((res) => {
         setEventDetails(res.data);
         setOpenEventDetails(true);
+        setCanViewParticipantForum(
+          canUserViewParticipantForum(user.id, res.data)
+        );
       })
       .catch((err) => console.log(err));
   };
@@ -325,6 +331,7 @@ const Events = ({ user }) => {
                 eventDetails={eventDetails}
                 handleClose={handleEventDetailsClose}
                 handleEventRegistration={handleEventRegistration}
+                canViewParticipantForum = {canViewParticipantForum}
               />
 
               <Snackbar
