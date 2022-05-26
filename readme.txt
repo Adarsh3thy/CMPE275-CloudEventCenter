@@ -14,4 +14,10 @@ Build Instructions for Backend:
 3. Allow eclipse to download the dependencies
 4. Run the project as a Java application from com.cmpe275.finalProject.cloudEventCenter.CloudEventCenterApplication
 
+Instructions for running the project:
+1) git clone <git_url>
+2) navigate to frontend
+3) npm install
+4) npm start
+
 Commit History: https://github.com/Adarsh3thy/CMPE275-CloudEventCenter/commits/main
