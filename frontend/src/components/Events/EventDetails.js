@@ -16,8 +16,10 @@ import {
   getAverageOrganizerRatings,
   getAverageParticipantRatings,
 } from "../../controllers/reviews";
+import { AuthConsumer } from "../contexts/Auth/AuthContext";
 
-export default function EventDetails({
+function EventDetails({
+  user,
   open,
   handleClose,
   eventDetails,
@@ -25,10 +27,12 @@ export default function EventDetails({
   isOrganizer,
   getEventDetailsFunc = () => {},
   isParticipationForum = false,
+  canViewParticipantForum = false
 }) {
   const [isSignUpModal, setIsSignUpModal] = useState(false);
   const [organizerRating, setOrganizerRating] = useState(null);
   const [participantRatingObj, setParticipantRatingObj] = useState({});
+  // const [canViewParticipantForum, setCanViewParticipantForum ] = useState(false);
 
   const handleParticipant = (e, action, ids) => {
     e.preventDefault();
@@ -49,11 +53,42 @@ export default function EventDetails({
     }
   };
 
+  // const canUserViewParticipantForum = (userId, eventDetails) => {
+  //   if (eventDetails.organizer && eventDetails.organizer.id ) {
+  //     if (eventDetails.organizer.id === userId) {
+  //       console.log("canUserViewParticipantForum:: User created event:: returning true");
+  //       return true
+  //     }
+  //   };
+
+  //   const { participants } = eventDetails;
+  //   if (Array.isArray(participants)) {
+  //     for(let i = 0; i < participants.length; i++) {
+  //       const { participant, status } = participants[i];
+  //         if (status === "Approved") {
+  //           if (participant && participant.id === userId) {
+  //             console.log("canUserViewParticipantForum:: approved participant:: returning true");
+  //             return true;
+  //           }
+  //         }
+  //     };
+  //   };
+
+  //   console.log("canUserViewParticipantForum:: Unauthorized:: returning false");
+  //   return false;
+  // }
+
   useEffect(() => {
     if (eventDetails) {
       getAverageOrganizerRatings(eventDetails.organizer.id)
         .then((res) => setOrganizerRating(res.data))
         .catch((err) => console.log(err));
+
+      // Check if user can view the participant forum
+      // if (canUserViewParticipantForum(user.id, eventDetails)) {
+      //   setCanViewParticipantForum(true);
+      // };
+      
     }
   }, [eventDetails]);
 
@@ -248,7 +283,7 @@ export default function EventDetails({
                       ))}
                   </Grid>
                 )}
-                {isParticipationForum ? (
+                { canViewParticipantForum === true? (
                   <Typography>
                     Already enrolled?{" "}
                     <Link
@@ -291,3 +326,9 @@ export default function EventDetails({
     </div>
   );
 }
+
+export default (props) => (
+  <AuthConsumer>
+    {({ user }) => <EventDetails user={user} {...props} />}
+  </AuthConsumer>
+);
