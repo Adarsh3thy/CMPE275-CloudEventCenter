@@ -17,6 +17,12 @@ export function createQuestion(
   token = JSON.parse(localStorage.getItem("user")).token
 ) {
   axios.defaults.headers.common["authorization"] = "Bearer " + token;
+  let data = {};
+  data.file = dataJson.file;
+  let headers = {
+    "Content-Type": "multipart-formdata",
+    ContentType: "multipart-formdata",
+  };
   return axios.post(
     semiEndpoint +
       "/api/forums/sign_up/" +
@@ -24,7 +30,9 @@ export function createQuestion(
       "/questions?text=" +
       dataJson.text +
       "&userId=" +
-      dataJson.userId
+      dataJson.userId,
+    data,
+    headers
   );
 }
 

@@ -91,6 +91,9 @@ const SignupForum = ({ user }) => {
                   : ""}
               </h4>
               <p style={{ textAlign: "left" }}>{item.text}</p>
+              <p style={{ textAlign: "left" }}>
+                <img src={item.imageUrl} />
+              </p>
               <p style={{ textAlign: "left", color: "gray" }}>
                 posted on {item.createdAt}
               </p>

@@ -1,2 +1,1 @@
-export const semiEndpoint =
-  "http://Cmpe275cloudeventcenter-env.eba-gvrtiqb8.us-west-1.elasticbeanstalk.com";
+export const semiEndpoint = "http://localhost:8080";
