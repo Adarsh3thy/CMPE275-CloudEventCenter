@@ -4,7 +4,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Grid, TextField, Rating, MenuItem } from "@mui/material";
+import { Grid, TextField, Rating, MenuItem, Typography } from "@mui/material";
 import { createOrganizerReview } from "../../../controllers/reviews";
 import { getEventRegistrationsByOrganizer } from "../../../controllers/events";
 
@@ -19,6 +19,7 @@ export default function PostReview({
   const [rating, setRating] = useState(0);
   const [organizerEvents, setOrganizerEvents] = useState(null);
   const [eventId, setEventId] = useState(null);
+  const [error, setError] = useState(null);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -26,11 +27,15 @@ export default function PostReview({
     data.review = reviewText;
     data.rating = rating;
     createOrganizerReview(eventId, userId, data)
-      .then(() => {
+      .then((res) => {
+        console.log(res);
         handleClose();
         getOrganizerReviewsFunc();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        setError(err.response.data);
+      });
   };
 
   useEffect(() => {
@@ -93,6 +98,9 @@ export default function PostReview({
                   onChange={(e) => setReviewText(e.target.value)}
                 />
               </Grid>
+              {error ? (
+                <Typography sx={{ color: "red" }}>{error}</Typography>
+              ) : null}
             </Grid>
           </DialogContent>
           <DialogActions>
