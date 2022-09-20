@@ -134,32 +134,33 @@ before the event deadline. Email notification will be sent to all registered use
 them of the cancellation.
 
 ### Reports
-i) System Report
+- System Report
 System event report: available to every user. This report shows the following numbers of
 from the last 90 days (based on the current virtual time):
-a) Number of created events (based on creation time) and the percentage of paid
+  - Number of created events (based on creation time) and the percentage of paid
 events.
-b) Number of canceled events (based on registration deadline) and total number of
+  - Number of canceled events (based on registration deadline) and total number of
 participation requests (regardless of approval or not) divided by the total number
 of minimum participants for such events.
-c) Number of finished events (based on finishing time), and the average number of
+  - Number of finished events (based on finishing time), and the average number of
 participants of these events.
 
-ii) Participation report.
-a) Number of signed-up events (based on singing-up time).
-b) Number of rejects and approvals (based respective action time).
-c) Number of finished events (based on finishing time).
+- Participation report.
+  - Number of signed-up events (based on singing-up time).
+  - Number of rejects and approvals (based respective action time).
+  - Number of finished events (based on finishing time).
 
-iii) Organizer Report
-a) Number of created events (based on creation time) and the percentage of paid events.
-b) Number of canceled events (based on registration deadline) and total number of
-participation requests (regardless of approval or not) divided by the total number of
+- Organizer Report
+  - Number of created events (based on creation time) and the percentage of paid events.
+  - Number of canceled events (based on registration deadline) and total number of
+  - participation requests (regardless of approval or not) divided by the total number of
 minimum participants for such events.
-c) Number of finished events (based on finishing time), and the average number of
+  - Number of finished events (based on finishing time), and the average number of
 participants of these events.
-d) Number of paid events finished (based on finishing time) and total revenue from these
+  - Number of paid events finished (based on finishing time) and total revenue from these
 events.
-Handout:
+
+#### Handout:
 https://docs.google.com/document/d/1I5RzW8oSG8j-u7z76YcrkVTgaqDQ3ExZfRD3iTy8cvw/edit
 
 Draft Design: https://drive.google.com/drive/folders/1nwJnsl13Zx9kprfa8WlMa7blzWVfL8rS?usp=sharing
