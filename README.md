@@ -76,10 +76,10 @@ for searching:
 - Location: It will be set to the user’s city by default. He can provide a different
 value if required.
 - Status: the following three statuses are allowed
--- Active: An event that has not been canceled and has not finished is considered
+  - Active: An event that has not been canceled and has not finished is considered
 active.
--- OpenForRegistration : events that are open for registration
--- All : all events including past and canceled events.
+  - OpenForRegistration : events that are open for registration
+  - All : all events including past and canceled events.
 - StartTime & EndTime: (EndTime is optional, defaults to infinite future) Only
 events that occur within the given time window will be shown in the filtered
 results. The StartTime defaults to the current time, if not given.
