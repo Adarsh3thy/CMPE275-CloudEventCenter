@@ -26,6 +26,7 @@ implemented to rate participants and organizers based on the feedback for each o
 The user can sign up to the application in either of two ways
 - Email
 - Google account
+![image info](./images/IMG_1.png)
 
 In both cases, an email will be sent to the user’s email address for verification. Only after
 the account is verified, the user will be able to sign in the application
