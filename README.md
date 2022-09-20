@@ -21,12 +21,20 @@ implemented to rate participants and organizers based on the feedback for each o
 - Database: MYSQL
 - Cloud Service: AWS
 
+## Architecture
+![image info](./images/IMG_1.png)
+
+
+
 ## Features and Screenshots
 ### User sign up
 The user can sign up to the application in either of two ways
 - Email
 - Google account
-![image info](./images/IMG_1.png)
+
+![image info](./images/IMG_3.png)
+![image info](./images/IMG_4.png)
+![image info](./images/IMG_5.png)
 
 In both cases, an email will be sent to the user’s email address for verification. Only after
 the account is verified, the user will be able to sign in the application
@@ -36,9 +44,10 @@ the account is verified, the user will be able to sign in the application
 The user can login to the application in two ways, depending on the option that he chose
 for registration. In case of standard email/password, the credentials will be compared
 against the values in the database. In case of incorrect credentials, error will be thrown.
-
+![image info](./images/IMG_7.png)
 If the user chooses to sign-in through google, his oAuth token will be sent to google for
 validation and on success he will gain access to the application.
+![image info](./images/IMG_8.png)
 
 ### Update User Information
 
@@ -48,6 +57,7 @@ When the user log’s in for the first time, he must provide below information:
 - Gender: optional, and applies to persons only.
 - Description: optional text to describe the user.
 - Address: Street and number (optional), City, State, Zip Code.
+![image info](./images/IMG_9.png)
 
 ### Create New Event
 Any user can create an event, he must provide the below information:
@@ -69,7 +79,8 @@ is assumed to be free.
 - Admission Policy: Either ‘First come first server’ in which case approval is
 not required by the user, or ‘Approval required’ when approval is required
 by the organizer.
-
+![image info](./images/IMG_10.png)
+![image info](./images/IMG_11.png)
 
 ### Event Search
 The user can search for available events and sign-up for them. He has the below filters
@@ -90,6 +101,7 @@ ignored, hence matches everything.
 - Organizer: this is used to partially match against (be a substring of) the screen
 name of organizers, also in a case insensitive way. When not given, it matches
 every organizer.
+![image info](./images/IMG_12.png)
 
 ### Event Details
 The user can view the details of the event such as Description, Min/max participants,
@@ -98,12 +110,14 @@ The user can even access the sign-up forum from here, where he can ask questions
 about the event.
 He can also view the reviews of the organizer for the event.
 The user can register for the event by clicking on ‘Sign up for the event’.
+![image info](./images/IMG_14.png)
 
 ### Sign-up for events
 After the user clicks on ‘Sign up for the event’, the user will be taken to a confirmation
 screen. If the event involves any fee, a notification will be displayed below. Clicking on
 ‘Confirm’ registers the user to the event if the event has auto approval, else it is sent to
 the organizer for approval.
+![image info](./images/IMG_15.png)
 
 ### Events page
 The user can access all the events that he has registered for from ‘My events’ page. He
@@ -112,10 +126,12 @@ can even view the status of his registration from here.
 ### My events
 The organizer can access all the events that he has organized from My events page. He
 can approve/reject participants for the event from this page by clicking on any event.
+![image info](./images/IMG_20.png)
 
 ### Post a review
 The organizer can post reviews for the participants who participated in the event,
 likewise the participant can provide review for the organizer of the event.
+![image info](./images/IMG_23.png)
 
 ### Sign-up Forum
 Sign-up forum is open to every user once the event has been created.
@@ -125,7 +141,7 @@ sender is the organizer.
 - Messages should allow a mix of text and pictures.
 - The sign-up forum becomes closed for posting of new messages once the event
 registration deadline passes, or the event has been canceled.
-
+![image info](./images/IMG_24.png)
 ### Participant forum
 User can post a question and add images if he/she wants
 
@@ -160,6 +176,9 @@ minimum participants for such events.
 participants of these events.
   - Number of paid events finished (based on finishing time) and total revenue from these
 events.
+
+### ER diagram
+![image info](./images/IMG_2.png)
 
 #### Handout:
 https://docs.google.com/document/d/1I5RzW8oSG8j-u7z76YcrkVTgaqDQ3ExZfRD3iTy8cvw/edit
